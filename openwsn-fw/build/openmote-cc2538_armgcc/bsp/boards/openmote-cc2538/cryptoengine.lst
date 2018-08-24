@@ -1,0 +1,704 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"cryptoengine.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44              		.text
+  45              		.align	2
+  46              		.global	cryptoengine_init
+  47              		.thumb
+  48              		.thumb_func
+  50              	cryptoengine_init:
+  51              	.LFB0:
+  52              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** /**
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** \brief Crypto engine implementation for OpenMote-CC2538
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****   
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** \author Malisa Vucinic <malishav@gmail.com>, March 2015.
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** */
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include <stdint.h>
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include <headers/hw_sys_ctrl.h>
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include <source/sys_ctrl.h>
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include <source/aes.h>
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include <source/ccm.h>
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #include "cryptoengine.h"
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** #define DEFAULT_KEY_AREA KEY_AREA_0
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** //=========================== prototypes ======================================
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** static owerror_t load_key(uint8_t key[16], uint8_t* /* out */ key_location);
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** //=========================== public ==========================================
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** owerror_t cryptoengine_init(void) {
+  53              		.loc 1 26 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 1, uses_anonymous_args = 0
+  57 0000 80B5     		push	{r7, lr}
+  58              		.cfi_def_cfa_offset 8
+  59              		.cfi_offset 7, -8
+  60              		.cfi_offset 14, -4
+  61 0002 00AF     		add	r7, sp, #0
+  62              		.cfi_def_cfa_register 7
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    //
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    // Enable AES peripheral
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    //
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    SysCtrlPeripheralReset(SYS_CTRL_PERIPH_AES);
+  63              		.loc 1 30 0
+  64 0004 40F20140 		movw	r0, #1025
+  65 0008 FFF7FEFF 		bl	SysCtrlPeripheralReset
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_AES);
+  66              		.loc 1 31 0
+  67 000c 40F20140 		movw	r0, #1025
+  68 0010 FFF7FEFF 		bl	SysCtrlPeripheralEnable
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    return E_SUCCESS;
+  69              		.loc 1 32 0
+  70 0014 0023     		movs	r3, #0
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** }
+  71              		.loc 1 33 0
+  72 0016 1846     		mov	r0, r3
+  73 0018 80BD     		pop	{r7, pc}
+  74              		.cfi_endproc
+  75              	.LFE0:
+  77 001a 00BF     		.align	2
+  78              		.global	cryptoengine_aes_ccms_enc
+  79              		.thumb
+  80              		.thumb_func
+  82              	cryptoengine_aes_ccms_enc:
+  83              	.LFB1:
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** owerror_t cryptoengine_aes_ccms_enc(uint8_t* a,
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t len_a,
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* m,
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* len_m,
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* nonce,
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t l,
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t key[16],
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t len_mac) {
+  84              		.loc 1 42 0
+  85              		.cfi_startproc
+  86              		@ args = 16, pretend = 0, frame = 24
+  87              		@ frame_needed = 1, uses_anonymous_args = 0
+  88 001c B0B5     		push	{r4, r5, r7, lr}
+  89              		.cfi_def_cfa_offset 16
+  90              		.cfi_offset 4, -16
+  91              		.cfi_offset 5, -12
+  92              		.cfi_offset 7, -8
+  93              		.cfi_offset 14, -4
+  94 001e 8EB0     		sub	sp, sp, #56
+  95              		.cfi_def_cfa_offset 72
+  96 0020 08AF     		add	r7, sp, #32
+  97              		.cfi_def_cfa 7, 40
+  98 0022 F860     		str	r0, [r7, #12]
+  99 0024 7A60     		str	r2, [r7, #4]
+ 100 0026 3B60     		str	r3, [r7]
+ 101 0028 0B46     		mov	r3, r1
+ 102 002a FB72     		strb	r3, [r7, #11]
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    bool encrypt;
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    uint8_t key_location;
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****   
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    encrypt = *len_m > 0 ? true : false;
+ 103              		.loc 1 47 0
+ 104 002c 3B68     		ldr	r3, [r7]
+ 105 002e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 106 0030 002B     		cmp	r3, #0
+ 107 0032 14BF     		ite	ne
+ 108 0034 0123     		movne	r3, #1
+ 109 0036 0023     		moveq	r3, #0
+ 110 0038 FB75     		strb	r3, [r7, #23]
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    if(load_key(key, &key_location) == E_SUCCESS) {
+ 111              		.loc 1 49 0
+ 112 003a 07F11603 		add	r3, r7, #22
+ 113 003e 386B     		ldr	r0, [r7, #48]
+ 114 0040 1946     		mov	r1, r3
+ 115 0042 00F0D9F8 		bl	load_key
+ 116 0046 0346     		mov	r3, r0
+ 117 0048 002B     		cmp	r3, #0
+ 118 004a 43D1     		bne	.L4
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(CCMAuthEncryptStart(encrypt,
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               len_mac,
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               nonce,
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               m,
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               (uint16_t) *len_m,
+ 119              		.loc 1 54 0
+ 120 004c 3B68     		ldr	r3, [r7]
+ 121 004e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(CCMAuthEncryptStart(encrypt,
+ 122              		.loc 1 50 0
+ 123 0050 98B2     		uxth	r0, r3
+ 124 0052 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 125 0054 99B2     		uxth	r1, r3
+ 126 0056 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               a,
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               (uint16_t) len_a,
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               key_location,
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               &m[*len_m],
+ 127              		.loc 1 58 0
+ 128 0058 3B68     		ldr	r3, [r7]
+ 129 005a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(CCMAuthEncryptStart(encrypt,
+ 130              		.loc 1 50 0
+ 131 005c 1C46     		mov	r4, r3
+ 132 005e 7B68     		ldr	r3, [r7, #4]
+ 133 0060 2344     		add	r3, r3, r4
+ 134 0062 FD7D     		ldrb	r5, [r7, #23]	@ zero_extendqisi2
+ 135 0064 97F83440 		ldrb	r4, [r7, #52]	@ zero_extendqisi2
+ 136 0068 0090     		str	r0, [sp]
+ 137 006a F868     		ldr	r0, [r7, #12]
+ 138 006c 0190     		str	r0, [sp, #4]
+ 139 006e 0291     		str	r1, [sp, #8]
+ 140 0070 0392     		str	r2, [sp, #12]
+ 141 0072 0493     		str	r3, [sp, #16]
+ 142 0074 97F82C30 		ldrb	r3, [r7, #44]	@ zero_extendqisi2
+ 143 0078 0593     		str	r3, [sp, #20]
+ 144 007a 0023     		movs	r3, #0
+ 145 007c 0693     		str	r3, [sp, #24]
+ 146 007e 2846     		mov	r0, r5
+ 147 0080 2146     		mov	r1, r4
+ 148 0082 BA6A     		ldr	r2, [r7, #40]
+ 149 0084 7B68     		ldr	r3, [r7, #4]
+ 150 0086 FFF7FEFF 		bl	CCMAuthEncryptStart
+ 151 008a 0346     		mov	r3, r0
+ 152 008c 002B     		cmp	r3, #0
+ 153 008e 21D1     		bne	.L4
+ 154              	.L5:
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               l,
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               /* polling */ 0) == AES_SUCCESS) {
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          do {
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             ASM_NOP;
+ 155              		.loc 1 63 0 discriminator 1
+ 156              	@ 63 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c" 1
+ 157 0090 00BF     		NOP
+ 158              	@ 0 "" 2
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          } while(CCMAuthEncryptCheckResult() == 0);
+ 159              		.loc 1 64 0 discriminator 1
+ 160              		.thumb
+ 161 0092 FFF7FEFF 		bl	CCMAuthEncryptCheckResult
+ 162 0096 0346     		mov	r3, r0
+ 163 0098 002B     		cmp	r3, #0
+ 164 009a F9D0     		beq	.L5
+  65:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****         
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          if(CCMAuthEncryptGetResult(len_mac, 
+  67:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                     (uint16_t) *len_m,
+ 165              		.loc 1 67 0
+ 166 009c 3B68     		ldr	r3, [r7]
+ 167 009e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                     (uint16_t) *len_m,
+ 168              		.loc 1 66 0
+ 169 00a0 9AB2     		uxth	r2, r3
+  68:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                     &m[*len_m]) == AES_SUCCESS) {
+ 170              		.loc 1 68 0
+ 171 00a2 3B68     		ldr	r3, [r7]
+ 172 00a4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                     (uint16_t) *len_m,
+ 173              		.loc 1 66 0
+ 174 00a6 1946     		mov	r1, r3
+ 175 00a8 7B68     		ldr	r3, [r7, #4]
+ 176 00aa 0B44     		add	r3, r3, r1
+ 177 00ac 97F83410 		ldrb	r1, [r7, #52]	@ zero_extendqisi2
+ 178 00b0 0846     		mov	r0, r1
+ 179 00b2 1146     		mov	r1, r2
+ 180 00b4 1A46     		mov	r2, r3
+ 181 00b6 FFF7FEFF 		bl	CCMAuthEncryptGetResult
+ 182 00ba 0346     		mov	r3, r0
+ 183 00bc 002B     		cmp	r3, #0
+ 184 00be 09D1     		bne	.L4
+  69:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  70:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             *len_m += len_mac;
+ 185              		.loc 1 70 0
+ 186 00c0 3B68     		ldr	r3, [r7]
+ 187 00c2 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 188 00c4 97F83430 		ldrb	r3, [r7, #52]
+ 189 00c8 1344     		add	r3, r3, r2
+ 190 00ca DAB2     		uxtb	r2, r3
+ 191 00cc 3B68     		ldr	r3, [r7]
+ 192 00ce 1A70     		strb	r2, [r3]
+  71:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             return E_SUCCESS;
+ 193              		.loc 1 71 0
+ 194 00d0 0023     		movs	r3, #0
+ 195 00d2 00E0     		b	.L7
+ 196              	.L4:
+  72:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          }
+  73:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       }
+  74:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    }
+  75:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  76:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    return E_FAIL;
+ 197              		.loc 1 76 0
+ 198 00d4 0123     		movs	r3, #1
+ 199              	.L7:
+  77:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** }
+ 200              		.loc 1 77 0 discriminator 1
+ 201 00d6 1846     		mov	r0, r3
+ 202 00d8 1837     		adds	r7, r7, #24
+ 203              		.cfi_def_cfa_offset 16
+ 204 00da BD46     		mov	sp, r7
+ 205              		.cfi_def_cfa_register 13
+ 206              		@ sp needed
+ 207 00dc B0BD     		pop	{r4, r5, r7, pc}
+ 208              		.cfi_endproc
+ 209              	.LFE1:
+ 211 00de 00BF     		.align	2
+ 212              		.global	cryptoengine_aes_ccms_dec
+ 213              		.thumb
+ 214              		.thumb_func
+ 216              	cryptoengine_aes_ccms_dec:
+ 217              	.LFB2:
+  78:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  79:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** owerror_t cryptoengine_aes_ccms_dec(uint8_t* a,
+  80:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t len_a,
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* m,
+  82:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* len_m,
+  83:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t* nonce,
+  84:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t l,
+  85:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t key[16],
+  86:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          uint8_t len_mac) {
+ 218              		.loc 1 86 0
+ 219              		.cfi_startproc
+ 220              		@ args = 16, pretend = 0, frame = 40
+ 221              		@ frame_needed = 1, uses_anonymous_args = 0
+ 222 00e0 90B5     		push	{r4, r7, lr}
+ 223              		.cfi_def_cfa_offset 12
+ 224              		.cfi_offset 4, -12
+ 225              		.cfi_offset 7, -8
+ 226              		.cfi_offset 14, -4
+ 227 00e2 93B0     		sub	sp, sp, #76
+ 228              		.cfi_def_cfa_offset 88
+ 229 00e4 08AF     		add	r7, sp, #32
+ 230              		.cfi_def_cfa 7, 56
+ 231 00e6 F860     		str	r0, [r7, #12]
+ 232 00e8 7A60     		str	r2, [r7, #4]
+ 233 00ea 3B60     		str	r3, [r7]
+ 234 00ec 0B46     		mov	r3, r1
+ 235 00ee FB72     		strb	r3, [r7, #11]
+  87:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  88:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    bool decrypt;
+  89:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    uint8_t key_location;
+  90:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    uint8_t tag[CBC_MAX_MAC_SIZE];
+  91:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****   
+  92:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    decrypt = *len_m - len_mac > 0 ? true : false;
+ 236              		.loc 1 92 0
+ 237 00f0 3B68     		ldr	r3, [r7]
+ 238 00f2 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 239 00f4 1A46     		mov	r2, r3
+ 240 00f6 97F84430 		ldrb	r3, [r7, #68]	@ zero_extendqisi2
+ 241 00fa D31A     		subs	r3, r2, r3
+ 242 00fc 002B     		cmp	r3, #0
+ 243 00fe CCBF     		ite	gt
+ 244 0100 0123     		movgt	r3, #1
+ 245 0102 0023     		movle	r3, #0
+ 246 0104 87F82730 		strb	r3, [r7, #39]
+  93:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+  94:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    if(load_key(key, &key_location) == E_SUCCESS) {
+ 247              		.loc 1 94 0
+ 248 0108 07F12603 		add	r3, r7, #38
+ 249 010c 386C     		ldr	r0, [r7, #64]
+ 250 010e 1946     		mov	r1, r3
+ 251 0110 00F072F8 		bl	load_key
+ 252 0114 0346     		mov	r3, r0
+ 253 0116 002B     		cmp	r3, #0
+ 254 0118 3DD1     		bne	.L9
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(CCMInvAuthDecryptStart(decrypt,
+  96:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               len_mac,
+  97:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               nonce,
+  98:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               m,
+  99:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               (uint16_t) *len_m,
+ 255              		.loc 1 99 0
+ 256 011a 3B68     		ldr	r3, [r7]
+ 257 011c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(CCMInvAuthDecryptStart(decrypt,
+ 258              		.loc 1 95 0
+ 259 011e 99B2     		uxth	r1, r3
+ 260 0120 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 261 0122 9AB2     		uxth	r2, r3
+ 262 0124 97F82630 		ldrb	r3, [r7, #38]	@ zero_extendqisi2
+ 263 0128 97F82700 		ldrb	r0, [r7, #39]	@ zero_extendqisi2
+ 264 012c 97F84440 		ldrb	r4, [r7, #68]	@ zero_extendqisi2
+ 265 0130 0091     		str	r1, [sp]
+ 266 0132 F968     		ldr	r1, [r7, #12]
+ 267 0134 0191     		str	r1, [sp, #4]
+ 268 0136 0292     		str	r2, [sp, #8]
+ 269 0138 0393     		str	r3, [sp, #12]
+ 270 013a 07F11403 		add	r3, r7, #20
+ 271 013e 0493     		str	r3, [sp, #16]
+ 272 0140 97F83C30 		ldrb	r3, [r7, #60]	@ zero_extendqisi2
+ 273 0144 0593     		str	r3, [sp, #20]
+ 274 0146 0023     		movs	r3, #0
+ 275 0148 0693     		str	r3, [sp, #24]
+ 276 014a 2146     		mov	r1, r4
+ 277 014c BA6B     		ldr	r2, [r7, #56]
+ 278 014e 7B68     		ldr	r3, [r7, #4]
+ 279 0150 FFF7FEFF 		bl	CCMInvAuthDecryptStart
+ 280 0154 0346     		mov	r3, r0
+ 281 0156 002B     		cmp	r3, #0
+ 282 0158 1DD1     		bne	.L9
+ 283              	.L10:
+ 100:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               a,
+ 101:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               (uint16_t) len_a,
+ 102:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               key_location,
+ 103:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               tag,
+ 104:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               l,
+ 105:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                               /* polling */ 0) == AES_SUCCESS) {
+ 106:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 107:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          do {
+ 108:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             ASM_NOP;
+ 284              		.loc 1 108 0 discriminator 1
+ 285              	@ 108 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c" 1
+ 286 015a 00BF     		NOP
+ 287              	@ 0 "" 2
+ 109:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          } while(CCMInvAuthDecryptCheckResult() == 0);
+ 288              		.loc 1 109 0 discriminator 1
+ 289              		.thumb
+ 290 015c FFF7FEFF 		bl	CCMInvAuthDecryptCheckResult
+ 291 0160 0346     		mov	r3, r0
+ 292 0162 002B     		cmp	r3, #0
+ 293 0164 F9D0     		beq	.L10
+ 110:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****        
+ 111:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          if(CCMInvAuthDecryptGetResult(len_mac, 
+ 112:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                        m,
+ 113:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                        (uint16_t) *len_m,
+ 294              		.loc 1 113 0
+ 295 0166 3B68     		ldr	r3, [r7]
+ 296 0168 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 111:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                        m,
+ 297              		.loc 1 111 0
+ 298 016a 9AB2     		uxth	r2, r3
+ 299 016c 97F84410 		ldrb	r1, [r7, #68]	@ zero_extendqisi2
+ 300 0170 07F11403 		add	r3, r7, #20
+ 301 0174 0846     		mov	r0, r1
+ 302 0176 7968     		ldr	r1, [r7, #4]
+ 303 0178 FFF7FEFF 		bl	CCMInvAuthDecryptGetResult
+ 304 017c 0346     		mov	r3, r0
+ 305 017e 002B     		cmp	r3, #0
+ 306 0180 09D1     		bne	.L9
+ 114:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****                                        tag) == AES_SUCCESS) {
+ 115:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 116:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             *len_m -= len_mac;
+ 307              		.loc 1 116 0
+ 308 0182 3B68     		ldr	r3, [r7]
+ 309 0184 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 310 0186 97F84430 		ldrb	r3, [r7, #68]
+ 311 018a D31A     		subs	r3, r2, r3
+ 312 018c DAB2     		uxtb	r2, r3
+ 313 018e 3B68     		ldr	r3, [r7]
+ 314 0190 1A70     		strb	r2, [r3]
+ 117:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             return E_SUCCESS;
+ 315              		.loc 1 117 0
+ 316 0192 0023     		movs	r3, #0
+ 317 0194 00E0     		b	.L12
+ 318              	.L9:
+ 118:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          }
+ 119:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       }
+ 120:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    }
+ 121:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    return E_FAIL;
+ 319              		.loc 1 121 0
+ 320 0196 0123     		movs	r3, #1
+ 321              	.L12:
+ 122:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** }
+ 322              		.loc 1 122 0 discriminator 1
+ 323 0198 1846     		mov	r0, r3
+ 324 019a 2C37     		adds	r7, r7, #44
+ 325              		.cfi_def_cfa_offset 12
+ 326 019c BD46     		mov	sp, r7
+ 327              		.cfi_def_cfa_register 13
+ 328              		@ sp needed
+ 329 019e 90BD     		pop	{r4, r7, pc}
+ 330              		.cfi_endproc
+ 331              	.LFE2:
+ 333              		.align	2
+ 334              		.global	cryptoengine_aes_ecb_enc
+ 335              		.thumb
+ 336              		.thumb_func
+ 338              	cryptoengine_aes_ecb_enc:
+ 339              	.LFB3:
+ 123:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 124:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** owerror_t cryptoengine_aes_ecb_enc(uint8_t* buffer, uint8_t* key) {
+ 340              		.loc 1 124 0
+ 341              		.cfi_startproc
+ 342              		@ args = 0, pretend = 0, frame = 16
+ 343              		@ frame_needed = 1, uses_anonymous_args = 0
+ 344 01a0 80B5     		push	{r7, lr}
+ 345              		.cfi_def_cfa_offset 8
+ 346              		.cfi_offset 7, -8
+ 347              		.cfi_offset 14, -4
+ 348 01a2 86B0     		sub	sp, sp, #24
+ 349              		.cfi_def_cfa_offset 32
+ 350 01a4 02AF     		add	r7, sp, #8
+ 351              		.cfi_def_cfa 7, 24
+ 352 01a6 7860     		str	r0, [r7, #4]
+ 353 01a8 3960     		str	r1, [r7]
+ 125:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    uint8_t key_location;
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    if(load_key(key, &key_location) == E_SUCCESS) {
+ 354              		.loc 1 126 0
+ 355 01aa 07F10F03 		add	r3, r7, #15
+ 356 01ae 3868     		ldr	r0, [r7]
+ 357 01b0 1946     		mov	r1, r3
+ 358 01b2 00F021F8 		bl	load_key
+ 359 01b6 0346     		mov	r3, r0
+ 360 01b8 002B     		cmp	r3, #0
+ 361 01ba 17D1     		bne	.L14
+ 127:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       // Polling
+ 128:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(AESECBStart(buffer, buffer, key_location, 1, 0) == AES_SUCCESS) {
+ 362              		.loc 1 128 0
+ 363 01bc FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 364 01be 0023     		movs	r3, #0
+ 365 01c0 0093     		str	r3, [sp]
+ 366 01c2 7868     		ldr	r0, [r7, #4]
+ 367 01c4 7968     		ldr	r1, [r7, #4]
+ 368 01c6 0123     		movs	r3, #1
+ 369 01c8 FFF7FEFF 		bl	AESECBStart
+ 370 01cc 0346     		mov	r3, r0
+ 371 01ce 002B     		cmp	r3, #0
+ 372 01d0 0CD1     		bne	.L14
+ 373              	.L15:
+ 129:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          do {
+ 130:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             ASM_NOP;
+ 374              		.loc 1 130 0 discriminator 1
+ 375              	@ 130 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c" 1
+ 376 01d2 00BF     		NOP
+ 377              	@ 0 "" 2
+ 131:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          } while(AESECBCheckResult() == 0);
+ 378              		.loc 1 131 0 discriminator 1
+ 379              		.thumb
+ 380 01d4 FFF7FEFF 		bl	AESECBCheckResult
+ 381 01d8 0346     		mov	r3, r0
+ 382 01da 002B     		cmp	r3, #0
+ 383 01dc F9D0     		beq	.L15
+ 132:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 133:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          if(AESECBGetResult() == AES_SUCCESS) {
+ 384              		.loc 1 133 0
+ 385 01de FFF7FEFF 		bl	AESECBGetResult
+ 386 01e2 0346     		mov	r3, r0
+ 387 01e4 002B     		cmp	r3, #0
+ 388 01e6 01D1     		bne	.L14
+ 134:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****             return E_SUCCESS;
+ 389              		.loc 1 134 0
+ 390 01e8 0023     		movs	r3, #0
+ 391 01ea 00E0     		b	.L17
+ 392              	.L14:
+ 135:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          }
+ 136:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       }
+ 137:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    }
+ 138:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    return E_FAIL;
+ 393              		.loc 1 138 0
+ 394 01ec 0123     		movs	r3, #1
+ 395              	.L17:
+ 139:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** }
+ 396              		.loc 1 139 0 discriminator 1
+ 397 01ee 1846     		mov	r0, r3
+ 398 01f0 1037     		adds	r7, r7, #16
+ 399              		.cfi_def_cfa_offset 8
+ 400 01f2 BD46     		mov	sp, r7
+ 401              		.cfi_def_cfa_register 13
+ 402              		@ sp needed
+ 403 01f4 80BD     		pop	{r7, pc}
+ 404              		.cfi_endproc
+ 405              	.LFE3:
+ 407 01f6 00BF     		.align	2
+ 408              		.thumb
+ 409              		.thumb_func
+ 411              	load_key:
+ 412              	.LFB4:
+ 140:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** //=========================== private ==========================================
+ 142:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** 
+ 143:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** /**
+ 144:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** \brief On success, returns by reference the location in key RAM where the 
+ 145:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    new/existing key is stored.
+ 146:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** */
+ 147:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** static owerror_t load_key(uint8_t key[16], uint8_t* /* out */ key_location) {
+ 413              		.loc 1 147 0
+ 414              		.cfi_startproc
+ 415              		@ args = 0, pretend = 0, frame = 8
+ 416              		@ frame_needed = 1, uses_anonymous_args = 0
+ 417 01f8 90B5     		push	{r4, r7, lr}
+ 418              		.cfi_def_cfa_offset 12
+ 419              		.cfi_offset 4, -12
+ 420              		.cfi_offset 7, -8
+ 421              		.cfi_offset 14, -4
+ 422 01fa 83B0     		sub	sp, sp, #12
+ 423              		.cfi_def_cfa_offset 24
+ 424 01fc 00AF     		add	r7, sp, #0
+ 425              		.cfi_def_cfa_register 7
+ 426 01fe 7860     		str	r0, [r7, #4]
+ 427 0200 3960     		str	r1, [r7]
+ 148:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    static uint8_t loaded_key[16];
+ 149:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    
+ 150:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    if(memcmp(loaded_key, key, 16) != 0) {
+ 428              		.loc 1 150 0
+ 429 0202 1048     		ldr	r0, .L21
+ 430 0204 7968     		ldr	r1, [r7, #4]
+ 431 0206 1022     		movs	r2, #16
+ 432 0208 FFF7FEFF 		bl	memcmp
+ 433 020c 0346     		mov	r3, r0
+ 434 020e 002B     		cmp	r3, #0
+ 435 0210 10D0     		beq	.L19
+ 151:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       memcpy(loaded_key, key, 16);
+ 436              		.loc 1 151 0
+ 437 0212 0C4A     		ldr	r2, .L21
+ 438 0214 7B68     		ldr	r3, [r7, #4]
+ 439 0216 1446     		mov	r4, r2
+ 440 0218 1868     		ldr	r0, [r3]	@ unaligned
+ 441 021a 5968     		ldr	r1, [r3, #4]	@ unaligned
+ 442 021c 9A68     		ldr	r2, [r3, #8]	@ unaligned
+ 443 021e DB68     		ldr	r3, [r3, #12]	@ unaligned
+ 444 0220 0FC4     		stmia	r4!, {r0, r1, r2, r3}
+ 152:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       // Load the key in key RAM
+ 153:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       if(AESLoadKey(loaded_key, DEFAULT_KEY_AREA) != AES_SUCCESS) {
+ 445              		.loc 1 153 0
+ 446 0222 0848     		ldr	r0, .L21
+ 447 0224 0021     		movs	r1, #0
+ 448 0226 FFF7FEFF 		bl	AESLoadKey
+ 449 022a 0346     		mov	r3, r0
+ 450 022c 002B     		cmp	r3, #0
+ 451 022e 01D0     		beq	.L19
+ 154:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****          return E_FAIL;
+ 452              		.loc 1 154 0
+ 453 0230 0123     		movs	r3, #1
+ 454 0232 03E0     		b	.L20
+ 455              	.L19:
+ 155:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****       }
+ 156:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    }
+ 157:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    *key_location = DEFAULT_KEY_AREA;
+ 456              		.loc 1 157 0
+ 457 0234 3B68     		ldr	r3, [r7]
+ 458 0236 0022     		movs	r2, #0
+ 459 0238 1A70     		strb	r2, [r3]
+ 158:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c ****    return E_SUCCESS;
+ 460              		.loc 1 158 0
+ 461 023a 0023     		movs	r3, #0
+ 462              	.L20:
+ 159:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/cryptoengine.c **** }
+ 463              		.loc 1 159 0
+ 464 023c 1846     		mov	r0, r3
+ 465 023e 0C37     		adds	r7, r7, #12
+ 466              		.cfi_def_cfa_offset 12
+ 467 0240 BD46     		mov	sp, r7
+ 468              		.cfi_def_cfa_register 13
+ 469              		@ sp needed
+ 470 0242 90BD     		pop	{r4, r7, pc}
+ 471              	.L22:
+ 472              		.align	2
+ 473              	.L21:
+ 474 0244 00000000 		.word	loaded_key.4941
+ 475              		.cfi_endproc
+ 476              	.LFE4:
+ 478              		.bss
+ 479              		.align	2
+ 480              	loaded_key.4941:
+ 481 0000 00000000 		.space	16
+ 481      00000000 
+ 481      00000000 
+ 481      00000000 
+ 482              		.text
+ 483              	.Letext0:
+ 484              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 485              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 486              		.file 4 "bsp/boards/openmote-cc2538/source/aes.h"
+ 487              		.file 5 "inc/opendefs.h"
+ 488              		.file 6 "bsp/boards/openmote-cc2538/board_info.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 cryptoengine.c
+     /tmp/cc6TfApg.s:19     .rodata:0000000000000000 $d
+     /tmp/cc6TfApg.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/cc6TfApg.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/cc6TfApg.s:32     .rodata:0000000000000010 infouCName
+     /tmp/cc6TfApg.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/cc6TfApg.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/cc6TfApg.s:45     .text:0000000000000000 $t
+     /tmp/cc6TfApg.s:50     .text:0000000000000000 cryptoengine_init
+     /tmp/cc6TfApg.s:82     .text:000000000000001c cryptoengine_aes_ccms_enc
+     /tmp/cc6TfApg.s:411    .text:00000000000001f8 load_key
+     /tmp/cc6TfApg.s:216    .text:00000000000000e0 cryptoengine_aes_ccms_dec
+     /tmp/cc6TfApg.s:338    .text:00000000000001a0 cryptoengine_aes_ecb_enc
+     /tmp/cc6TfApg.s:474    .text:0000000000000244 $d
+     /tmp/cc6TfApg.s:480    .bss:0000000000000000 loaded_key.4941
+     /tmp/cc6TfApg.s:479    .bss:0000000000000000 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.hw_sys_ctrl.h.39.50b4d7775c38e82076d0eb3bdc2daf82
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.sys_ctrl.h.62.2f03f4949954c40d60d71df89cf310cb
+                           .group:0000000000000000 wm4.hw_aes.h.39.77ecc3829d96bb0e5669b1f36ecffb12
+                           .group:0000000000000000 wm4.hw_ints.h.42.85b9479f2be35b086f1bb7cbb15bc097
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.aes.h.66.0fb976edb685649779bd34f5f8f7ef75
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.1de8df52ab2567aa1aa0a288d2325900
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+
+UNDEFINED SYMBOLS
+SysCtrlPeripheralReset
+SysCtrlPeripheralEnable
+CCMAuthEncryptStart
+CCMAuthEncryptCheckResult
+CCMAuthEncryptGetResult
+CCMInvAuthDecryptStart
+CCMInvAuthDecryptCheckResult
+CCMInvAuthDecryptGetResult
+AESECBStart
+AESECBCheckResult
+AESECBGetResult
+memcmp
+AESLoadKey

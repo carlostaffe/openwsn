@@ -1,0 +1,365 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"openrandom.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	linklocalprefix:
+  48 0030 FE       		.byte	-2
+  49 0031 80       		.byte	-128
+  50 0032 00       		.byte	0
+  51 0033 00       		.byte	0
+  52 0034 00       		.byte	0
+  53 0035 00       		.byte	0
+  54 0036 00       		.byte	0
+  55 0037 00       		.byte	0
+  56              		.comm	random_vars,2,4
+  57              		.text
+  58              		.align	2
+  59              		.global	openrandom_init
+  60              		.thumb
+  61              		.thumb_func
+  63              	openrandom_init:
+  64              	.LFB0:
+  65              		.file 1 "build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c"
+   1:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** #include "opendefs.h"
+   2:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** #include "openrandom.h"
+   3:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** #include "idmanager.h"
+   4:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+   5:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** //=========================== variables =======================================
+   6:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+   7:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** random_vars_t random_vars;
+   8:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+   9:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** //=========================== prototypes ======================================
+  10:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+  11:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** //=========================== public ==========================================
+  12:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+  13:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** void openrandom_init(void) {
+  66              		.loc 1 13 0
+  67              		.cfi_startproc
+  68              		@ args = 0, pretend = 0, frame = 0
+  69              		@ frame_needed = 1, uses_anonymous_args = 0
+  70 0000 80B5     		push	{r7, lr}
+  71              		.cfi_def_cfa_offset 8
+  72              		.cfi_offset 7, -8
+  73              		.cfi_offset 14, -4
+  74 0002 00AF     		add	r7, sp, #0
+  75              		.cfi_def_cfa_register 7
+  14:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     // seed the random number generator with the last 2 bytes of the MAC address
+  15:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     random_vars.shift_reg  = 0;
+  76              		.loc 1 15 0
+  77 0004 0E4B     		ldr	r3, .L2
+  78 0006 0022     		movs	r2, #0
+  79 0008 1A80     		strh	r2, [r3]	@ movhi
+  16:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     random_vars.shift_reg += idmanager_getMyID(ADDR_16B)->addr_16b[0]*256;
+  80              		.loc 1 16 0
+  81 000a 0120     		movs	r0, #1
+  82 000c FFF7FEFF 		bl	idmanager_getMyID
+  83 0010 0346     		mov	r3, r0
+  84 0012 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+  85 0014 1902     		lsls	r1, r3, #8
+  86 0016 0A4B     		ldr	r3, .L2
+  87 0018 1A88     		ldrh	r2, [r3]
+  88 001a 8BB2     		uxth	r3, r1
+  89 001c 1344     		add	r3, r3, r2
+  90 001e 9AB2     		uxth	r2, r3
+  91 0020 074B     		ldr	r3, .L2
+  92 0022 1A80     		strh	r2, [r3]	@ movhi
+  17:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     random_vars.shift_reg += idmanager_getMyID(ADDR_16B)->addr_16b[1];
+  93              		.loc 1 17 0
+  94 0024 0120     		movs	r0, #1
+  95 0026 FFF7FEFF 		bl	idmanager_getMyID
+  96 002a 0346     		mov	r3, r0
+  97 002c 9978     		ldrb	r1, [r3, #2]	@ zero_extendqisi2
+  98 002e 044B     		ldr	r3, .L2
+  99 0030 1A88     		ldrh	r2, [r3]
+ 100 0032 8BB2     		uxth	r3, r1
+ 101 0034 1344     		add	r3, r3, r2
+ 102 0036 9AB2     		uxth	r2, r3
+ 103 0038 014B     		ldr	r3, .L2
+ 104 003a 1A80     		strh	r2, [r3]	@ movhi
+  18:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** }
+ 105              		.loc 1 18 0
+ 106 003c 80BD     		pop	{r7, pc}
+ 107              	.L3:
+ 108 003e 00BF     		.align	2
+ 109              	.L2:
+ 110 0040 00000000 		.word	random_vars
+ 111              		.cfi_endproc
+ 112              	.LFE0:
+ 114              		.align	2
+ 115              		.global	openrandom_get16b
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	openrandom_get16b:
+ 120              	.LFB1:
+  19:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+  20:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** uint16_t openrandom_get16b(void) {
+ 121              		.loc 1 20 0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 8
+ 124              		@ frame_needed = 1, uses_anonymous_args = 0
+ 125              		@ link register save eliminated.
+ 126 0044 80B4     		push	{r7}
+ 127              		.cfi_def_cfa_offset 4
+ 128              		.cfi_offset 7, -4
+ 129 0046 83B0     		sub	sp, sp, #12
+ 130              		.cfi_def_cfa_offset 16
+ 131 0048 00AF     		add	r7, sp, #0
+ 132              		.cfi_def_cfa_register 7
+  21:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     uint8_t  i;
+  22:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     uint16_t random_value;
+  23:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     random_value = 0;
+ 133              		.loc 1 23 0
+ 134 004a 0023     		movs	r3, #0
+ 135 004c BB80     		strh	r3, [r7, #4]	@ movhi
+  24:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     for(i=0;i<16;i++) {
+ 136              		.loc 1 24 0
+ 137 004e 0023     		movs	r3, #0
+ 138 0050 FB71     		strb	r3, [r7, #7]
+ 139 0052 25E0     		b	.L5
+ 140              	.L6:
+  25:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         // Galois shift register
+  26:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         // taps: 16 14 13 11
+  27:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         // characteristic polynomial: x^16 + x^14 + x^13 + x^11 + 1
+  28:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         random_value          |= (random_vars.shift_reg & 0x01)<<i;
+ 141              		.loc 1 28 0 discriminator 3
+ 142 0054 174B     		ldr	r3, .L8
+ 143 0056 1B88     		ldrh	r3, [r3]
+ 144 0058 03F00102 		and	r2, r3, #1
+ 145 005c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 146 005e 02FA03F3 		lsl	r3, r2, r3
+ 147 0062 9AB2     		uxth	r2, r3
+ 148 0064 BB88     		ldrh	r3, [r7, #4]
+ 149 0066 1343     		orrs	r3, r3, r2
+ 150 0068 9BB2     		uxth	r3, r3
+ 151 006a BB80     		strh	r3, [r7, #4]	@ movhi
+  29:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         random_vars.shift_reg  = (random_vars.shift_reg>>1)^(-(int16_t)(random_vars.shift_reg & 1)&
+ 152              		.loc 1 29 0 discriminator 3
+ 153 006c 114B     		ldr	r3, .L8
+ 154 006e 1B88     		ldrh	r3, [r3]
+ 155 0070 5B08     		lsrs	r3, r3, #1
+ 156 0072 9BB2     		uxth	r3, r3
+ 157 0074 9AB2     		uxth	r2, r3
+ 158 0076 0F4B     		ldr	r3, .L8
+ 159 0078 1B88     		ldrh	r3, [r3]
+ 160 007a 03F00103 		and	r3, r3, #1
+ 161 007e 9BB2     		uxth	r3, r3
+ 162 0080 5B42     		negs	r3, r3
+ 163 0082 9BB2     		uxth	r3, r3
+ 164 0084 9BB2     		uxth	r3, r3
+ 165 0086 23F49743 		bic	r3, r3, #19328
+ 166 008a 23F07F03 		bic	r3, r3, #127
+ 167 008e 9BB2     		uxth	r3, r3
+ 168 0090 5340     		eors	r3, r3, r2
+ 169 0092 9BB2     		uxth	r3, r3
+ 170 0094 9AB2     		uxth	r2, r3
+ 171 0096 074B     		ldr	r3, .L8
+ 172 0098 1A80     		strh	r2, [r3]	@ movhi
+  24:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     for(i=0;i<16;i++) {
+ 173              		.loc 1 24 0 discriminator 3
+ 174 009a FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 175 009c 0133     		adds	r3, r3, #1
+ 176 009e FB71     		strb	r3, [r7, #7]
+ 177              	.L5:
+  24:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     for(i=0;i<16;i++) {
+ 178              		.loc 1 24 0 is_stmt 0 discriminator 1
+ 179 00a0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 180 00a2 0F2B     		cmp	r3, #15
+ 181 00a4 D6D9     		bls	.L6
+  30:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     }
+  31:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     return random_value;
+ 182              		.loc 1 31 0 is_stmt 1
+ 183 00a6 BB88     		ldrh	r3, [r7, #4]
+  32:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** }
+ 184              		.loc 1 32 0
+ 185 00a8 1846     		mov	r0, r3
+ 186 00aa 0C37     		adds	r7, r7, #12
+ 187              		.cfi_def_cfa_offset 4
+ 188 00ac BD46     		mov	sp, r7
+ 189              		.cfi_def_cfa_register 13
+ 190              		@ sp needed
+ 191 00ae 5DF8047B 		ldr	r7, [sp], #4
+ 192              		.cfi_restore 7
+ 193              		.cfi_def_cfa_offset 0
+ 194 00b2 7047     		bx	lr
+ 195              	.L9:
+ 196              		.align	2
+ 197              	.L8:
+ 198 00b4 00000000 		.word	random_vars
+ 199              		.cfi_endproc
+ 200              	.LFE1:
+ 202              		.align	2
+ 203              		.global	openrandom_getRandomizePeriod
+ 204              		.thumb
+ 205              		.thumb_func
+ 207              	openrandom_getRandomizePeriod:
+ 208              	.LFB2:
+  33:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** 
+  34:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** uint16_t openrandom_getRandomizePeriod(uint16_t period, uint16_t range){
+ 209              		.loc 1 34 0
+ 210              		.cfi_startproc
+ 211              		@ args = 0, pretend = 0, frame = 16
+ 212              		@ frame_needed = 1, uses_anonymous_args = 0
+ 213 00b8 90B5     		push	{r4, r7, lr}
+ 214              		.cfi_def_cfa_offset 12
+ 215              		.cfi_offset 4, -12
+ 216              		.cfi_offset 7, -8
+ 217              		.cfi_offset 14, -4
+ 218 00ba 85B0     		sub	sp, sp, #20
+ 219              		.cfi_def_cfa_offset 32
+ 220 00bc 00AF     		add	r7, sp, #0
+ 221              		.cfi_def_cfa_register 7
+ 222 00be 0346     		mov	r3, r0
+ 223 00c0 0A46     		mov	r2, r1
+ 224 00c2 FB80     		strh	r3, [r7, #6]	@ movhi
+ 225 00c4 1346     		mov	r3, r2	@ movhi
+ 226 00c6 BB80     		strh	r3, [r7, #4]	@ movhi
+  35:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     uint16_t new_period;
+  36:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     if (period<range){
+ 227              		.loc 1 36 0
+ 228 00c8 FA88     		ldrh	r2, [r7, #6]
+ 229 00ca BB88     		ldrh	r3, [r7, #4]
+ 230 00cc 9A42     		cmp	r2, r3
+ 231 00ce 10D2     		bcs	.L11
+  37:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         // randomly choose a new period from [period/2 ... period+period/2]
+  38:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         new_period = period/2+openrandom_get16b()%period;
+ 232              		.loc 1 38 0
+ 233 00d0 FB88     		ldrh	r3, [r7, #6]
+ 234 00d2 5B08     		lsrs	r3, r3, #1
+ 235 00d4 9CB2     		uxth	r4, r3
+ 236 00d6 FFF7FEFF 		bl	openrandom_get16b
+ 237 00da 0346     		mov	r3, r0
+ 238 00dc 1A46     		mov	r2, r3
+ 239 00de FB88     		ldrh	r3, [r7, #6]
+ 240 00e0 B2FBF3F1 		udiv	r1, r2, r3
+ 241 00e4 03FB01F3 		mul	r3, r3, r1
+ 242 00e8 D31A     		subs	r3, r2, r3
+ 243 00ea 9BB2     		uxth	r3, r3
+ 244 00ec 2344     		add	r3, r3, r4
+ 245 00ee FB81     		strh	r3, [r7, #14]	@ movhi
+ 246 00f0 12E0     		b	.L12
+ 247              	.L11:
+  39:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     } else {
+  40:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****         new_period = period-range/2+openrandom_get16b()%range;
+ 248              		.loc 1 40 0
+ 249 00f2 BB88     		ldrh	r3, [r7, #4]
+ 250 00f4 5B08     		lsrs	r3, r3, #1
+ 251 00f6 9BB2     		uxth	r3, r3
+ 252 00f8 FA88     		ldrh	r2, [r7, #6]	@ movhi
+ 253 00fa D31A     		subs	r3, r2, r3
+ 254 00fc 9CB2     		uxth	r4, r3
+ 255 00fe FFF7FEFF 		bl	openrandom_get16b
+ 256 0102 0346     		mov	r3, r0
+ 257 0104 1A46     		mov	r2, r3
+ 258 0106 BB88     		ldrh	r3, [r7, #4]
+ 259 0108 B2FBF3F1 		udiv	r1, r2, r3
+ 260 010c 03FB01F3 		mul	r3, r3, r1
+ 261 0110 D31A     		subs	r3, r2, r3
+ 262 0112 9BB2     		uxth	r3, r3
+ 263 0114 2344     		add	r3, r3, r4
+ 264 0116 FB81     		strh	r3, [r7, #14]	@ movhi
+ 265              	.L12:
+  41:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     }
+  42:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c ****     return new_period;
+ 266              		.loc 1 42 0
+ 267 0118 FB89     		ldrh	r3, [r7, #14]
+  43:build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.c **** }
+ 268              		.loc 1 43 0
+ 269 011a 1846     		mov	r0, r3
+ 270 011c 1437     		adds	r7, r7, #20
+ 271              		.cfi_def_cfa_offset 12
+ 272 011e BD46     		mov	sp, r7
+ 273              		.cfi_def_cfa_register 13
+ 274              		@ sp needed
+ 275 0120 90BD     		pop	{r4, r7, pc}
+ 276              		.cfi_endproc
+ 277              	.LFE2:
+ 279              	.Letext0:
+ 280              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 281              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 282              		.file 4 "build/openmote-cc2538_armgcc/openstack/cross-layers/openrandom.h"
+ 283              		.file 5 "bsp/boards/openmote-cc2538/board_info.h"
+ 284              		.file 6 "inc/opendefs.h"
+ 285              		.file 7 "build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 openrandom.c
+     /tmp/ccs2LxSc.s:19     .rodata:0000000000000000 $d
+     /tmp/ccs2LxSc.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccs2LxSc.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/ccs2LxSc.s:32     .rodata:0000000000000010 infouCName
+     /tmp/ccs2LxSc.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/ccs2LxSc.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/ccs2LxSc.s:47     .rodata:0000000000000030 linklocalprefix
+                            *COM*:0000000000000002 random_vars
+     /tmp/ccs2LxSc.s:58     .text:0000000000000000 $t
+     /tmp/ccs2LxSc.s:63     .text:0000000000000000 openrandom_init
+     /tmp/ccs2LxSc.s:110    .text:0000000000000040 $d
+     /tmp/ccs2LxSc.s:114    .text:0000000000000044 $t
+     /tmp/ccs2LxSc.s:119    .text:0000000000000044 openrandom_get16b
+     /tmp/ccs2LxSc.s:198    .text:00000000000000b4 $d
+     /tmp/ccs2LxSc.s:202    .text:00000000000000b8 $t
+     /tmp/ccs2LxSc.s:207    .text:00000000000000b8 openrandom_getRandomizePeriod
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+
+UNDEFINED SYMBOLS
+idmanager_getMyID

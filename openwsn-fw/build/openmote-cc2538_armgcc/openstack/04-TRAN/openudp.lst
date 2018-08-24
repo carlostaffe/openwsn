@@ -1,0 +1,1384 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"openudp.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	ipAddr_ipsoRD:
+  48 0030 26       		.byte	38
+  49 0031 07       		.byte	7
+  50 0032 F7       		.byte	-9
+  51 0033 40       		.byte	64
+  52 0034 00       		.byte	0
+  53 0035 00       		.byte	0
+  54 0036 00       		.byte	0
+  55 0037 3F       		.byte	63
+  56 0038 00       		.byte	0
+  57 0039 00       		.byte	0
+  58 003a 00       		.byte	0
+  59 003b 00       		.byte	0
+  60 003c 00       		.byte	0
+  61 003d 00       		.byte	0
+  62 003e 0E       		.byte	14
+  63 003f 29       		.byte	41
+  64              		.align	2
+  67              	ipAddr_motesEecs:
+  68 0040 20       		.byte	32
+  69 0041 01       		.byte	1
+  70 0042 04       		.byte	4
+  71 0043 70       		.byte	112
+  72 0044 00       		.byte	0
+  73 0045 66       		.byte	102
+  74 0046 00       		.byte	0
+  75 0047 19       		.byte	25
+  76 0048 00       		.byte	0
+  77 0049 00       		.byte	0
+  78 004a 00       		.byte	0
+  79 004b 00       		.byte	0
+  80 004c 00       		.byte	0
+  81 004d 00       		.byte	0
+  82 004e 00       		.byte	0
+  83 004f 02       		.byte	2
+  84              		.align	2
+  87              	ipAddr_local:
+  88 0050 26       		.byte	38
+  89 0051 07       		.byte	7
+  90 0052 F1       		.byte	-15
+  91 0053 40       		.byte	64
+  92 0054 04       		.byte	4
+  93 0055 00       		.byte	0
+  94 0056 10       		.byte	16
+  95 0057 36       		.byte	54
+  96 0058 4D       		.byte	77
+  97 0059 CD       		.byte	-51
+  98 005a AB       		.byte	-85
+  99 005b 54       		.byte	84
+ 100 005c 81       		.byte	-127
+ 101 005d 99       		.byte	-103
+ 102 005e C1       		.byte	-63
+ 103 005f F7       		.byte	-9
+ 104              		.align	2
+ 107              	ipAddr_motedata:
+ 108 0060 20       		.byte	32
+ 109 0061 01       		.byte	1
+ 110 0062 04       		.byte	4
+ 111 0063 70       		.byte	112
+ 112 0064 00       		.byte	0
+ 113 0065 66       		.byte	102
+ 114 0066 00       		.byte	0
+ 115 0067 17       		.byte	23
+ 116 0068 00       		.byte	0
+ 117 0069 00       		.byte	0
+ 118 006a 00       		.byte	0
+ 119 006b 00       		.byte	0
+ 120 006c 00       		.byte	0
+ 121 006d 00       		.byte	0
+ 122 006e 00       		.byte	0
+ 123 006f 02       		.byte	2
+ 124              		.align	2
+ 127              	ipAddr_ringmaster:
+ 128 0070 BB       		.byte	-69
+ 129 0071 BB       		.byte	-69
+ 130 0072 00       		.byte	0
+ 131 0073 00       		.byte	0
+ 132 0074 00       		.byte	0
+ 133 0075 00       		.byte	0
+ 134 0076 00       		.byte	0
+ 135 0077 00       		.byte	0
+ 136 0078 00       		.byte	0
+ 137 0079 00       		.byte	0
+ 138 007a 00       		.byte	0
+ 139 007b 00       		.byte	0
+ 140 007c 00       		.byte	0
+ 141 007d 00       		.byte	0
+ 142 007e 00       		.byte	0
+ 143 007f 01       		.byte	1
+ 144              		.comm	openudp_vars,4,4
+ 145              		.text
+ 146              		.align	2
+ 147              		.global	openudp_init
+ 148              		.thumb
+ 149              		.thumb_func
+ 151              	openudp_init:
+ 152              	.LFB0:
+ 153              		.file 1 "build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c"
+   1:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "opendefs.h"
+   2:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "openudp.h"
+   3:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "openserial.h"
+   4:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "packetfunctions.h"
+   5:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "forwarding.h"
+   6:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "openqueue.h"
+   7:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** // applications
+   8:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "opencoap.h"
+   9:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "uecho.h"
+  10:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "uinject.h"
+  11:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "userialbridge.h"
+  12:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** #include "rrt.h"
+  13:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  14:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** //=========================== variables =======================================
+  15:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  16:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** openudp_vars_t openudp_vars;
+  17:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  18:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** //=========================== prototypes ======================================
+  19:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  20:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** static void openudp_sendDone_default_handler(OpenQueueEntry_t* msg, owerror_t error);
+  21:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** static void openudp_receive_default_handler(OpenQueueEntry_t* msg);
+  22:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  23:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** //=========================== public ==========================================
+  24:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  25:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** void openudp_init(void) {
+ 154              		.loc 1 25 0
+ 155              		.cfi_startproc
+ 156              		@ args = 0, pretend = 0, frame = 0
+ 157              		@ frame_needed = 1, uses_anonymous_args = 0
+ 158              		@ link register save eliminated.
+ 159 0000 80B4     		push	{r7}
+ 160              		.cfi_def_cfa_offset 4
+ 161              		.cfi_offset 7, -4
+ 162 0002 00AF     		add	r7, sp, #0
+ 163              		.cfi_def_cfa_register 7
+  26:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    // initialize the resource linked list
+  27:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    openudp_vars.resources = NULL;
+ 164              		.loc 1 27 0
+ 165 0004 034B     		ldr	r3, .L2
+ 166 0006 0022     		movs	r2, #0
+ 167 0008 1A60     		str	r2, [r3]
+  28:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 168              		.loc 1 28 0
+ 169 000a BD46     		mov	sp, r7
+ 170              		.cfi_def_cfa_register 13
+ 171              		@ sp needed
+ 172 000c 5DF8047B 		ldr	r7, [sp], #4
+ 173              		.cfi_restore 7
+ 174              		.cfi_def_cfa_offset 0
+ 175 0010 7047     		bx	lr
+ 176              	.L3:
+ 177 0012 00BF     		.align	2
+ 178              	.L2:
+ 179 0014 00000000 		.word	openudp_vars
+ 180              		.cfi_endproc
+ 181              	.LFE0:
+ 183              		.align	2
+ 184              		.global	openudp_register
+ 185              		.thumb
+ 186              		.thumb_func
+ 188              	openudp_register:
+ 189              	.LFB1:
+  29:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  30:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** void openudp_register(udp_resource_desc_t* desc) {
+ 190              		.loc 1 30 0
+ 191              		.cfi_startproc
+ 192              		@ args = 0, pretend = 0, frame = 8
+ 193              		@ frame_needed = 1, uses_anonymous_args = 0
+ 194              		@ link register save eliminated.
+ 195 0018 80B4     		push	{r7}
+ 196              		.cfi_def_cfa_offset 4
+ 197              		.cfi_offset 7, -4
+ 198 001a 83B0     		sub	sp, sp, #12
+ 199              		.cfi_def_cfa_offset 16
+ 200 001c 00AF     		add	r7, sp, #0
+ 201              		.cfi_def_cfa_register 7
+ 202 001e 7860     		str	r0, [r7, #4]
+  31:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    // chain the new resource to head of resource list
+  32:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    desc->next = openudp_vars.resources;
+ 203              		.loc 1 32 0
+ 204 0020 054B     		ldr	r3, .L5
+ 205 0022 1A68     		ldr	r2, [r3]
+ 206 0024 7B68     		ldr	r3, [r7, #4]
+ 207 0026 DA60     		str	r2, [r3, #12]
+  33:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    openudp_vars.resources = desc;
+ 208              		.loc 1 33 0
+ 209 0028 034A     		ldr	r2, .L5
+ 210 002a 7B68     		ldr	r3, [r7, #4]
+ 211 002c 1360     		str	r3, [r2]
+  34:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 212              		.loc 1 34 0
+ 213 002e 0C37     		adds	r7, r7, #12
+ 214              		.cfi_def_cfa_offset 4
+ 215 0030 BD46     		mov	sp, r7
+ 216              		.cfi_def_cfa_register 13
+ 217              		@ sp needed
+ 218 0032 5DF8047B 		ldr	r7, [sp], #4
+ 219              		.cfi_restore 7
+ 220              		.cfi_def_cfa_offset 0
+ 221 0036 7047     		bx	lr
+ 222              	.L6:
+ 223              		.align	2
+ 224              	.L5:
+ 225 0038 00000000 		.word	openudp_vars
+ 226              		.cfi_endproc
+ 227              	.LFE1:
+ 229              		.align	2
+ 230              		.global	openudp_send
+ 231              		.thumb
+ 232              		.thumb_func
+ 234              	openudp_send:
+ 235              	.LFB2:
+  35:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  36:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** owerror_t openudp_send(OpenQueueEntry_t* msg) {
+ 236              		.loc 1 36 0
+ 237              		.cfi_startproc
+ 238              		@ args = 0, pretend = 0, frame = 16
+ 239              		@ frame_needed = 1, uses_anonymous_args = 0
+ 240 003c 80B5     		push	{r7, lr}
+ 241              		.cfi_def_cfa_offset 8
+ 242              		.cfi_offset 7, -8
+ 243              		.cfi_offset 14, -4
+ 244 003e 84B0     		sub	sp, sp, #16
+ 245              		.cfi_def_cfa_offset 24
+ 246 0040 00AF     		add	r7, sp, #0
+ 247              		.cfi_def_cfa_register 7
+ 248 0042 7860     		str	r0, [r7, #4]
+  37:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     uint8_t* checksum_position;
+  38:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     msg->owner       = COMPONENT_OPENUDP;
+ 249              		.loc 1 38 0
+ 250 0044 7B68     		ldr	r3, [r7, #4]
+ 251 0046 1722     		movs	r2, #23
+ 252 0048 5A70     		strb	r2, [r3, #1]
+  39:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     msg->l4_protocol = IANA_UDP;
+ 253              		.loc 1 39 0
+ 254 004a 7B68     		ldr	r3, [r7, #4]
+ 255 004c 1122     		movs	r2, #17
+ 256 004e 9A73     		strb	r2, [r3, #14]
+  40:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     msg->l4_payload  = msg->payload;
+ 257              		.loc 1 40 0
+ 258 0050 7B68     		ldr	r3, [r7, #4]
+ 259 0052 5A68     		ldr	r2, [r3, #4]
+ 260 0054 7B68     		ldr	r3, [r7, #4]
+ 261 0056 5A61     		str	r2, [r3, #20]
+  41:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     msg->l4_length   = msg->length;
+ 262              		.loc 1 41 0
+ 263 0058 7B68     		ldr	r3, [r7, #4]
+ 264 005a 1A7A     		ldrb	r2, [r3, #8]	@ zero_extendqisi2
+ 265 005c 7B68     		ldr	r3, [r7, #4]
+ 266 005e 1A76     		strb	r2, [r3, #24]
+  42:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     
+  43:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     msg->l4_protocol_compressed = FALSE; // by default
+ 267              		.loc 1 43 0
+ 268 0060 7B68     		ldr	r3, [r7, #4]
+ 269 0062 0022     		movs	r2, #0
+ 270 0064 DA73     		strb	r2, [r3, #15]
+  44:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     uint8_t compType = NHC_UDP_PORTS_INLINE;
+ 271              		.loc 1 44 0
+ 272 0066 0023     		movs	r3, #0
+ 273 0068 FB73     		strb	r3, [r7, #15]
+  45:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  46:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     //check if the header can be compressed.
+  47:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     if (msg->l4_destination_port>=0xf000 && msg->l4_destination_port<0xf100){
+ 274              		.loc 1 47 0
+ 275 006a 7B68     		ldr	r3, [r7, #4]
+ 276 006c 5B8A     		ldrh	r3, [r3, #18]
+ 277 006e B3F5704F 		cmp	r3, #61440
+ 278 0072 25D3     		bcc	.L8
+ 279              		.loc 1 47 0 is_stmt 0 discriminator 1
+ 280 0074 7B68     		ldr	r3, [r7, #4]
+ 281 0076 5B8A     		ldrh	r3, [r3, #18]
+ 282 0078 B3F5714F 		cmp	r3, #61696
+ 283 007c 20D2     		bcs	.L8
+  48:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         // destination can be compressed 8 bit
+  49:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         msg->l4_protocol_compressed = TRUE;
+ 284              		.loc 1 49 0 is_stmt 1
+ 285 007e 7B68     		ldr	r3, [r7, #4]
+ 286 0080 0122     		movs	r2, #1
+ 287 0082 DA73     		strb	r2, [r3, #15]
+  50:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         compType = NHC_UDP_PORTS_16S_8D;
+ 288              		.loc 1 50 0
+ 289 0084 0123     		movs	r3, #1
+ 290 0086 FB73     		strb	r3, [r7, #15]
+  51:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //check now if both can still be more compressed 4b each
+  52:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         if (
+  53:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       >= 0xf0b0 &&
+ 291              		.loc 1 53 0
+ 292 0088 7B68     		ldr	r3, [r7, #4]
+ 293 008a 5B8A     		ldrh	r3, [r3, #18]
+  52:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       >= 0xf0b0 &&
+ 294              		.loc 1 52 0
+ 295 008c 4FF2AF02 		movw	r2, #61615
+ 296 0090 9342     		cmp	r3, r2
+ 297 0092 14D9     		bls	.L9
+  54:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       <= 0xf0bf &&
+ 298              		.loc 1 54 0
+ 299 0094 7B68     		ldr	r3, [r7, #4]
+ 300 0096 5B8A     		ldrh	r3, [r3, #18]
+  53:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       <= 0xf0bf &&
+ 301              		.loc 1 53 0
+ 302 0098 4FF2BF02 		movw	r2, #61631
+ 303 009c 9342     		cmp	r3, r2
+ 304 009e 0ED8     		bhi	.L9
+  55:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type >= 0xf0b0 &&
+ 305              		.loc 1 55 0
+ 306 00a0 7B68     		ldr	r3, [r7, #4]
+ 307 00a2 1B8A     		ldrh	r3, [r3, #16]
+  54:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       <= 0xf0bf &&
+ 308              		.loc 1 54 0
+ 309 00a4 4FF2AF02 		movw	r2, #61615
+ 310 00a8 9342     		cmp	r3, r2
+ 311 00aa 08D9     		bls	.L9
+  56:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type <= 0xf0bf
+ 312              		.loc 1 56 0
+ 313 00ac 7B68     		ldr	r3, [r7, #4]
+ 314 00ae 1B8A     		ldrh	r3, [r3, #16]
+  55:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type >= 0xf0b0 &&
+ 315              		.loc 1 55 0
+ 316 00b0 4FF2BF02 		movw	r2, #61631
+ 317 00b4 9342     		cmp	r3, r2
+ 318 00b6 02D8     		bhi	.L9
+  57:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         ){
+  58:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             //can be fully compressed
+  59:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             compType = NHC_UDP_PORTS_4S_4D;
+ 319              		.loc 1 59 0
+ 320 00b8 0323     		movs	r3, #3
+ 321 00ba FB73     		strb	r3, [r7, #15]
+  52:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port       >= 0xf0b0 &&
+ 322              		.loc 1 52 0
+ 323 00bc 0FE0     		b	.L10
+ 324              	.L9:
+ 325 00be 0EE0     		b	.L10
+ 326              	.L8:
+  60:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         }
+  61:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     } else {
+  62:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //check source now
+  63:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         if (msg->l4_sourcePortORicmpv6Type>=0xf000 && msg->l4_sourcePortORicmpv6Type<0xf100){
+ 327              		.loc 1 63 0
+ 328 00c0 7B68     		ldr	r3, [r7, #4]
+ 329 00c2 1B8A     		ldrh	r3, [r3, #16]
+ 330 00c4 B3F5704F 		cmp	r3, #61440
+ 331 00c8 09D3     		bcc	.L10
+ 332              		.loc 1 63 0 is_stmt 0 discriminator 1
+ 333 00ca 7B68     		ldr	r3, [r7, #4]
+ 334 00cc 1B8A     		ldrh	r3, [r3, #16]
+ 335 00ce B3F5714F 		cmp	r3, #61696
+ 336 00d2 04D2     		bcs	.L10
+  64:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             //source can be compressed -> 8bit
+  65:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_protocol_compressed = TRUE;
+ 337              		.loc 1 65 0 is_stmt 1
+ 338 00d4 7B68     		ldr	r3, [r7, #4]
+ 339 00d6 0122     		movs	r2, #1
+ 340 00d8 DA73     		strb	r2, [r3, #15]
+  66:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             compType = NHC_UDP_PORTS_8S_16D;
+ 341              		.loc 1 66 0
+ 342 00da 0223     		movs	r3, #2
+ 343 00dc FB73     		strb	r3, [r7, #15]
+ 344              	.L10:
+  67:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         }
+  68:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     }
+  69:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  70:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     // fill in the header in the packet
+  71:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     if (msg->l4_protocol_compressed){
+ 345              		.loc 1 71 0
+ 346 00de 7B68     		ldr	r3, [r7, #4]
+ 347 00e0 DB7B     		ldrb	r3, [r3, #15]	@ zero_extendqisi2
+ 348 00e2 002B     		cmp	r3, #0
+ 349 00e4 7BD0     		beq	.L11
+  72:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  73:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //add checksum space in the packet.
+  74:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_reserveHeaderSize(msg,2);
+ 350              		.loc 1 74 0
+ 351 00e6 7868     		ldr	r0, [r7, #4]
+ 352 00e8 0221     		movs	r1, #2
+ 353 00ea FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+  75:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //keep position and calculatre checksum at the end.
+  76:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         checksum_position = &msg->payload[0];
+ 354              		.loc 1 76 0
+ 355 00ee 7B68     		ldr	r3, [r7, #4]
+ 356 00f0 5B68     		ldr	r3, [r3, #4]
+ 357 00f2 BB60     		str	r3, [r7, #8]
+  77:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  78:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //length is always omitted
+  79:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         /*
+  80:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          RFC6282 -> The UDP Length field
+  81:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                    MUST always be elided and is inferred from lower layers using the
+  82:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                    6LoWPAN Fragmentation header or the IEEE 802.15.4 header.
+  83:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         */
+  84:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+  85:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         switch (compType) {
+ 358              		.loc 1 85 0
+ 359 00f4 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 360 00f6 032B     		cmp	r3, #3
+ 361 00f8 6CD8     		bhi	.L12
+ 362 00fa 01A2     		adr	r2, .L14
+ 363 00fc 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 364              		.p2align 2
+ 365              	.L14:
+ 366 0100 D5010000 		.word	.L12+1
+ 367 0104 11010000 		.word	.L15+1
+ 368 0108 4F010000 		.word	.L16+1
+ 369 010c 8D010000 		.word	.L17+1
+ 370              		.p2align 1
+ 371              	.L15:
+  86:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             case NHC_UDP_PORTS_INLINE:
+  87:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // error this is not possible.
+  88:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 break;
+  89:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             case NHC_UDP_PORTS_16S_8D:
+  90:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // dest port:   0xf0  +  8 bits in-line
+  91:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // source port:         16 bits in-line
+  92:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 372              		.loc 1 92 0
+ 373 0110 7868     		ldr	r0, [r7, #4]
+ 374 0112 0121     		movs	r1, #1
+ 375 0114 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+  93:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = (uint8_t) (msg->l4_destination_port & 0x00ff);
+ 376              		.loc 1 93 0
+ 377 0118 7B68     		ldr	r3, [r7, #4]
+ 378 011a 5B68     		ldr	r3, [r3, #4]
+ 379 011c 7A68     		ldr	r2, [r7, #4]
+ 380 011e 528A     		ldrh	r2, [r2, #18]
+ 381 0120 D2B2     		uxtb	r2, r2
+ 382 0122 1A70     		strb	r2, [r3]
+  94:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,2);
+ 383              		.loc 1 94 0
+ 384 0124 7868     		ldr	r0, [r7, #4]
+ 385 0126 0221     		movs	r1, #2
+ 386 0128 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+  95:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_htons(msg->l4_sourcePortORicmpv6Type,&(msg->payload[0]));
+ 387              		.loc 1 95 0
+ 388 012c 7B68     		ldr	r3, [r7, #4]
+ 389 012e 1A8A     		ldrh	r2, [r3, #16]
+ 390 0130 7B68     		ldr	r3, [r7, #4]
+ 391 0132 5B68     		ldr	r3, [r3, #4]
+ 392 0134 1046     		mov	r0, r2
+ 393 0136 1946     		mov	r1, r3
+ 394 0138 FFF7FEFF 		bl	packetfunctions_htons
+  96:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 //write proper LOWPAN_NHC
+  97:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 395              		.loc 1 97 0
+ 396 013c 7868     		ldr	r0, [r7, #4]
+ 397 013e 0121     		movs	r1, #1
+ 398 0140 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+  98:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = NHC_UDP_ID|NHC_UDP_PORTS_16S_8D;
+ 399              		.loc 1 98 0
+ 400 0144 7B68     		ldr	r3, [r7, #4]
+ 401 0146 5B68     		ldr	r3, [r3, #4]
+ 402 0148 F122     		movs	r2, #241
+ 403 014a 1A70     		strb	r2, [r3]
+  99:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 break;
+ 404              		.loc 1 99 0
+ 405 014c 42E0     		b	.L12
+ 406              	.L16:
+ 100:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             case NHC_UDP_PORTS_8S_16D:
+ 101:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // dest port:   0xf0  + 16 bits in-line
+ 102:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // source port: 0xf0  +  8 bits in-line
+ 103:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,2);
+ 407              		.loc 1 103 0
+ 408 014e 7868     		ldr	r0, [r7, #4]
+ 409 0150 0221     		movs	r1, #2
+ 410 0152 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 104:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_htons(msg->l4_destination_port,&(msg->payload[0]));
+ 411              		.loc 1 104 0
+ 412 0156 7B68     		ldr	r3, [r7, #4]
+ 413 0158 5A8A     		ldrh	r2, [r3, #18]
+ 414 015a 7B68     		ldr	r3, [r7, #4]
+ 415 015c 5B68     		ldr	r3, [r3, #4]
+ 416 015e 1046     		mov	r0, r2
+ 417 0160 1946     		mov	r1, r3
+ 418 0162 FFF7FEFF 		bl	packetfunctions_htons
+ 105:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 419              		.loc 1 105 0
+ 420 0166 7868     		ldr	r0, [r7, #4]
+ 421 0168 0121     		movs	r1, #1
+ 422 016a FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 106:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = (uint8_t) (msg->l4_sourcePortORicmpv6Type & 0x00ff);
+ 423              		.loc 1 106 0
+ 424 016e 7B68     		ldr	r3, [r7, #4]
+ 425 0170 5B68     		ldr	r3, [r3, #4]
+ 426 0172 7A68     		ldr	r2, [r7, #4]
+ 427 0174 128A     		ldrh	r2, [r2, #16]
+ 428 0176 D2B2     		uxtb	r2, r2
+ 429 0178 1A70     		strb	r2, [r3]
+ 107:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 //write proper LOWPAN_NHC
+ 108:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 430              		.loc 1 108 0
+ 431 017a 7868     		ldr	r0, [r7, #4]
+ 432 017c 0121     		movs	r1, #1
+ 433 017e FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 109:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = NHC_UDP_ID|NHC_UDP_PORTS_8S_16D;
+ 434              		.loc 1 109 0
+ 435 0182 7B68     		ldr	r3, [r7, #4]
+ 436 0184 5B68     		ldr	r3, [r3, #4]
+ 437 0186 F222     		movs	r2, #242
+ 438 0188 1A70     		strb	r2, [r3]
+ 110:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 break;
+ 439              		.loc 1 110 0
+ 440 018a 23E0     		b	.L12
+ 441              	.L17:
+ 111:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             case NHC_UDP_PORTS_4S_4D:
+ 112:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // source port: 0xf0b +  4 bits in-line (high 4)
+ 113:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 // dest port:   0xf0b +  4 bits in-line  (low 4)
+ 114:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 442              		.loc 1 114 0
+ 443 018c 7868     		ldr	r0, [r7, #4]
+ 444 018e 0121     		movs	r1, #1
+ 445 0190 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 115:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = (msg->l4_sourcePortORicmpv6Type & 0x000f)<<4;
+ 446              		.loc 1 115 0
+ 447 0194 7B68     		ldr	r3, [r7, #4]
+ 448 0196 5B68     		ldr	r3, [r3, #4]
+ 449 0198 7A68     		ldr	r2, [r7, #4]
+ 450 019a 128A     		ldrh	r2, [r2, #16]
+ 451 019c 1201     		lsls	r2, r2, #4
+ 452 019e D2B2     		uxtb	r2, r2
+ 453 01a0 1A70     		strb	r2, [r3]
+ 116:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] |= (msg->l4_destination_port & 0x000f);
+ 454              		.loc 1 116 0
+ 455 01a2 7B68     		ldr	r3, [r7, #4]
+ 456 01a4 5B68     		ldr	r3, [r3, #4]
+ 457 01a6 7A68     		ldr	r2, [r7, #4]
+ 458 01a8 5268     		ldr	r2, [r2, #4]
+ 459 01aa 1278     		ldrb	r2, [r2]	@ zero_extendqisi2
+ 460 01ac D1B2     		uxtb	r1, r2
+ 461 01ae 7A68     		ldr	r2, [r7, #4]
+ 462 01b0 528A     		ldrh	r2, [r2, #18]
+ 463 01b2 D2B2     		uxtb	r2, r2
+ 464 01b4 02F00F02 		and	r2, r2, #15
+ 465 01b8 D2B2     		uxtb	r2, r2
+ 466 01ba 0A43     		orrs	r2, r2, r1
+ 467 01bc D2B2     		uxtb	r2, r2
+ 468 01be D2B2     		uxtb	r2, r2
+ 469 01c0 1A70     		strb	r2, [r3]
+ 117:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 //write proper LOWPAN_NHC
+ 118:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 packetfunctions_reserveHeaderSize(msg,1);
+ 470              		.loc 1 118 0
+ 471 01c2 7868     		ldr	r0, [r7, #4]
+ 472 01c4 0121     		movs	r1, #1
+ 473 01c6 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 119:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 msg->payload[0] = NHC_UDP_ID|NHC_UDP_PORTS_4S_4D;
+ 474              		.loc 1 119 0
+ 475 01ca 7B68     		ldr	r3, [r7, #4]
+ 476 01cc 5B68     		ldr	r3, [r3, #4]
+ 477 01ce F322     		movs	r2, #243
+ 478 01d0 1A70     		strb	r2, [r3]
+ 120:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                 break;
+ 479              		.loc 1 120 0
+ 480 01d2 00BF     		nop
+ 481              	.L12:
+ 121:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         }
+ 122:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 123:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //after filling the packet we calculate the checksum
+ 124:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_calculateChecksum(msg,checksum_position);
+ 482              		.loc 1 124 0
+ 483 01d4 7868     		ldr	r0, [r7, #4]
+ 484 01d6 B968     		ldr	r1, [r7, #8]
+ 485 01d8 FFF7FEFF 		bl	packetfunctions_calculateChecksum
+ 486 01dc 25E0     		b	.L18
+ 487              	.L11:
+ 125:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 126:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     } else{
+ 127:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_reserveHeaderSize(msg,sizeof(udp_ht));
+ 488              		.loc 1 127 0
+ 489 01de 7868     		ldr	r0, [r7, #4]
+ 490 01e0 0821     		movs	r1, #8
+ 491 01e2 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 128:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_htons(msg->l4_sourcePortORicmpv6Type,&(msg->payload[0]));
+ 492              		.loc 1 128 0
+ 493 01e6 7B68     		ldr	r3, [r7, #4]
+ 494 01e8 1A8A     		ldrh	r2, [r3, #16]
+ 495 01ea 7B68     		ldr	r3, [r7, #4]
+ 496 01ec 5B68     		ldr	r3, [r3, #4]
+ 497 01ee 1046     		mov	r0, r2
+ 498 01f0 1946     		mov	r1, r3
+ 499 01f2 FFF7FEFF 		bl	packetfunctions_htons
+ 129:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_htons(msg->l4_destination_port,&(msg->payload[2]));
+ 500              		.loc 1 129 0
+ 501 01f6 7B68     		ldr	r3, [r7, #4]
+ 502 01f8 5A8A     		ldrh	r2, [r3, #18]
+ 503 01fa 7B68     		ldr	r3, [r7, #4]
+ 504 01fc 5B68     		ldr	r3, [r3, #4]
+ 505 01fe 0233     		adds	r3, r3, #2
+ 506 0200 1046     		mov	r0, r2
+ 507 0202 1946     		mov	r1, r3
+ 508 0204 FFF7FEFF 		bl	packetfunctions_htons
+ 130:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         //TODO check this as the lenght MUST be ommited.
+ 131:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_htons(msg->length,&(msg->payload[4]));
+ 509              		.loc 1 131 0
+ 510 0208 7B68     		ldr	r3, [r7, #4]
+ 511 020a 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 512 020c 9AB2     		uxth	r2, r3
+ 513 020e 7B68     		ldr	r3, [r7, #4]
+ 514 0210 5B68     		ldr	r3, [r3, #4]
+ 515 0212 0433     		adds	r3, r3, #4
+ 516 0214 1046     		mov	r0, r2
+ 517 0216 1946     		mov	r1, r3
+ 518 0218 FFF7FEFF 		bl	packetfunctions_htons
+ 132:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         packetfunctions_calculateChecksum(msg,(uint8_t*)&(((udp_ht*)msg->payload)->checksum));
+ 519              		.loc 1 132 0
+ 520 021c 7B68     		ldr	r3, [r7, #4]
+ 521 021e 5B68     		ldr	r3, [r3, #4]
+ 522 0220 0633     		adds	r3, r3, #6
+ 523 0222 7868     		ldr	r0, [r7, #4]
+ 524 0224 1946     		mov	r1, r3
+ 525 0226 FFF7FEFF 		bl	packetfunctions_calculateChecksum
+ 526              	.L18:
+ 133:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     }
+ 134:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****     return forwarding_send(msg);
+ 527              		.loc 1 134 0
+ 528 022a 7868     		ldr	r0, [r7, #4]
+ 529 022c FFF7FEFF 		bl	forwarding_send
+ 530 0230 0346     		mov	r3, r0
+ 135:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 531              		.loc 1 135 0
+ 532 0232 1846     		mov	r0, r3
+ 533 0234 1037     		adds	r7, r7, #16
+ 534              		.cfi_def_cfa_offset 8
+ 535 0236 BD46     		mov	sp, r7
+ 536              		.cfi_def_cfa_register 13
+ 537              		@ sp needed
+ 538 0238 80BD     		pop	{r7, pc}
+ 539              		.cfi_endproc
+ 540              	.LFE2:
+ 542 023a 00BF     		.align	2
+ 543              		.global	openudp_sendDone
+ 544              		.thumb
+ 545              		.thumb_func
+ 547              	openudp_sendDone:
+ 548              	.LFB3:
+ 136:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 137:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** void openudp_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
+ 549              		.loc 1 137 0
+ 550              		.cfi_startproc
+ 551              		@ args = 0, pretend = 0, frame = 16
+ 552              		@ frame_needed = 1, uses_anonymous_args = 0
+ 553 023c 80B5     		push	{r7, lr}
+ 554              		.cfi_def_cfa_offset 8
+ 555              		.cfi_offset 7, -8
+ 556              		.cfi_offset 14, -4
+ 557 023e 84B0     		sub	sp, sp, #16
+ 558              		.cfi_def_cfa_offset 24
+ 559 0240 00AF     		add	r7, sp, #0
+ 560              		.cfi_def_cfa_register 7
+ 561 0242 7860     		str	r0, [r7, #4]
+ 562 0244 0B46     		mov	r3, r1
+ 563 0246 FB70     		strb	r3, [r7, #3]
+ 138:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    udp_resource_desc_t* resource;
+ 139:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    udp_callbackSendDone_cbt udp_send_done_callback_ptr = NULL;
+ 564              		.loc 1 139 0
+ 565 0248 0023     		movs	r3, #0
+ 566 024a BB60     		str	r3, [r7, #8]
+ 140:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 141:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    msg->owner = COMPONENT_OPENUDP;
+ 567              		.loc 1 141 0
+ 568 024c 7B68     		ldr	r3, [r7, #4]
+ 569 024e 1722     		movs	r2, #23
+ 570 0250 5A70     		strb	r2, [r3, #1]
+ 142:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 143:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    // iterate list of registered resources
+ 144:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    resource = openudp_vars.resources;
+ 571              		.loc 1 144 0
+ 572 0252 184B     		ldr	r3, .L29
+ 573 0254 1B68     		ldr	r3, [r3]
+ 574 0256 FB60     		str	r3, [r7, #12]
+ 145:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    while (NULL != resource) {
+ 575              		.loc 1 145 0
+ 576 0258 12E0     		b	.L21
+ 577              	.L26:
+ 146:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       if (resource->port == msg->l4_sourcePortORicmpv6Type) {
+ 578              		.loc 1 146 0
+ 579 025a FB68     		ldr	r3, [r7, #12]
+ 580 025c 1A88     		ldrh	r2, [r3]
+ 581 025e 7B68     		ldr	r3, [r7, #4]
+ 582 0260 1B8A     		ldrh	r3, [r3, #16]
+ 583 0262 9A42     		cmp	r2, r3
+ 584 0264 09D1     		bne	.L22
+ 147:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          // there is a registration for this port, either forward the send completion or simply rel
+ 148:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         udp_send_done_callback_ptr = (resource->callbackSendDone == NULL) ? openudp_sendDone_defaul
+ 585              		.loc 1 148 0
+ 586 0266 FB68     		ldr	r3, [r7, #12]
+ 587 0268 9B68     		ldr	r3, [r3, #8]
+ 149:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                                                                           : resource->callbackSendD
+ 588              		.loc 1 149 0
+ 589 026a 002B     		cmp	r3, #0
+ 590 026c 02D0     		beq	.L23
+ 591              		.loc 1 149 0 is_stmt 0 discriminator 1
+ 592 026e FB68     		ldr	r3, [r7, #12]
+ 593 0270 9B68     		ldr	r3, [r3, #8]
+ 594 0272 00E0     		b	.L24
+ 595              	.L23:
+ 596              		.loc 1 149 0 discriminator 2
+ 597 0274 104B     		ldr	r3, .L29+4
+ 598              	.L24:
+ 148:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                                                                           : resource->callbackSendD
+ 599              		.loc 1 148 0 is_stmt 1
+ 600 0276 BB60     		str	r3, [r7, #8]
+ 150:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          break;
+ 601              		.loc 1 150 0
+ 602 0278 05E0     		b	.L25
+ 603              	.L22:
+ 151:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       }
+ 152:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       resource = resource->next;
+ 604              		.loc 1 152 0
+ 605 027a FB68     		ldr	r3, [r7, #12]
+ 606 027c DB68     		ldr	r3, [r3, #12]
+ 607 027e FB60     		str	r3, [r7, #12]
+ 608              	.L21:
+ 145:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       if (resource->port == msg->l4_sourcePortORicmpv6Type) {
+ 609              		.loc 1 145 0
+ 610 0280 FB68     		ldr	r3, [r7, #12]
+ 611 0282 002B     		cmp	r3, #0
+ 612 0284 E9D1     		bne	.L26
+ 613              	.L25:
+ 153:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    }
+ 154:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 155:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    if (udp_send_done_callback_ptr == NULL) {
+ 614              		.loc 1 155 0
+ 615 0286 BB68     		ldr	r3, [r7, #8]
+ 616 0288 002B     		cmp	r3, #0
+ 617 028a 0BD1     		bne	.L27
+ 156:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       openserial_printError(COMPONENT_OPENUDP,ERR_UNSUPPORTED_PORT_NUMBER,
+ 618              		.loc 1 156 0
+ 619 028c 7B68     		ldr	r3, [r7, #4]
+ 620 028e 1B8A     		ldrh	r3, [r3, #16]
+ 621 0290 1720     		movs	r0, #23
+ 622 0292 0921     		movs	r1, #9
+ 623 0294 1A46     		mov	r2, r3
+ 624 0296 0523     		movs	r3, #5
+ 625 0298 FFF7FEFF 		bl	openserial_printError
+ 157:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                             (errorparameter_t)msg->l4_sourcePortORicmpv6Type,
+ 158:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                             (errorparameter_t)5);
+ 159:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       openqueue_freePacketBuffer(msg);
+ 626              		.loc 1 159 0
+ 627 029c 7868     		ldr	r0, [r7, #4]
+ 628 029e FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 160:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       return;
+ 629              		.loc 1 160 0
+ 630 02a2 04E0     		b	.L20
+ 631              	.L27:
+ 161:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    }
+ 162:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 163:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    // handle send completion
+ 164:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    udp_send_done_callback_ptr(msg, error);
+ 632              		.loc 1 164 0
+ 633 02a4 FA78     		ldrb	r2, [r7, #3]	@ zero_extendqisi2
+ 634 02a6 BB68     		ldr	r3, [r7, #8]
+ 635 02a8 7868     		ldr	r0, [r7, #4]
+ 636 02aa 1146     		mov	r1, r2
+ 637 02ac 9847     		blx	r3
+ 638              	.L20:
+ 165:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 639              		.loc 1 165 0
+ 640 02ae 1037     		adds	r7, r7, #16
+ 641              		.cfi_def_cfa_offset 8
+ 642 02b0 BD46     		mov	sp, r7
+ 643              		.cfi_def_cfa_register 13
+ 644              		@ sp needed
+ 645 02b2 80BD     		pop	{r7, pc}
+ 646              	.L30:
+ 647              		.align	2
+ 648              	.L29:
+ 649 02b4 00000000 		.word	openudp_vars
+ 650 02b8 00000000 		.word	openudp_sendDone_default_handler
+ 651              		.cfi_endproc
+ 652              	.LFE3:
+ 654              		.align	2
+ 655              		.global	openudp_receive
+ 656              		.thumb
+ 657              		.thumb_func
+ 659              	openudp_receive:
+ 660              	.LFB4:
+ 166:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 167:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** void openudp_receive(OpenQueueEntry_t* msg) {
+ 661              		.loc 1 167 0
+ 662              		.cfi_startproc
+ 663              		@ args = 0, pretend = 0, frame = 24
+ 664              		@ frame_needed = 1, uses_anonymous_args = 0
+ 665 02bc 80B5     		push	{r7, lr}
+ 666              		.cfi_def_cfa_offset 8
+ 667              		.cfi_offset 7, -8
+ 668              		.cfi_offset 14, -4
+ 669 02be 86B0     		sub	sp, sp, #24
+ 670              		.cfi_def_cfa_offset 32
+ 671 02c0 00AF     		add	r7, sp, #0
+ 672              		.cfi_def_cfa_register 7
+ 673 02c2 7860     		str	r0, [r7, #4]
+ 168:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    uint8_t temp_8b;
+ 169:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    udp_resource_desc_t* resource;
+ 170:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    udp_callbackReceive_cbt udp_receive_done_callback_ptr = NULL;
+ 674              		.loc 1 170 0
+ 675 02c4 0023     		movs	r3, #0
+ 676 02c6 3B61     		str	r3, [r7, #16]
+ 171:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 172:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    msg->owner = COMPONENT_OPENUDP;
+ 677              		.loc 1 172 0
+ 678 02c8 7B68     		ldr	r3, [r7, #4]
+ 679 02ca 1722     		movs	r2, #23
+ 680 02cc 5A70     		strb	r2, [r3, #1]
+ 173:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 174:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    if (msg->l4_protocol_compressed==TRUE) {
+ 681              		.loc 1 174 0
+ 682 02ce 7B68     		ldr	r3, [r7, #4]
+ 683 02d0 DB7B     		ldrb	r3, [r3, #15]	@ zero_extendqisi2
+ 684 02d2 002B     		cmp	r3, #0
+ 685 02d4 00F09A80 		beq	.L32
+ 175:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       // get the UDP header encoding byte
+ 176:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       temp_8b = *((uint8_t*)(msg->payload));
+ 686              		.loc 1 176 0
+ 687 02d8 7B68     		ldr	r3, [r7, #4]
+ 688 02da 5B68     		ldr	r3, [r3, #4]
+ 689 02dc 1B78     		ldrb	r3, [r3]
+ 690 02de FB73     		strb	r3, [r7, #15]
+ 177:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       packetfunctions_tossHeader(msg,sizeof(temp_8b));
+ 691              		.loc 1 177 0
+ 692 02e0 7868     		ldr	r0, [r7, #4]
+ 693 02e2 0121     		movs	r1, #1
+ 694 02e4 FFF7FEFF 		bl	packetfunctions_tossHeader
+ 178:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       switch (temp_8b & NHC_UDP_PORTS_MASK) {
+ 695              		.loc 1 178 0
+ 696 02e8 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 697 02ea 03F00303 		and	r3, r3, #3
+ 698 02ee 032B     		cmp	r3, #3
+ 699 02f0 00F2AF80 		bhi	.L39
+ 700 02f4 01A2     		adr	r2, .L35
+ 701 02f6 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 702 02fa 00BF     		.p2align 2
+ 703              	.L35:
+ 704 02fc 0D030000 		.word	.L34+1
+ 705 0300 55030000 		.word	.L36+1
+ 706 0304 91030000 		.word	.L37+1
+ 707 0308 CD030000 		.word	.L38+1
+ 708              		.p2align 1
+ 709              	.L34:
+ 179:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          case NHC_UDP_PORTS_INLINE:
+ 180:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // source port:         16 bits in-line
+ 181:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // dest port:           16 bits in-line
+ 182:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type  = msg->payload[0]*256+msg->payload[1];
+ 710              		.loc 1 182 0
+ 711 030c 7B68     		ldr	r3, [r7, #4]
+ 712 030e 5B68     		ldr	r3, [r3, #4]
+ 713 0310 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 714 0312 9BB2     		uxth	r3, r3
+ 715 0314 1B02     		lsls	r3, r3, #8
+ 716 0316 9AB2     		uxth	r2, r3
+ 717 0318 7B68     		ldr	r3, [r7, #4]
+ 718 031a 5B68     		ldr	r3, [r3, #4]
+ 719 031c 0133     		adds	r3, r3, #1
+ 720 031e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 721 0320 9BB2     		uxth	r3, r3
+ 722 0322 1344     		add	r3, r3, r2
+ 723 0324 9AB2     		uxth	r2, r3
+ 724 0326 7B68     		ldr	r3, [r7, #4]
+ 725 0328 1A82     		strh	r2, [r3, #16]	@ movhi
+ 183:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port        = msg->payload[2]*256+msg->payload[3];
+ 726              		.loc 1 183 0
+ 727 032a 7B68     		ldr	r3, [r7, #4]
+ 728 032c 5B68     		ldr	r3, [r3, #4]
+ 729 032e 0233     		adds	r3, r3, #2
+ 730 0330 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 731 0332 9BB2     		uxth	r3, r3
+ 732 0334 1B02     		lsls	r3, r3, #8
+ 733 0336 9AB2     		uxth	r2, r3
+ 734 0338 7B68     		ldr	r3, [r7, #4]
+ 735 033a 5B68     		ldr	r3, [r3, #4]
+ 736 033c 0333     		adds	r3, r3, #3
+ 737 033e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 738 0340 9BB2     		uxth	r3, r3
+ 739 0342 1344     		add	r3, r3, r2
+ 740 0344 9AB2     		uxth	r2, r3
+ 741 0346 7B68     		ldr	r3, [r7, #4]
+ 742 0348 5A82     		strh	r2, [r3, #18]	@ movhi
+ 184:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             packetfunctions_tossHeader(msg,2+2);
+ 743              		.loc 1 184 0
+ 744 034a 7868     		ldr	r0, [r7, #4]
+ 745 034c 0421     		movs	r1, #4
+ 746 034e FFF7FEFF 		bl	packetfunctions_tossHeader
+ 185:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             break;
+ 747              		.loc 1 185 0
+ 748 0352 5AE0     		b	.L33
+ 749              	.L36:
+ 186:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          case NHC_UDP_PORTS_16S_8D:
+ 187:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // source port:         16 bits in-line
+ 188:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // dest port:   0xf0  +  8 bits in-line
+ 189:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type  = msg->payload[0]*256+msg->payload[1];
+ 750              		.loc 1 189 0
+ 751 0354 7B68     		ldr	r3, [r7, #4]
+ 752 0356 5B68     		ldr	r3, [r3, #4]
+ 753 0358 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 754 035a 9BB2     		uxth	r3, r3
+ 755 035c 1B02     		lsls	r3, r3, #8
+ 756 035e 9AB2     		uxth	r2, r3
+ 757 0360 7B68     		ldr	r3, [r7, #4]
+ 758 0362 5B68     		ldr	r3, [r3, #4]
+ 759 0364 0133     		adds	r3, r3, #1
+ 760 0366 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 761 0368 9BB2     		uxth	r3, r3
+ 762 036a 1344     		add	r3, r3, r2
+ 763 036c 9AB2     		uxth	r2, r3
+ 764 036e 7B68     		ldr	r3, [r7, #4]
+ 765 0370 1A82     		strh	r2, [r3, #16]	@ movhi
+ 190:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port        = 0xf000 +            msg->payload[2];
+ 766              		.loc 1 190 0
+ 767 0372 7B68     		ldr	r3, [r7, #4]
+ 768 0374 5B68     		ldr	r3, [r3, #4]
+ 769 0376 0233     		adds	r3, r3, #2
+ 770 0378 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 771 037a 9BB2     		uxth	r3, r3
+ 772 037c A3F58053 		sub	r3, r3, #4096
+ 773 0380 9AB2     		uxth	r2, r3
+ 774 0382 7B68     		ldr	r3, [r7, #4]
+ 775 0384 5A82     		strh	r2, [r3, #18]	@ movhi
+ 191:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             packetfunctions_tossHeader(msg,2+1);
+ 776              		.loc 1 191 0
+ 777 0386 7868     		ldr	r0, [r7, #4]
+ 778 0388 0321     		movs	r1, #3
+ 779 038a FFF7FEFF 		bl	packetfunctions_tossHeader
+ 192:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             break;
+ 780              		.loc 1 192 0
+ 781 038e 3CE0     		b	.L33
+ 782              	.L37:
+ 193:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          case NHC_UDP_PORTS_8S_16D:
+ 194:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // source port: 0xf0  +  8 bits in-line
+ 195:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // dest port:   0xf0  +  8 bits in-line
+ 196:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type  = 0xf000 +            msg->payload[0];
+ 783              		.loc 1 196 0
+ 784 0390 7B68     		ldr	r3, [r7, #4]
+ 785 0392 5B68     		ldr	r3, [r3, #4]
+ 786 0394 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 787 0396 9BB2     		uxth	r3, r3
+ 788 0398 A3F58053 		sub	r3, r3, #4096
+ 789 039c 9AB2     		uxth	r2, r3
+ 790 039e 7B68     		ldr	r3, [r7, #4]
+ 791 03a0 1A82     		strh	r2, [r3, #16]	@ movhi
+ 197:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port        = msg->payload[1]*256+msg->payload[2];
+ 792              		.loc 1 197 0
+ 793 03a2 7B68     		ldr	r3, [r7, #4]
+ 794 03a4 5B68     		ldr	r3, [r3, #4]
+ 795 03a6 0133     		adds	r3, r3, #1
+ 796 03a8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 797 03aa 9BB2     		uxth	r3, r3
+ 798 03ac 1B02     		lsls	r3, r3, #8
+ 799 03ae 9AB2     		uxth	r2, r3
+ 800 03b0 7B68     		ldr	r3, [r7, #4]
+ 801 03b2 5B68     		ldr	r3, [r3, #4]
+ 802 03b4 0233     		adds	r3, r3, #2
+ 803 03b6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 804 03b8 9BB2     		uxth	r3, r3
+ 805 03ba 1344     		add	r3, r3, r2
+ 806 03bc 9AB2     		uxth	r2, r3
+ 807 03be 7B68     		ldr	r3, [r7, #4]
+ 808 03c0 5A82     		strh	r2, [r3, #18]	@ movhi
+ 198:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             packetfunctions_tossHeader(msg,1+2);
+ 809              		.loc 1 198 0
+ 810 03c2 7868     		ldr	r0, [r7, #4]
+ 811 03c4 0321     		movs	r1, #3
+ 812 03c6 FFF7FEFF 		bl	packetfunctions_tossHeader
+ 199:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             break;
+ 813              		.loc 1 199 0
+ 814 03ca 1EE0     		b	.L33
+ 815              	.L38:
+ 200:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          case NHC_UDP_PORTS_4S_4D:
+ 201:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // source port: 0xf0b +  4 bits in-line
+ 202:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             // dest port:   0xf0b +  4 bits in-line
+ 203:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_sourcePortORicmpv6Type  = 0xf0b0 + ((msg->payload[0] >> 4) & 0x0f);
+ 816              		.loc 1 203 0
+ 817 03cc 7B68     		ldr	r3, [r7, #4]
+ 818 03ce 5B68     		ldr	r3, [r3, #4]
+ 819 03d0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 820 03d2 1B09     		lsrs	r3, r3, #4
+ 821 03d4 DBB2     		uxtb	r3, r3
+ 822 03d6 9BB2     		uxth	r3, r3
+ 823 03d8 03F00F03 		and	r3, r3, #15
+ 824 03dc 9BB2     		uxth	r3, r3
+ 825 03de A3F57563 		sub	r3, r3, #3920
+ 826 03e2 9AB2     		uxth	r2, r3
+ 827 03e4 7B68     		ldr	r3, [r7, #4]
+ 828 03e6 1A82     		strh	r2, [r3, #16]	@ movhi
+ 204:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             msg->l4_destination_port        = 0xf0b0 + ((msg->payload[0] >> 0) & 0x0f);
+ 829              		.loc 1 204 0
+ 830 03e8 7B68     		ldr	r3, [r7, #4]
+ 831 03ea 5B68     		ldr	r3, [r3, #4]
+ 832 03ec 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 833 03ee 9BB2     		uxth	r3, r3
+ 834 03f0 03F00F03 		and	r3, r3, #15
+ 835 03f4 9BB2     		uxth	r3, r3
+ 836 03f6 A3F57563 		sub	r3, r3, #3920
+ 837 03fa 9AB2     		uxth	r2, r3
+ 838 03fc 7B68     		ldr	r3, [r7, #4]
+ 839 03fe 5A82     		strh	r2, [r3, #18]	@ movhi
+ 205:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             packetfunctions_tossHeader(msg,1);
+ 840              		.loc 1 205 0
+ 841 0400 7868     		ldr	r0, [r7, #4]
+ 842 0402 0121     		movs	r1, #1
+ 843 0404 FFF7FEFF 		bl	packetfunctions_tossHeader
+ 206:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****             break;
+ 844              		.loc 1 206 0
+ 845 0408 00BF     		nop
+ 846              	.L33:
+ 847 040a 22E0     		b	.L39
+ 848              	.L32:
+ 207:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       }
+ 208:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    } else {
+ 209:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       msg->l4_sourcePortORicmpv6Type  = msg->payload[0]*256+msg->payload[1];
+ 849              		.loc 1 209 0
+ 850 040c 7B68     		ldr	r3, [r7, #4]
+ 851 040e 5B68     		ldr	r3, [r3, #4]
+ 852 0410 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 853 0412 9BB2     		uxth	r3, r3
+ 854 0414 1B02     		lsls	r3, r3, #8
+ 855 0416 9AB2     		uxth	r2, r3
+ 856 0418 7B68     		ldr	r3, [r7, #4]
+ 857 041a 5B68     		ldr	r3, [r3, #4]
+ 858 041c 0133     		adds	r3, r3, #1
+ 859 041e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 860 0420 9BB2     		uxth	r3, r3
+ 861 0422 1344     		add	r3, r3, r2
+ 862 0424 9AB2     		uxth	r2, r3
+ 863 0426 7B68     		ldr	r3, [r7, #4]
+ 864 0428 1A82     		strh	r2, [r3, #16]	@ movhi
+ 210:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       msg->l4_destination_port        = msg->payload[2]*256+msg->payload[3];
+ 865              		.loc 1 210 0
+ 866 042a 7B68     		ldr	r3, [r7, #4]
+ 867 042c 5B68     		ldr	r3, [r3, #4]
+ 868 042e 0233     		adds	r3, r3, #2
+ 869 0430 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 870 0432 9BB2     		uxth	r3, r3
+ 871 0434 1B02     		lsls	r3, r3, #8
+ 872 0436 9AB2     		uxth	r2, r3
+ 873 0438 7B68     		ldr	r3, [r7, #4]
+ 874 043a 5B68     		ldr	r3, [r3, #4]
+ 875 043c 0333     		adds	r3, r3, #3
+ 876 043e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 877 0440 9BB2     		uxth	r3, r3
+ 878 0442 1344     		add	r3, r3, r2
+ 879 0444 9AB2     		uxth	r2, r3
+ 880 0446 7B68     		ldr	r3, [r7, #4]
+ 881 0448 5A82     		strh	r2, [r3, #18]	@ movhi
+ 211:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       packetfunctions_tossHeader(msg,sizeof(udp_ht));
+ 882              		.loc 1 211 0
+ 883 044a 7868     		ldr	r0, [r7, #4]
+ 884 044c 0821     		movs	r1, #8
+ 885 044e FFF7FEFF 		bl	packetfunctions_tossHeader
+ 886              	.L39:
+ 212:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    }
+ 213:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    
+ 214:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    // iterate list of registered resources
+ 215:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    resource = openudp_vars.resources;
+ 887              		.loc 1 215 0
+ 888 0452 174B     		ldr	r3, .L48
+ 889 0454 1B68     		ldr	r3, [r3]
+ 890 0456 7B61     		str	r3, [r7, #20]
+ 216:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    while (NULL != resource) {
+ 891              		.loc 1 216 0
+ 892 0458 12E0     		b	.L40
+ 893              	.L45:
+ 217:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       if (resource->port == msg->l4_destination_port) {
+ 894              		.loc 1 217 0
+ 895 045a 7B69     		ldr	r3, [r7, #20]
+ 896 045c 1A88     		ldrh	r2, [r3]
+ 897 045e 7B68     		ldr	r3, [r7, #4]
+ 898 0460 5B8A     		ldrh	r3, [r3, #18]
+ 899 0462 9A42     		cmp	r2, r3
+ 900 0464 09D1     		bne	.L41
+ 218:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         udp_receive_done_callback_ptr = (resource->callbackReceive == NULL) ? openudp_receive_defau
+ 901              		.loc 1 218 0
+ 902 0466 7B69     		ldr	r3, [r7, #20]
+ 903 0468 5B68     		ldr	r3, [r3, #4]
+ 219:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                                                                             : resource->callbackRec
+ 904              		.loc 1 219 0
+ 905 046a 002B     		cmp	r3, #0
+ 906 046c 02D0     		beq	.L42
+ 907              		.loc 1 219 0 is_stmt 0 discriminator 1
+ 908 046e 7B69     		ldr	r3, [r7, #20]
+ 909 0470 5B68     		ldr	r3, [r3, #4]
+ 910 0472 00E0     		b	.L43
+ 911              	.L42:
+ 912              		.loc 1 219 0 discriminator 2
+ 913 0474 0F4B     		ldr	r3, .L48+4
+ 914              	.L43:
+ 218:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****         udp_receive_done_callback_ptr = (resource->callbackReceive == NULL) ? openudp_receive_defau
+ 915              		.loc 1 218 0 is_stmt 1
+ 916 0476 3B61     		str	r3, [r7, #16]
+ 220:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****          break;
+ 917              		.loc 1 220 0
+ 918 0478 05E0     		b	.L44
+ 919              	.L41:
+ 221:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       }
+ 222:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       resource = resource->next;
+ 920              		.loc 1 222 0
+ 921 047a 7B69     		ldr	r3, [r7, #20]
+ 922 047c DB68     		ldr	r3, [r3, #12]
+ 923 047e 7B61     		str	r3, [r7, #20]
+ 924              	.L40:
+ 216:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       if (resource->port == msg->l4_destination_port) {
+ 925              		.loc 1 216 0
+ 926 0480 7B69     		ldr	r3, [r7, #20]
+ 927 0482 002B     		cmp	r3, #0
+ 928 0484 E9D1     		bne	.L45
+ 929              	.L44:
+ 223:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    }
+ 224:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 225:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    if (udp_receive_done_callback_ptr == NULL) {
+ 930              		.loc 1 225 0
+ 931 0486 3B69     		ldr	r3, [r7, #16]
+ 932 0488 002B     		cmp	r3, #0
+ 933 048a 0BD1     		bne	.L46
+ 226:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       openserial_printError(COMPONENT_OPENUDP,ERR_UNSUPPORTED_PORT_NUMBER,
+ 934              		.loc 1 226 0
+ 935 048c 7B68     		ldr	r3, [r7, #4]
+ 936 048e 5B8A     		ldrh	r3, [r3, #18]
+ 937 0490 1720     		movs	r0, #23
+ 938 0492 0921     		movs	r1, #9
+ 939 0494 1A46     		mov	r2, r3
+ 940 0496 0623     		movs	r3, #6
+ 941 0498 FFF7FEFF 		bl	openserial_printError
+ 227:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                             (errorparameter_t)msg->l4_destination_port,
+ 228:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****                             (errorparameter_t)6);
+ 229:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       openqueue_freePacketBuffer(msg);
+ 942              		.loc 1 229 0
+ 943 049c 7868     		ldr	r0, [r7, #4]
+ 944 049e FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 945 04a2 02E0     		b	.L31
+ 946              	.L46:
+ 230:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    } else {
+ 231:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       // forward message to resource
+ 232:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****       udp_receive_done_callback_ptr(msg);  
+ 947              		.loc 1 232 0
+ 948 04a4 3B69     		ldr	r3, [r7, #16]
+ 949 04a6 7868     		ldr	r0, [r7, #4]
+ 950 04a8 9847     		blx	r3
+ 951              	.L31:
+ 233:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    }
+ 234:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 952              		.loc 1 234 0
+ 953 04aa 1837     		adds	r7, r7, #24
+ 954              		.cfi_def_cfa_offset 8
+ 955 04ac BD46     		mov	sp, r7
+ 956              		.cfi_def_cfa_register 13
+ 957              		@ sp needed
+ 958 04ae 80BD     		pop	{r7, pc}
+ 959              	.L49:
+ 960              		.align	2
+ 961              	.L48:
+ 962 04b0 00000000 		.word	openudp_vars
+ 963 04b4 00000000 		.word	openudp_receive_default_handler
+ 964              		.cfi_endproc
+ 965              	.LFE4:
+ 967              		.align	2
+ 968              		.global	openudp_debugPrint
+ 969              		.thumb
+ 970              		.thumb_func
+ 972              	openudp_debugPrint:
+ 973              	.LFB5:
+ 235:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 236:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** bool openudp_debugPrint(void) {
+ 974              		.loc 1 236 0
+ 975              		.cfi_startproc
+ 976              		@ args = 0, pretend = 0, frame = 0
+ 977              		@ frame_needed = 1, uses_anonymous_args = 0
+ 978              		@ link register save eliminated.
+ 979 04b8 80B4     		push	{r7}
+ 980              		.cfi_def_cfa_offset 4
+ 981              		.cfi_offset 7, -4
+ 982 04ba 00AF     		add	r7, sp, #0
+ 983              		.cfi_def_cfa_register 7
+ 237:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    return FALSE;
+ 984              		.loc 1 237 0
+ 985 04bc 0023     		movs	r3, #0
+ 238:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 986              		.loc 1 238 0
+ 987 04be 1846     		mov	r0, r3
+ 988 04c0 BD46     		mov	sp, r7
+ 989              		.cfi_def_cfa_register 13
+ 990              		@ sp needed
+ 991 04c2 5DF8047B 		ldr	r7, [sp], #4
+ 992              		.cfi_restore 7
+ 993              		.cfi_def_cfa_offset 0
+ 994 04c6 7047     		bx	lr
+ 995              		.cfi_endproc
+ 996              	.LFE5:
+ 998              		.align	2
+ 999              		.thumb
+ 1000              		.thumb_func
+ 1002              	openudp_sendDone_default_handler:
+ 1003              	.LFB6:
+ 239:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 240:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** //=========================== private =========================================
+ 241:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 242:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** static void openudp_sendDone_default_handler(OpenQueueEntry_t* msg, owerror_t error) {
+ 1004              		.loc 1 242 0
+ 1005              		.cfi_startproc
+ 1006              		@ args = 0, pretend = 0, frame = 8
+ 1007              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1008 04c8 80B5     		push	{r7, lr}
+ 1009              		.cfi_def_cfa_offset 8
+ 1010              		.cfi_offset 7, -8
+ 1011              		.cfi_offset 14, -4
+ 1012 04ca 82B0     		sub	sp, sp, #8
+ 1013              		.cfi_def_cfa_offset 16
+ 1014 04cc 00AF     		add	r7, sp, #0
+ 1015              		.cfi_def_cfa_register 7
+ 1016 04ce 7860     		str	r0, [r7, #4]
+ 1017 04d0 0B46     		mov	r3, r1
+ 1018 04d2 FB70     		strb	r3, [r7, #3]
+ 243:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    openqueue_freePacketBuffer(msg);
+ 1019              		.loc 1 243 0
+ 1020 04d4 7868     		ldr	r0, [r7, #4]
+ 1021 04d6 FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 244:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 1022              		.loc 1 244 0
+ 1023 04da 0837     		adds	r7, r7, #8
+ 1024              		.cfi_def_cfa_offset 8
+ 1025 04dc BD46     		mov	sp, r7
+ 1026              		.cfi_def_cfa_register 13
+ 1027              		@ sp needed
+ 1028 04de 80BD     		pop	{r7, pc}
+ 1029              		.cfi_endproc
+ 1030              	.LFE6:
+ 1032              		.align	2
+ 1033              		.thumb
+ 1034              		.thumb_func
+ 1036              	openudp_receive_default_handler:
+ 1037              	.LFB7:
+ 245:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** 
+ 246:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** static void openudp_receive_default_handler(OpenQueueEntry_t* msg) {
+ 1038              		.loc 1 246 0
+ 1039              		.cfi_startproc
+ 1040              		@ args = 0, pretend = 0, frame = 8
+ 1041              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1042 04e0 80B5     		push	{r7, lr}
+ 1043              		.cfi_def_cfa_offset 8
+ 1044              		.cfi_offset 7, -8
+ 1045              		.cfi_offset 14, -4
+ 1046 04e2 82B0     		sub	sp, sp, #8
+ 1047              		.cfi_def_cfa_offset 16
+ 1048 04e4 00AF     		add	r7, sp, #0
+ 1049              		.cfi_def_cfa_register 7
+ 1050 04e6 7860     		str	r0, [r7, #4]
+ 247:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c ****    openqueue_freePacketBuffer(msg);
+ 1051              		.loc 1 247 0
+ 1052 04e8 7868     		ldr	r0, [r7, #4]
+ 1053 04ea FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 248:build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.c **** }
+ 1054              		.loc 1 248 0
+ 1055 04ee 0837     		adds	r7, r7, #8
+ 1056              		.cfi_def_cfa_offset 8
+ 1057 04f0 BD46     		mov	sp, r7
+ 1058              		.cfi_def_cfa_register 13
+ 1059              		@ sp needed
+ 1060 04f2 80BD     		pop	{r7, pc}
+ 1061              		.cfi_endproc
+ 1062              	.LFE7:
+ 1064              	.Letext0:
+ 1065              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1066              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1067              		.file 4 "inc/opendefs.h"
+ 1068              		.file 5 "build/openmote-cc2538_armgcc/openstack/04-TRAN/openudp.h"
+ 1069              		.file 6 "openstack/03a-IPHC/iphc.h"
+ 1070              		.file 7 "bsp/boards/openmote-cc2538/board_info.h"
+ 1071              		.file 8 "openapps/opencoap/opencoap.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 openudp.c
+     /tmp/ccrgbCOt.s:19     .rodata:0000000000000000 $d
+     /tmp/ccrgbCOt.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccrgbCOt.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/ccrgbCOt.s:32     .rodata:0000000000000010 infouCName
+     /tmp/ccrgbCOt.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/ccrgbCOt.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/ccrgbCOt.s:47     .rodata:0000000000000030 ipAddr_ipsoRD
+     /tmp/ccrgbCOt.s:67     .rodata:0000000000000040 ipAddr_motesEecs
+     /tmp/ccrgbCOt.s:87     .rodata:0000000000000050 ipAddr_local
+     /tmp/ccrgbCOt.s:107    .rodata:0000000000000060 ipAddr_motedata
+     /tmp/ccrgbCOt.s:127    .rodata:0000000000000070 ipAddr_ringmaster
+                            *COM*:0000000000000004 openudp_vars
+     /tmp/ccrgbCOt.s:146    .text:0000000000000000 $t
+     /tmp/ccrgbCOt.s:151    .text:0000000000000000 openudp_init
+     /tmp/ccrgbCOt.s:179    .text:0000000000000014 $d
+     /tmp/ccrgbCOt.s:183    .text:0000000000000018 $t
+     /tmp/ccrgbCOt.s:188    .text:0000000000000018 openudp_register
+     /tmp/ccrgbCOt.s:225    .text:0000000000000038 $d
+     /tmp/ccrgbCOt.s:229    .text:000000000000003c $t
+     /tmp/ccrgbCOt.s:234    .text:000000000000003c openudp_send
+     /tmp/ccrgbCOt.s:366    .text:0000000000000100 $d
+     /tmp/ccrgbCOt.s:370    .text:0000000000000110 $t
+     /tmp/ccrgbCOt.s:547    .text:000000000000023c openudp_sendDone
+     /tmp/ccrgbCOt.s:649    .text:00000000000002b4 $d
+     /tmp/ccrgbCOt.s:1002   .text:00000000000004c8 openudp_sendDone_default_handler
+     /tmp/ccrgbCOt.s:654    .text:00000000000002bc $t
+     /tmp/ccrgbCOt.s:659    .text:00000000000002bc openudp_receive
+     /tmp/ccrgbCOt.s:704    .text:00000000000002fc $d
+     /tmp/ccrgbCOt.s:708    .text:000000000000030c $t
+     /tmp/ccrgbCOt.s:962    .text:00000000000004b0 $d
+     /tmp/ccrgbCOt.s:1036   .text:00000000000004e0 openudp_receive_default_handler
+     /tmp/ccrgbCOt.s:967    .text:00000000000004b8 $t
+     /tmp/ccrgbCOt.s:972    .text:00000000000004b8 openudp_debugPrint
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.stdio.h.27.3fc80220048df77954e38daec3bb9670
+                           .group:0000000000000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:0000000000000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:0000000000000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:0000000000000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:0000000000000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:0000000000000000 wm4.stdio.h.68.a99a2db1e55915cfd1b035cc1e9fcff1
+                           .group:0000000000000000 wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949
+                           .group:0000000000000000 wm4.openserial.h.32.c1b1c4db184af4a79a2b8ff62d908d4d
+                           .group:0000000000000000 wm4.iphc.h.2.9e7d9d56ac728a3c0b3014283a59854e
+                           .group:0000000000000000 wm4.forwarding.h.15.45cb0af1f91ed153925f6c7828496d3e
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.opencoap.h.32.4fd89a1f25836020968932a0f7dffe46
+                           .group:0000000000000000 wm4.uinject.h.2.f41ccf5b1e1bb8383ad85950f26f4007
+                           .group:0000000000000000 wm4.userialbridge.h.2.ba65066aed51e33abcaf4c4d089f1dd5
+                           .group:0000000000000000 wm4.schedule.h.2.1e56c0a55af41b0871de1bf3babafbff
+
+UNDEFINED SYMBOLS
+packetfunctions_reserveHeaderSize
+packetfunctions_htons
+packetfunctions_calculateChecksum
+forwarding_send
+openserial_printError
+openqueue_freePacketBuffer
+packetfunctions_tossHeader

@@ -1,0 +1,452 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"sctimer.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39              		.comm	sctimer_vars,4,4
+  40              		.text
+  41              		.align	2
+  42              		.global	sctimer_init
+  43              		.thumb
+  44              		.thumb_func
+  46              	sctimer_init:
+  47              	.LFB0:
+  48              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** /**
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** \brief A timer module with only a single compare value.
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** \author Tengfei Chang     <tengfei.chang@inria.fr> April 2017
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** */
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #include "board_info.h"
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #include "sctimer.h"
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #include "sleepmode.h"
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #include "debugpins.h"
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #include <headers/hw_ints.h>
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // ========================== define ==========================================
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #define TIMERLOOP_THRESHOLD          0xffffff     // 511 seconds @ 32768Hz clock
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // refer to SWRU319C cc2538 user's guide: section 13.2:
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // -- When setting a new compare value, the value must be at least 5 more than the
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // -- current sleep timer value. Otherwise, the timer compare event may be lost.
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** #define MINIMUM_COMPAREVALE_ADVANCE  5
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // ========================== variable ========================================
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** typedef struct {
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     sctimer_cbt sctimer_cb;
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** } sctimer_vars_t;
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** sctimer_vars_t sctimer_vars;
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // ========================== private =========================================
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_isr_internal(void);
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // ========================== protocol =========================================
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** /**
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** \brief Initialization sctimer.
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** */
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_init(void){
+  49              		.loc 1 39 0
+  50              		.cfi_startproc
+  51              		@ args = 0, pretend = 0, frame = 0
+  52              		@ frame_needed = 1, uses_anonymous_args = 0
+  53 0000 80B5     		push	{r7, lr}
+  54              		.cfi_def_cfa_offset 8
+  55              		.cfi_offset 7, -8
+  56              		.cfi_offset 14, -4
+  57 0002 00AF     		add	r7, sp, #0
+  58              		.cfi_def_cfa_register 7
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     memset(&sctimer_vars, 0, sizeof(sctimer_vars_t));
+  59              		.loc 1 40 0
+  60 0004 0648     		ldr	r0, .L2
+  61 0006 0021     		movs	r1, #0
+  62 0008 0422     		movs	r2, #4
+  63 000a FFF7FEFF 		bl	memset
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     IntRegister(INT_SMTIM, sctimer_isr_internal);
+  64              		.loc 1 41 0
+  65 000e A120     		movs	r0, #161
+  66 0010 0449     		ldr	r1, .L2+4
+  67 0012 FFF7FEFF 		bl	IntRegister
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     IntDisable(INT_SMTIM);
+  68              		.loc 1 42 0
+  69 0016 A120     		movs	r0, #161
+  70 0018 FFF7FEFF 		bl	IntDisable
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+  71              		.loc 1 43 0
+  72 001c 80BD     		pop	{r7, pc}
+  73              	.L3:
+  74 001e 00BF     		.align	2
+  75              	.L2:
+  76 0020 00000000 		.word	sctimer_vars
+  77 0024 00000000 		.word	sctimer_isr_internal
+  78              		.cfi_endproc
+  79              	.LFE0:
+  81              		.align	2
+  82              		.global	sctimer_set_callback
+  83              		.thumb
+  84              		.thumb_func
+  86              	sctimer_set_callback:
+  87              	.LFB1:
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_set_callback(sctimer_cbt cb){
+  88              		.loc 1 45 0
+  89              		.cfi_startproc
+  90              		@ args = 0, pretend = 0, frame = 8
+  91              		@ frame_needed = 1, uses_anonymous_args = 0
+  92              		@ link register save eliminated.
+  93 0028 80B4     		push	{r7}
+  94              		.cfi_def_cfa_offset 4
+  95              		.cfi_offset 7, -4
+  96 002a 83B0     		sub	sp, sp, #12
+  97              		.cfi_def_cfa_offset 16
+  98 002c 00AF     		add	r7, sp, #0
+  99              		.cfi_def_cfa_register 7
+ 100 002e 7860     		str	r0, [r7, #4]
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     sctimer_vars.sctimer_cb = cb;
+ 101              		.loc 1 46 0
+ 102 0030 034A     		ldr	r2, .L5
+ 103 0032 7B68     		ldr	r3, [r7, #4]
+ 104 0034 1360     		str	r3, [r2]
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+ 105              		.loc 1 47 0
+ 106 0036 0C37     		adds	r7, r7, #12
+ 107              		.cfi_def_cfa_offset 4
+ 108 0038 BD46     		mov	sp, r7
+ 109              		.cfi_def_cfa_register 13
+ 110              		@ sp needed
+ 111 003a 5DF8047B 		ldr	r7, [sp], #4
+ 112              		.cfi_restore 7
+ 113              		.cfi_def_cfa_offset 0
+ 114 003e 7047     		bx	lr
+ 115              	.L6:
+ 116              		.align	2
+ 117              	.L5:
+ 118 0040 00000000 		.word	sctimer_vars
+ 119              		.cfi_endproc
+ 120              	.LFE1:
+ 122              		.align	2
+ 123              		.global	sctimer_setCompare
+ 124              		.thumb
+ 125              		.thumb_func
+ 127              	sctimer_setCompare:
+ 128              	.LFB2:
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** /**
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** \brief set compare interrupt
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** */
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_setCompare(uint32_t val){
+ 129              		.loc 1 52 0
+ 130              		.cfi_startproc
+ 131              		@ args = 0, pretend = 0, frame = 8
+ 132              		@ frame_needed = 1, uses_anonymous_args = 0
+ 133 0044 80B5     		push	{r7, lr}
+ 134              		.cfi_def_cfa_offset 8
+ 135              		.cfi_offset 7, -8
+ 136              		.cfi_offset 14, -4
+ 137 0046 82B0     		sub	sp, sp, #8
+ 138              		.cfi_def_cfa_offset 16
+ 139 0048 00AF     		add	r7, sp, #0
+ 140              		.cfi_def_cfa_register 7
+ 141 004a 7860     		str	r0, [r7, #4]
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     IntEnable(INT_SMTIM);
+ 142              		.loc 1 53 0
+ 143 004c A120     		movs	r0, #161
+ 144 004e FFF7FEFF 		bl	IntEnable
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     if (SleepModeTimerCountGet() - val < TIMERLOOP_THRESHOLD){
+ 145              		.loc 1 54 0
+ 146 0052 FFF7FEFF 		bl	SleepModeTimerCountGet
+ 147 0056 0246     		mov	r2, r0
+ 148 0058 7B68     		ldr	r3, [r7, #4]
+ 149 005a D31A     		subs	r3, r2, r3
+ 150 005c 0B4A     		ldr	r2, .L11
+ 151 005e 9342     		cmp	r3, r2
+ 152 0060 03D8     		bhi	.L8
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         // the timer is already late, schedule the ISR right now manually
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         IntPendSet(INT_SMTIM);
+ 153              		.loc 1 56 0
+ 154 0062 A120     		movs	r0, #161
+ 155 0064 FFF7FEFF 		bl	IntPendSet
+ 156 0068 0DE0     		b	.L7
+ 157              	.L8:
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     } else {
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         if (val-SleepModeTimerCountGet()<MINIMUM_COMPAREVALE_ADVANCE){
+ 158              		.loc 1 58 0
+ 159 006a FFF7FEFF 		bl	SleepModeTimerCountGet
+ 160 006e 0246     		mov	r2, r0
+ 161 0070 7B68     		ldr	r3, [r7, #4]
+ 162 0072 9B1A     		subs	r3, r3, r2
+ 163 0074 042B     		cmp	r3, #4
+ 164 0076 03D8     		bhi	.L10
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****             // there is hardware limitation to schedule the timer within TIMERTHRESHOLD ticks
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****             // schedule ISR right now manually
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****             IntPendSet(INT_SMTIM);
+ 165              		.loc 1 61 0
+ 166 0078 A120     		movs	r0, #161
+ 167 007a FFF7FEFF 		bl	IntPendSet
+ 168 007e 02E0     		b	.L7
+ 169              	.L10:
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         } else {
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****             // schedule the timer at val
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****             SleepModeTimerCompareSet(val);
+ 170              		.loc 1 64 0
+ 171 0080 7868     		ldr	r0, [r7, #4]
+ 172 0082 FFF7FEFF 		bl	SleepModeTimerCompareSet
+ 173              	.L7:
+  65:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         }
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     }
+  67:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+ 174              		.loc 1 67 0
+ 175 0086 0837     		adds	r7, r7, #8
+ 176              		.cfi_def_cfa_offset 8
+ 177 0088 BD46     		mov	sp, r7
+ 178              		.cfi_def_cfa_register 13
+ 179              		@ sp needed
+ 180 008a 80BD     		pop	{r7, pc}
+ 181              	.L12:
+ 182              		.align	2
+ 183              	.L11:
+ 184 008c FEFFFF00 		.word	16777214
+ 185              		.cfi_endproc
+ 186              	.LFE2:
+ 188              		.align	2
+ 189              		.global	sctimer_readCounter
+ 190              		.thumb
+ 191              		.thumb_func
+ 193              	sctimer_readCounter:
+ 194              	.LFB3:
+  68:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  69:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** /**
+  70:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** \brief Return the current value of the timer's counter.
+  71:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  72:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****  \returns The current value of the timer's counter.
+  73:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** */
+  74:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** uint32_t sctimer_readCounter(void){
+ 195              		.loc 1 74 0
+ 196              		.cfi_startproc
+ 197              		@ args = 0, pretend = 0, frame = 0
+ 198              		@ frame_needed = 1, uses_anonymous_args = 0
+ 199 0090 80B5     		push	{r7, lr}
+ 200              		.cfi_def_cfa_offset 8
+ 201              		.cfi_offset 7, -8
+ 202              		.cfi_offset 14, -4
+ 203 0092 00AF     		add	r7, sp, #0
+ 204              		.cfi_def_cfa_register 7
+  75:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****   return SleepModeTimerCountGet();
+ 205              		.loc 1 75 0
+ 206 0094 FFF7FEFF 		bl	SleepModeTimerCountGet
+ 207 0098 0346     		mov	r3, r0
+  76:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+ 208              		.loc 1 76 0
+ 209 009a 1846     		mov	r0, r3
+ 210 009c 80BD     		pop	{r7, pc}
+ 211              		.cfi_endproc
+ 212              	.LFE3:
+ 214 009e 00BF     		.align	2
+ 215              		.global	sctimer_enable
+ 216              		.thumb
+ 217              		.thumb_func
+ 219              	sctimer_enable:
+ 220              	.LFB4:
+  77:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  78:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_enable(void){
+ 221              		.loc 1 78 0
+ 222              		.cfi_startproc
+ 223              		@ args = 0, pretend = 0, frame = 0
+ 224              		@ frame_needed = 1, uses_anonymous_args = 0
+ 225 00a0 80B5     		push	{r7, lr}
+ 226              		.cfi_def_cfa_offset 8
+ 227              		.cfi_offset 7, -8
+ 228              		.cfi_offset 14, -4
+ 229 00a2 00AF     		add	r7, sp, #0
+ 230              		.cfi_def_cfa_register 7
+  79:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     IntEnable(INT_SMTIM);
+ 231              		.loc 1 79 0
+ 232 00a4 A120     		movs	r0, #161
+ 233 00a6 FFF7FEFF 		bl	IntEnable
+  80:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+ 234              		.loc 1 80 0
+ 235 00aa 80BD     		pop	{r7, pc}
+ 236              		.cfi_endproc
+ 237              	.LFE4:
+ 239              		.align	2
+ 240              		.global	sctimer_disable
+ 241              		.thumb
+ 242              		.thumb_func
+ 244              	sctimer_disable:
+ 245              	.LFB5:
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  82:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_disable(void){
+ 246              		.loc 1 82 0
+ 247              		.cfi_startproc
+ 248              		@ args = 0, pretend = 0, frame = 0
+ 249              		@ frame_needed = 1, uses_anonymous_args = 0
+ 250 00ac 80B5     		push	{r7, lr}
+ 251              		.cfi_def_cfa_offset 8
+ 252              		.cfi_offset 7, -8
+ 253              		.cfi_offset 14, -4
+ 254 00ae 00AF     		add	r7, sp, #0
+ 255              		.cfi_def_cfa_register 7
+  83:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     IntDisable(INT_SMTIM);
+ 256              		.loc 1 83 0
+ 257 00b0 A120     		movs	r0, #161
+ 258 00b2 FFF7FEFF 		bl	IntDisable
+  84:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }
+ 259              		.loc 1 84 0
+ 260 00b6 80BD     		pop	{r7, pc}
+ 261              		.cfi_endproc
+ 262              	.LFE5:
+ 264              		.align	2
+ 265              		.global	sctimer_isr_internal
+ 266              		.thumb
+ 267              		.thumb_func
+ 269              	sctimer_isr_internal:
+ 270              	.LFB6:
+  85:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  86:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** // ========================== private =========================================
+  87:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** 
+  88:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** void sctimer_isr_internal(void){
+ 271              		.loc 1 88 0
+ 272              		.cfi_startproc
+ 273              		@ args = 0, pretend = 0, frame = 0
+ 274              		@ frame_needed = 1, uses_anonymous_args = 0
+ 275 00b8 80B5     		push	{r7, lr}
+ 276              		.cfi_def_cfa_offset 8
+ 277              		.cfi_offset 7, -8
+ 278              		.cfi_offset 14, -4
+ 279 00ba 00AF     		add	r7, sp, #0
+ 280              		.cfi_def_cfa_register 7
+  89:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     debugpins_isr_set();
+ 281              		.loc 1 89 0
+ 282 00bc FFF7FEFF 		bl	debugpins_isr_set
+  90:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     if (sctimer_vars.sctimer_cb!=NULL) {
+ 283              		.loc 1 90 0
+ 284 00c0 074B     		ldr	r3, .L19
+ 285 00c2 1B68     		ldr	r3, [r3]
+ 286 00c4 002B     		cmp	r3, #0
+ 287 00c6 07D0     		beq	.L18
+  91:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         IntPendClear(INT_SMTIM);
+ 288              		.loc 1 91 0
+ 289 00c8 A120     		movs	r0, #161
+ 290 00ca FFF7FEFF 		bl	IntPendClear
+  92:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         sctimer_vars.sctimer_cb();
+ 291              		.loc 1 92 0
+ 292 00ce 044B     		ldr	r3, .L19
+ 293 00d0 1B68     		ldr	r3, [r3]
+ 294 00d2 9847     		blx	r3
+  93:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****         debugpins_isr_clr();
+ 295              		.loc 1 93 0
+ 296 00d4 FFF7FEFF 		bl	debugpins_isr_clr
+ 297              	.L18:
+  94:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     }
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c ****     debugpins_isr_clr();
+ 298              		.loc 1 95 0
+ 299 00d8 FFF7FEFF 		bl	debugpins_isr_clr
+  96:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/sctimer.c **** }...
+ 300              		.loc 1 96 0
+ 301 00dc 80BD     		pop	{r7, pc}
+ 302              	.L20:
+ 303 00de 00BF     		.align	2
+ 304              	.L19:
+ 305 00e0 00000000 		.word	sctimer_vars
+ 306              		.cfi_endproc
+ 307              	.LFE6:
+ 309              	.Letext0:
+ 310              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 311              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 312              		.file 4 "bsp/boards/sctimer.h"
+ 313              		.file 5 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/board_info.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sctimer.c
+     /tmp/cceTF6vG.s:19     .rodata:0000000000000000 $d
+     /tmp/cceTF6vG.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/cceTF6vG.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/cceTF6vG.s:32     .rodata:0000000000000010 infouCName
+     /tmp/cceTF6vG.s:37     .rodata:0000000000000018 infoRadioName
+                            *COM*:0000000000000004 sctimer_vars
+     /tmp/cceTF6vG.s:41     .text:0000000000000000 $t
+     /tmp/cceTF6vG.s:46     .text:0000000000000000 sctimer_init
+     /tmp/cceTF6vG.s:76     .text:0000000000000020 $d
+     /tmp/cceTF6vG.s:269    .text:00000000000000b8 sctimer_isr_internal
+     /tmp/cceTF6vG.s:81     .text:0000000000000028 $t
+     /tmp/cceTF6vG.s:86     .text:0000000000000028 sctimer_set_callback
+     /tmp/cceTF6vG.s:118    .text:0000000000000040 $d
+     /tmp/cceTF6vG.s:122    .text:0000000000000044 $t
+     /tmp/cceTF6vG.s:127    .text:0000000000000044 sctimer_setCompare
+     /tmp/cceTF6vG.s:184    .text:000000000000008c $d
+     /tmp/cceTF6vG.s:188    .text:0000000000000090 $t
+     /tmp/cceTF6vG.s:193    .text:0000000000000090 sctimer_readCounter
+     /tmp/cceTF6vG.s:219    .text:00000000000000a0 sctimer_enable
+     /tmp/cceTF6vG.s:244    .text:00000000000000ac sctimer_disable
+     /tmp/cceTF6vG.s:305    .text:00000000000000e0 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.1de8df52ab2567aa1aa0a288d2325900
+                           .group:0000000000000000 wm4.sleepmode.h.41.8aaaa1e0c85692d50a0ac7b45436b69e
+                           .group:0000000000000000 wm4.hw_ints.h.42.85b9479f2be35b086f1bb7cbb15bc097
+
+UNDEFINED SYMBOLS
+memset
+IntRegister
+IntDisable
+IntEnable
+SleepModeTimerCountGet
+IntPendSet
+SleepModeTimerCompareSet
+debugpins_isr_set
+IntPendClear
+debugpins_isr_clr

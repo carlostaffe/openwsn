@@ -1,0 +1,2156 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"sha224-256.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	addTemp:
+  21 0000 00000000 		.space	4
+  22              		.data
+  23              		.align	2
+  26              	SHA224_H0:
+  27 0000 D89E05C1 		.word	-1056596264
+  28 0004 07D57C36 		.word	914150663
+  29 0008 17DD7030 		.word	812702999
+  30 000c 39590EF7 		.word	-150054599
+  31 0010 310BC0FF 		.word	-4191439
+  32 0014 11155868 		.word	1750603025
+  33 0018 A78FF964 		.word	1694076839
+  34 001c A44FFABE 		.word	-1090891868
+  35              		.align	2
+  38              	SHA256_H0:
+  39 0020 67E6096A 		.word	1779033703
+  40 0024 85AE67BB 		.word	-1150833019
+  41 0028 72F36E3C 		.word	1013904242
+  42 002c 3AF54FA5 		.word	-1521486534
+  43 0030 7F520E51 		.word	1359893119
+  44 0034 8C68059B 		.word	-1694144372
+  45 0038 ABD9831F 		.word	528734635
+  46 003c 19CDE05B 		.word	1541459225
+  47              		.text
+  48              		.align	2
+  49              		.global	SHA224Reset
+  50              		.thumb
+  51              		.thumb_func
+  53              	SHA224Reset:
+  54              	.LFB0:
+  55              		.file 1 "build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c"
+   1:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /************************* sha224-256.c ************************/
+   2:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /***************** See RFC 6234 for details. *******************/
+   3:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Copyright (c) 2011 IETF Trust and the persons identified as */
+   4:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* authors of the code.  All rights reserved.                  */
+   5:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* See sha.h for terms of use and redistribution.              */
+   6:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+   7:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+   8:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+   9:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This file implements the Secure Hash Algorithms SHA-224 and
+  10:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   SHA-256 as defined in the U.S. National Institute of Standards
+  11:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   and Technology Federal Information Processing Standards
+  12:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Publication (FIPS PUB) 180-3 published in October 2008
+  13:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   and formerly defined in its predecessors, FIPS PUB 180-1
+  14:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   and FIP PUB 180-2.
+  15:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+  16:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   A combined document showing all algorithms is available at
+  17:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *       http://csrc.nist.gov/publications/fips/
+  18:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *              fips180-3/fips180-3_final.pdf
+  19:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+  20:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   The SHA-224 and SHA-256 algorithms produce 224-bit and 256-bit
+  21:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message digests for a given data stream.  It should take about
+  22:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   2**n steps to find a message with the same digest as a given
+  23:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message and 2**(n/2) to find any two messages with the same
+  24:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   digest, when n is the digest size in bits.  Therefore, this
+  25:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   algorithm can serve as a means of providing a
+  26:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   "fingerprint" for a message.
+  27:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+  28:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Portability Issues:
+  29:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   SHA-224 and SHA-256 are defined in terms of 32-bit "words".
+  30:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This code uses <stdint.h> (included via "sha.h") to define 32-
+  31:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   and 8-bit unsigned integer types.  If your C compiler does not
+  32:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   support 32-bit unsigned integers, this code is not
+  33:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   appropriate.
+  34:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+  35:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Caveats:
+  36:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   SHA-224 and SHA-256 are designed to work with messages less
+  37:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   than 2^64 bits long.  This implementation uses SHA224/256Input()
+  38:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   to hash the bits that are a multiple of the size of an 8-bit
+  39:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   octet, and then optionally uses SHA224/256FinalBits()
+  40:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   to hash the final few bits of the input.
+  41:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+  42:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  43:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #include "sha.h"
+  44:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #include "sha-private.h"
+  45:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  46:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Define the SHA shift, rotate left, and rotate right macros */
+  47:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_SHR(bits,word)      ((word) >> (bits))
+  48:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_ROTL(bits,word)                         \
+  49:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (((word) << (bits)) | ((word) >> (32-(bits))))
+  50:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_ROTR(bits,word)                         \
+  51:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (((word) >> (bits)) | ((word) << (32-(bits))))
+  52:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  53:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Define the SHA SIGMA and sigma macros */
+  54:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_SIGMA0(word)   \
+  55:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (SHA256_ROTR( 2,word) ^ SHA256_ROTR(13,word) ^ SHA256_ROTR(22,word))
+  56:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_SIGMA1(word)   \
+  57:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (SHA256_ROTR( 6,word) ^ SHA256_ROTR(11,word) ^ SHA256_ROTR(25,word))
+  58:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_sigma0(word)   \
+  59:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (SHA256_ROTR( 7,word) ^ SHA256_ROTR(18,word) ^ SHA256_SHR( 3,word))
+  60:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA256_sigma1(word)   \
+  61:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (SHA256_ROTR(17,word) ^ SHA256_ROTR(19,word) ^ SHA256_SHR(10,word))
+  62:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  63:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+  64:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Add "length" to the length.
+  65:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Set Corrupted when overflow has occurred.
+  66:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+  67:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static uint32_t addTemp;
+  68:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** #define SHA224_256AddLength(context, length)               \
+  69:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   (addTemp = (context)->Length_Low, (context)->Corrupted = \
+  70:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     (((context)->Length_Low += (length)) < addTemp) &&     \
+  71:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     (++(context)->Length_High == 0) ? shaInputTooLong :    \
+  72:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****                                       (context)->Corrupted )
+  73:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  74:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Local Function Prototypes */
+  75:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static int SHA224_256Reset(SHA256Context *context, uint32_t *H0);
+  76:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256ProcessMessageBlock(SHA256Context *context);
+  77:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256Finalize(SHA256Context *context,
+  78:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint8_t Pad_Byte);
+  79:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256PadMessage(SHA256Context *context,
+  80:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint8_t Pad_Byte);
+  81:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static int SHA224_256ResultN(SHA256Context *context,
+  82:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint8_t Message_Digest[ ], int HashSize);
+  83:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  84:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Initial Hash Values: FIPS 180-3 section 5.3.2 */
+  85:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static uint32_t SHA224_H0[SHA256HashSize/4] = {
+  86:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     0xC1059ED8, 0x367CD507, 0x3070DD17, 0xF70E5939,
+  87:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     0xFFC00B31, 0x68581511, 0x64F98FA7, 0xBEFA4FA4
+  88:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** };
+  89:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  90:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /* Initial Hash Values: FIPS 180-3 section 5.3.3 */
+  91:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static uint32_t SHA256_H0[SHA256HashSize/4] = {
+  92:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
+  93:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
+  94:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** };
+  95:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+  96:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+  97:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224Reset
+  98:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+  99:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 100:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will initialize the SHA224Context in preparation
+ 101:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   for computing a new SHA224 message digest.
+ 102:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 103:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 104:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 105:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to reset.
+ 106:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 107:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 108:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 109:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 110:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA224Reset(SHA224Context *context)
+ 111:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+  56              		.loc 1 111 0
+  57              		.cfi_startproc
+  58              		@ args = 0, pretend = 0, frame = 8
+  59              		@ frame_needed = 1, uses_anonymous_args = 0
+  60 0000 80B5     		push	{r7, lr}
+  61              		.cfi_def_cfa_offset 8
+  62              		.cfi_offset 7, -8
+  63              		.cfi_offset 14, -4
+  64 0002 82B0     		sub	sp, sp, #8
+  65              		.cfi_def_cfa_offset 16
+  66 0004 00AF     		add	r7, sp, #0
+  67              		.cfi_def_cfa_register 7
+  68 0006 7860     		str	r0, [r7, #4]
+ 112:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA224_256Reset(context, SHA224_H0);
+  69              		.loc 1 112 0
+  70 0008 7868     		ldr	r0, [r7, #4]
+  71 000a 0449     		ldr	r1, .L3
+  72 000c 00F036F9 		bl	SHA224_256Reset
+  73 0010 0346     		mov	r3, r0
+ 113:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+  74              		.loc 1 113 0
+  75 0012 1846     		mov	r0, r3
+  76 0014 0837     		adds	r7, r7, #8
+  77              		.cfi_def_cfa_offset 8
+  78 0016 BD46     		mov	sp, r7
+  79              		.cfi_def_cfa_register 13
+  80              		@ sp needed
+  81 0018 80BD     		pop	{r7, pc}
+  82              	.L4:
+  83 001a 00BF     		.align	2
+  84              	.L3:
+  85 001c 00000000 		.word	SHA224_H0
+  86              		.cfi_endproc
+  87              	.LFE0:
+  89              		.align	2
+  90              		.global	SHA224Input
+  91              		.thumb
+  92              		.thumb_func
+  94              	SHA224Input:
+  95              	.LFB1:
+ 114:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 115:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 116:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224Input
+ 117:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 118:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 119:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function accepts an array of octets as the next portion
+ 120:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   of the message.
+ 121:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 122:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 123:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 124:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 125:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message_array[ ]: [in]
+ 126:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     An array of octets representing the next portion of
+ 127:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     the message.
+ 128:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   length: [in]
+ 129:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The length of the message in message_array.
+ 130:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 131:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 132:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 133:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 134:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA224Input(SHA224Context *context, const uint8_t *message_array,
+ 136:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     unsigned int length)
+ 137:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+  96              		.loc 1 137 0
+  97              		.cfi_startproc
+  98              		@ args = 0, pretend = 0, frame = 16
+  99              		@ frame_needed = 1, uses_anonymous_args = 0
+ 100 0020 80B5     		push	{r7, lr}
+ 101              		.cfi_def_cfa_offset 8
+ 102              		.cfi_offset 7, -8
+ 103              		.cfi_offset 14, -4
+ 104 0022 84B0     		sub	sp, sp, #16
+ 105              		.cfi_def_cfa_offset 24
+ 106 0024 00AF     		add	r7, sp, #0
+ 107              		.cfi_def_cfa_register 7
+ 108 0026 F860     		str	r0, [r7, #12]
+ 109 0028 B960     		str	r1, [r7, #8]
+ 110 002a 7A60     		str	r2, [r7, #4]
+ 138:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA256Input(context, message_array, length);
+ 111              		.loc 1 138 0
+ 112 002c F868     		ldr	r0, [r7, #12]
+ 113 002e B968     		ldr	r1, [r7, #8]
+ 114 0030 7A68     		ldr	r2, [r7, #4]
+ 115 0032 FFF7FEFF 		bl	SHA256Input
+ 116 0036 0346     		mov	r3, r0
+ 139:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 117              		.loc 1 139 0
+ 118 0038 1846     		mov	r0, r3
+ 119 003a 1037     		adds	r7, r7, #16
+ 120              		.cfi_def_cfa_offset 8
+ 121 003c BD46     		mov	sp, r7
+ 122              		.cfi_def_cfa_register 13
+ 123              		@ sp needed
+ 124 003e 80BD     		pop	{r7, pc}
+ 125              		.cfi_endproc
+ 126              	.LFE1:
+ 128              		.align	2
+ 129              		.global	SHA224FinalBits
+ 130              		.thumb
+ 131              		.thumb_func
+ 133              	SHA224FinalBits:
+ 134              	.LFB2:
+ 140:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 141:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 142:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224FinalBits
+ 143:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 144:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 145:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will add in any final bits of the message.
+ 146:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 147:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 148:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 149:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 150:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message_bits: [in]
+ 151:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The final bits of the message, in the upper portion of the
+ 152:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     byte.  (Use 0b###00000 instead of 0b00000### to input the
+ 153:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     three bits ###.)
+ 154:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   length: [in]
+ 155:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The number of bits in message_bits, between 1 and 7.
+ 156:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 157:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 158:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 159:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 160:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA224FinalBits(SHA224Context *context,
+ 161:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****                     uint8_t message_bits, unsigned int length)
+ 162:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 135              		.loc 1 162 0
+ 136              		.cfi_startproc
+ 137              		@ args = 0, pretend = 0, frame = 16
+ 138              		@ frame_needed = 1, uses_anonymous_args = 0
+ 139 0040 80B5     		push	{r7, lr}
+ 140              		.cfi_def_cfa_offset 8
+ 141              		.cfi_offset 7, -8
+ 142              		.cfi_offset 14, -4
+ 143 0042 84B0     		sub	sp, sp, #16
+ 144              		.cfi_def_cfa_offset 24
+ 145 0044 00AF     		add	r7, sp, #0
+ 146              		.cfi_def_cfa_register 7
+ 147 0046 F860     		str	r0, [r7, #12]
+ 148 0048 0B46     		mov	r3, r1
+ 149 004a 7A60     		str	r2, [r7, #4]
+ 150 004c FB72     		strb	r3, [r7, #11]
+ 163:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA256FinalBits(context, message_bits, length);
+ 151              		.loc 1 163 0
+ 152 004e FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 153 0050 F868     		ldr	r0, [r7, #12]
+ 154 0052 1946     		mov	r1, r3
+ 155 0054 7A68     		ldr	r2, [r7, #4]
+ 156 0056 FFF7FEFF 		bl	SHA256FinalBits
+ 157 005a 0346     		mov	r3, r0
+ 164:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 158              		.loc 1 164 0
+ 159 005c 1846     		mov	r0, r3
+ 160 005e 1037     		adds	r7, r7, #16
+ 161              		.cfi_def_cfa_offset 8
+ 162 0060 BD46     		mov	sp, r7
+ 163              		.cfi_def_cfa_register 13
+ 164              		@ sp needed
+ 165 0062 80BD     		pop	{r7, pc}
+ 166              		.cfi_endproc
+ 167              	.LFE2:
+ 169              		.align	2
+ 170              		.global	SHA224Result
+ 171              		.thumb
+ 172              		.thumb_func
+ 174              	SHA224Result:
+ 175              	.LFB3:
+ 165:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 166:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 167:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224Result
+ 168:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 169:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 170:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will return the 224-bit message digest
+ 171:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   into the Message_Digest array provided by the caller.
+ 172:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   NOTE:
+ 173:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    The first octet of hash is stored in the element with index 0,
+ 174:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    the last octet of hash in the element with index 27.
+ 175:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 176:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 177:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 178:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to use to calculate the SHA hash.
+ 179:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Message_Digest[ ]: [out]
+ 180:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     Where the digest is returned.
+ 181:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 182:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 183:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 184:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 185:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA224Result(SHA224Context *context,
+ 186:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     uint8_t Message_Digest[SHA224HashSize])
+ 187:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 176              		.loc 1 187 0
+ 177              		.cfi_startproc
+ 178              		@ args = 0, pretend = 0, frame = 8
+ 179              		@ frame_needed = 1, uses_anonymous_args = 0
+ 180 0064 80B5     		push	{r7, lr}
+ 181              		.cfi_def_cfa_offset 8
+ 182              		.cfi_offset 7, -8
+ 183              		.cfi_offset 14, -4
+ 184 0066 82B0     		sub	sp, sp, #8
+ 185              		.cfi_def_cfa_offset 16
+ 186 0068 00AF     		add	r7, sp, #0
+ 187              		.cfi_def_cfa_register 7
+ 188 006a 7860     		str	r0, [r7, #4]
+ 189 006c 3960     		str	r1, [r7]
+ 188:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA224_256ResultN(context, Message_Digest, SHA224HashSize);
+ 190              		.loc 1 188 0
+ 191 006e 7868     		ldr	r0, [r7, #4]
+ 192 0070 3968     		ldr	r1, [r7]
+ 193 0072 1C22     		movs	r2, #28
+ 194 0074 00F0A4FB 		bl	SHA224_256ResultN
+ 195 0078 0346     		mov	r3, r0
+ 189:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 196              		.loc 1 189 0
+ 197 007a 1846     		mov	r0, r3
+ 198 007c 0837     		adds	r7, r7, #8
+ 199              		.cfi_def_cfa_offset 8
+ 200 007e BD46     		mov	sp, r7
+ 201              		.cfi_def_cfa_register 13
+ 202              		@ sp needed
+ 203 0080 80BD     		pop	{r7, pc}
+ 204              		.cfi_endproc
+ 205              	.LFE3:
+ 207 0082 00BF     		.align	2
+ 208              		.global	SHA256Reset
+ 209              		.thumb
+ 210              		.thumb_func
+ 212              	SHA256Reset:
+ 213              	.LFB4:
+ 190:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 191:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 192:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA256Reset
+ 193:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 194:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 195:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will initialize the SHA256Context in preparation
+ 196:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   for computing a new SHA256 message digest.
+ 197:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 198:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 199:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 200:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to reset.
+ 201:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 202:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 203:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 204:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 205:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA256Reset(SHA256Context *context)
+ 206:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 214              		.loc 1 206 0
+ 215              		.cfi_startproc
+ 216              		@ args = 0, pretend = 0, frame = 8
+ 217              		@ frame_needed = 1, uses_anonymous_args = 0
+ 218 0084 80B5     		push	{r7, lr}
+ 219              		.cfi_def_cfa_offset 8
+ 220              		.cfi_offset 7, -8
+ 221              		.cfi_offset 14, -4
+ 222 0086 82B0     		sub	sp, sp, #8
+ 223              		.cfi_def_cfa_offset 16
+ 224 0088 00AF     		add	r7, sp, #0
+ 225              		.cfi_def_cfa_register 7
+ 226 008a 7860     		str	r0, [r7, #4]
+ 207:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA224_256Reset(context, SHA256_H0);
+ 227              		.loc 1 207 0
+ 228 008c 7868     		ldr	r0, [r7, #4]
+ 229 008e 0449     		ldr	r1, .L13
+ 230 0090 00F0F4F8 		bl	SHA224_256Reset
+ 231 0094 0346     		mov	r3, r0
+ 208:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 232              		.loc 1 208 0
+ 233 0096 1846     		mov	r0, r3
+ 234 0098 0837     		adds	r7, r7, #8
+ 235              		.cfi_def_cfa_offset 8
+ 236 009a BD46     		mov	sp, r7
+ 237              		.cfi_def_cfa_register 13
+ 238              		@ sp needed
+ 239 009c 80BD     		pop	{r7, pc}
+ 240              	.L14:
+ 241 009e 00BF     		.align	2
+ 242              	.L13:
+ 243 00a0 20000000 		.word	SHA256_H0
+ 244              		.cfi_endproc
+ 245              	.LFE4:
+ 247              		.align	2
+ 248              		.global	SHA256Input
+ 249              		.thumb
+ 250              		.thumb_func
+ 252              	SHA256Input:
+ 253              	.LFB5:
+ 209:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 210:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 211:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA256Input
+ 212:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 213:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 214:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function accepts an array of octets as the next portion
+ 215:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   of the message.
+ 216:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 217:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 218:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 219:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 220:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message_array[ ]: [in]
+ 221:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     An array of octets representing the next portion of
+ 222:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     the message.
+ 223:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   length: [in]
+ 224:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The length of the message in message_array.
+ 225:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 226:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 227:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 228:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 229:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA256Input(SHA256Context *context, const uint8_t *message_array,
+ 230:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     unsigned int length)
+ 231:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 254              		.loc 1 231 0
+ 255              		.cfi_startproc
+ 256              		@ args = 0, pretend = 0, frame = 16
+ 257              		@ frame_needed = 1, uses_anonymous_args = 0
+ 258 00a4 80B5     		push	{r7, lr}
+ 259              		.cfi_def_cfa_offset 8
+ 260              		.cfi_offset 7, -8
+ 261              		.cfi_offset 14, -4
+ 262 00a6 84B0     		sub	sp, sp, #16
+ 263              		.cfi_def_cfa_offset 24
+ 264 00a8 00AF     		add	r7, sp, #0
+ 265              		.cfi_def_cfa_register 7
+ 266 00aa F860     		str	r0, [r7, #12]
+ 267 00ac B960     		str	r1, [r7, #8]
+ 268 00ae 7A60     		str	r2, [r7, #4]
+ 232:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!context) return shaNull;
+ 269              		.loc 1 232 0
+ 270 00b0 FB68     		ldr	r3, [r7, #12]
+ 271 00b2 002B     		cmp	r3, #0
+ 272 00b4 01D1     		bne	.L16
+ 273              		.loc 1 232 0 is_stmt 0 discriminator 1
+ 274 00b6 0123     		movs	r3, #1
+ 275 00b8 61E0     		b	.L17
+ 276              	.L16:
+ 233:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!length) return shaSuccess;
+ 277              		.loc 1 233 0 is_stmt 1
+ 278 00ba 7B68     		ldr	r3, [r7, #4]
+ 279 00bc 002B     		cmp	r3, #0
+ 280 00be 01D1     		bne	.L18
+ 281              		.loc 1 233 0 is_stmt 0 discriminator 1
+ 282 00c0 0023     		movs	r3, #0
+ 283 00c2 5CE0     		b	.L17
+ 284              	.L18:
+ 234:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!message_array) return shaNull;
+ 285              		.loc 1 234 0 is_stmt 1
+ 286 00c4 BB68     		ldr	r3, [r7, #8]
+ 287 00c6 002B     		cmp	r3, #0
+ 288 00c8 01D1     		bne	.L19
+ 289              		.loc 1 234 0 is_stmt 0 discriminator 1
+ 290 00ca 0123     		movs	r3, #1
+ 291 00cc 57E0     		b	.L17
+ 292              	.L19:
+ 235:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Computed) return context->Corrupted = shaStateError;
+ 293              		.loc 1 235 0 is_stmt 1
+ 294 00ce FB68     		ldr	r3, [r7, #12]
+ 295 00d0 DB6E     		ldr	r3, [r3, #108]
+ 296 00d2 002B     		cmp	r3, #0
+ 297 00d4 05D0     		beq	.L20
+ 298              		.loc 1 235 0 is_stmt 0 discriminator 1
+ 299 00d6 FB68     		ldr	r3, [r7, #12]
+ 300 00d8 0322     		movs	r2, #3
+ 301 00da 1A67     		str	r2, [r3, #112]
+ 302 00dc FB68     		ldr	r3, [r7, #12]
+ 303 00de 1B6F     		ldr	r3, [r3, #112]
+ 304 00e0 4DE0     		b	.L17
+ 305              	.L20:
+ 236:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Corrupted) return context->Corrupted;
+ 306              		.loc 1 236 0 is_stmt 1
+ 307 00e2 FB68     		ldr	r3, [r7, #12]
+ 308 00e4 1B6F     		ldr	r3, [r3, #112]
+ 309 00e6 002B     		cmp	r3, #0
+ 310 00e8 02D0     		beq	.L21
+ 311              		.loc 1 236 0 is_stmt 0 discriminator 1
+ 312 00ea FB68     		ldr	r3, [r7, #12]
+ 313 00ec 1B6F     		ldr	r3, [r3, #112]
+ 314 00ee 46E0     		b	.L17
+ 315              	.L21:
+ 237:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 238:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   while (length--) {
+ 316              		.loc 1 238 0 is_stmt 1
+ 317 00f0 3EE0     		b	.L22
+ 318              	.L27:
+ 239:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] =
+ 319              		.loc 1 239 0
+ 320 00f2 FB68     		ldr	r3, [r7, #12]
+ 321 00f4 1B8D     		ldrh	r3, [r3, #40]
+ 322 00f6 9BB2     		uxth	r3, r3
+ 323 00f8 9AB2     		uxth	r2, r3
+ 324 00fa 0132     		adds	r2, r2, #1
+ 325 00fc 92B2     		uxth	r2, r2
+ 326 00fe 91B2     		uxth	r1, r2
+ 327 0100 FA68     		ldr	r2, [r7, #12]
+ 328 0102 1185     		strh	r1, [r2, #40]	@ movhi
+ 329 0104 1BB2     		sxth	r3, r3
+ 240:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****             *message_array;
+ 330              		.loc 1 240 0
+ 331 0106 BA68     		ldr	r2, [r7, #8]
+ 332 0108 1178     		ldrb	r1, [r2]	@ zero_extendqisi2
+ 239:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] =
+ 333              		.loc 1 239 0
+ 334 010a FA68     		ldr	r2, [r7, #12]
+ 335 010c 1344     		add	r3, r3, r2
+ 336 010e 0A46     		mov	r2, r1
+ 337 0110 83F82A20 		strb	r2, [r3, #42]
+ 241:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     if ((SHA224_256AddLength(context, 8) == shaSuccess) &&
+ 338              		.loc 1 242 0
+ 339 0114 FB68     		ldr	r3, [r7, #12]
+ 340 0116 5B6A     		ldr	r3, [r3, #36]
+ 341 0118 1B4A     		ldr	r2, .L28
+ 342 011a 1360     		str	r3, [r2]
+ 343 011c FB68     		ldr	r3, [r7, #12]
+ 344 011e 5B6A     		ldr	r3, [r3, #36]
+ 345 0120 03F10802 		add	r2, r3, #8
+ 346 0124 FB68     		ldr	r3, [r7, #12]
+ 347 0126 5A62     		str	r2, [r3, #36]
+ 348 0128 FB68     		ldr	r3, [r7, #12]
+ 349 012a 5A6A     		ldr	r2, [r3, #36]
+ 350 012c 164B     		ldr	r3, .L28
+ 351 012e 1B68     		ldr	r3, [r3]
+ 352 0130 9A42     		cmp	r2, r3
+ 353 0132 08D2     		bcs	.L23
+ 354              		.loc 1 242 0 is_stmt 0 discriminator 2
+ 355 0134 FB68     		ldr	r3, [r7, #12]
+ 356 0136 1B6A     		ldr	r3, [r3, #32]
+ 357 0138 5A1C     		adds	r2, r3, #1
+ 358 013a FB68     		ldr	r3, [r7, #12]
+ 359 013c 1A62     		str	r2, [r3, #32]
+ 360 013e FB68     		ldr	r3, [r7, #12]
+ 361 0140 1B6A     		ldr	r3, [r3, #32]
+ 362 0142 002B     		cmp	r3, #0
+ 363 0144 02D0     		beq	.L24
+ 364              	.L23:
+ 365              		.loc 1 242 0 discriminator 3
+ 366 0146 FB68     		ldr	r3, [r7, #12]
+ 367 0148 1B6F     		ldr	r3, [r3, #112]
+ 368 014a 00E0     		b	.L25
+ 369              	.L24:
+ 370              		.loc 1 242 0 discriminator 4
+ 371 014c 0223     		movs	r3, #2
+ 372              	.L25:
+ 373              		.loc 1 242 0 discriminator 6
+ 374 014e FA68     		ldr	r2, [r7, #12]
+ 375 0150 1367     		str	r3, [r2, #112]
+ 376 0152 FB68     		ldr	r3, [r7, #12]
+ 377 0154 1B6F     		ldr	r3, [r3, #112]
+ 378 0156 002B     		cmp	r3, #0
+ 379 0158 07D1     		bne	.L26
+ 243:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       (context->Message_Block_Index == SHA256_Message_Block_Size))
+ 380              		.loc 1 243 0 is_stmt 1 discriminator 7
+ 381 015a FB68     		ldr	r3, [r7, #12]
+ 382 015c 1B8D     		ldrh	r3, [r3, #40]
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       (context->Message_Block_Index == SHA256_Message_Block_Size))
+ 383              		.loc 1 242 0 discriminator 7
+ 384 015e 1BB2     		sxth	r3, r3
+ 385 0160 402B     		cmp	r3, #64
+ 386 0162 02D1     		bne	.L26
+ 244:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       SHA224_256ProcessMessageBlock(context);
+ 387              		.loc 1 244 0
+ 388 0164 F868     		ldr	r0, [r7, #12]
+ 389 0166 00F0CBF8 		bl	SHA224_256ProcessMessageBlock
+ 390              	.L26:
+ 245:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 246:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     message_array++;
+ 391              		.loc 1 246 0
+ 392 016a BB68     		ldr	r3, [r7, #8]
+ 393 016c 0133     		adds	r3, r3, #1
+ 394 016e BB60     		str	r3, [r7, #8]
+ 395              	.L22:
+ 238:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] =
+ 396              		.loc 1 238 0
+ 397 0170 7B68     		ldr	r3, [r7, #4]
+ 398 0172 5A1E     		subs	r2, r3, #1
+ 399 0174 7A60     		str	r2, [r7, #4]
+ 400 0176 002B     		cmp	r3, #0
+ 401 0178 BBD1     		bne	.L27
+ 247:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   }
+ 248:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 249:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return context->Corrupted;
+ 402              		.loc 1 249 0
+ 403 017a FB68     		ldr	r3, [r7, #12]
+ 404 017c 1B6F     		ldr	r3, [r3, #112]
+ 405              	.L17:
+ 250:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 251:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 406              		.loc 1 251 0
+ 407 017e 1846     		mov	r0, r3
+ 408 0180 1037     		adds	r7, r7, #16
+ 409              		.cfi_def_cfa_offset 8
+ 410 0182 BD46     		mov	sp, r7
+ 411              		.cfi_def_cfa_register 13
+ 412              		@ sp needed
+ 413 0184 80BD     		pop	{r7, pc}
+ 414              	.L29:
+ 415 0186 00BF     		.align	2
+ 416              	.L28:
+ 417 0188 00000000 		.word	addTemp
+ 418              		.cfi_endproc
+ 419              	.LFE5:
+ 421              		.align	2
+ 422              		.global	SHA256FinalBits
+ 423              		.thumb
+ 424              		.thumb_func
+ 426              	SHA256FinalBits:
+ 427              	.LFB6:
+ 252:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 253:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 254:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA256FinalBits
+ 255:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 256:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 257:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will add in any final bits of the message.
+ 258:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 259:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 260:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 261:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 262:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message_bits: [in]
+ 263:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The final bits of the message, in the upper portion of the
+ 264:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     byte.  (Use 0b###00000 instead of 0b00000### to input the
+ 265:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     three bits ###.)
+ 266:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   length: [in]
+ 267:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The number of bits in message_bits, between 1 and 7.
+ 268:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 269:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 270:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 271:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 272:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA256FinalBits(SHA256Context *context,
+ 273:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****                     uint8_t message_bits, unsigned int length)
+ 274:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 428              		.loc 1 274 0
+ 429              		.cfi_startproc
+ 430              		@ args = 0, pretend = 0, frame = 16
+ 431              		@ frame_needed = 1, uses_anonymous_args = 0
+ 432 018c 80B5     		push	{r7, lr}
+ 433              		.cfi_def_cfa_offset 8
+ 434              		.cfi_offset 7, -8
+ 435              		.cfi_offset 14, -4
+ 436 018e 84B0     		sub	sp, sp, #16
+ 437              		.cfi_def_cfa_offset 24
+ 438 0190 00AF     		add	r7, sp, #0
+ 439              		.cfi_def_cfa_register 7
+ 440 0192 F860     		str	r0, [r7, #12]
+ 441 0194 0B46     		mov	r3, r1
+ 442 0196 7A60     		str	r2, [r7, #4]
+ 443 0198 FB72     		strb	r3, [r7, #11]
+ 275:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   static uint8_t masks[8] = {
+ 276:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 0 0b00000000 */ 0x00, /* 1 0b10000000 */ 0x80,
+ 277:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 2 0b11000000 */ 0xC0, /* 3 0b11100000 */ 0xE0,
+ 278:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 4 0b11110000 */ 0xF0, /* 5 0b11111000 */ 0xF8,
+ 279:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 6 0b11111100 */ 0xFC, /* 7 0b11111110 */ 0xFE
+ 280:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   };
+ 281:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   static uint8_t markbit[8] = {
+ 282:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 0 0b10000000 */ 0x80, /* 1 0b01000000 */ 0x40,
+ 283:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 2 0b00100000 */ 0x20, /* 3 0b00010000 */ 0x10,
+ 284:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 4 0b00001000 */ 0x08, /* 5 0b00000100 */ 0x04,
+ 285:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       /* 6 0b00000010 */ 0x02, /* 7 0b00000001 */ 0x01
+ 286:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   };
+ 287:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 288:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!context) return shaNull;
+ 444              		.loc 1 288 0
+ 445 019a FB68     		ldr	r3, [r7, #12]
+ 446 019c 002B     		cmp	r3, #0
+ 447 019e 01D1     		bne	.L31
+ 448              		.loc 1 288 0 is_stmt 0 discriminator 1
+ 449 01a0 0123     		movs	r3, #1
+ 450 01a2 50E0     		b	.L32
+ 451              	.L31:
+ 289:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!length) return shaSuccess;
+ 452              		.loc 1 289 0 is_stmt 1
+ 453 01a4 7B68     		ldr	r3, [r7, #4]
+ 454 01a6 002B     		cmp	r3, #0
+ 455 01a8 01D1     		bne	.L33
+ 456              		.loc 1 289 0 is_stmt 0 discriminator 1
+ 457 01aa 0023     		movs	r3, #0
+ 458 01ac 4BE0     		b	.L32
+ 459              	.L33:
+ 290:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Corrupted) return context->Corrupted;
+ 460              		.loc 1 290 0 is_stmt 1
+ 461 01ae FB68     		ldr	r3, [r7, #12]
+ 462 01b0 1B6F     		ldr	r3, [r3, #112]
+ 463 01b2 002B     		cmp	r3, #0
+ 464 01b4 02D0     		beq	.L34
+ 465              		.loc 1 290 0 is_stmt 0 discriminator 1
+ 466 01b6 FB68     		ldr	r3, [r7, #12]
+ 467 01b8 1B6F     		ldr	r3, [r3, #112]
+ 468 01ba 44E0     		b	.L32
+ 469              	.L34:
+ 291:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Computed) return context->Corrupted = shaStateError;
+ 470              		.loc 1 291 0 is_stmt 1
+ 471 01bc FB68     		ldr	r3, [r7, #12]
+ 472 01be DB6E     		ldr	r3, [r3, #108]
+ 473 01c0 002B     		cmp	r3, #0
+ 474 01c2 05D0     		beq	.L35
+ 475              		.loc 1 291 0 is_stmt 0 discriminator 1
+ 476 01c4 FB68     		ldr	r3, [r7, #12]
+ 477 01c6 0322     		movs	r2, #3
+ 478 01c8 1A67     		str	r2, [r3, #112]
+ 479 01ca FB68     		ldr	r3, [r7, #12]
+ 480 01cc 1B6F     		ldr	r3, [r3, #112]
+ 481 01ce 3AE0     		b	.L32
+ 482              	.L35:
+ 292:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (length >= 8) return context->Corrupted = shaBadParam;
+ 483              		.loc 1 292 0 is_stmt 1
+ 484 01d0 7B68     		ldr	r3, [r7, #4]
+ 485 01d2 072B     		cmp	r3, #7
+ 486 01d4 05D9     		bls	.L36
+ 487              		.loc 1 292 0 is_stmt 0 discriminator 1
+ 488 01d6 FB68     		ldr	r3, [r7, #12]
+ 489 01d8 0422     		movs	r2, #4
+ 490 01da 1A67     		str	r2, [r3, #112]
+ 491 01dc FB68     		ldr	r3, [r7, #12]
+ 492 01de 1B6F     		ldr	r3, [r3, #112]
+ 493 01e0 31E0     		b	.L32
+ 494              	.L36:
+ 293:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 294:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256AddLength(context, length);
+ 495              		.loc 1 294 0 is_stmt 1
+ 496 01e2 FB68     		ldr	r3, [r7, #12]
+ 497 01e4 5B6A     		ldr	r3, [r3, #36]
+ 498 01e6 1A4A     		ldr	r2, .L40
+ 499 01e8 1360     		str	r3, [r2]
+ 500 01ea FB68     		ldr	r3, [r7, #12]
+ 501 01ec 5A6A     		ldr	r2, [r3, #36]
+ 502 01ee 7B68     		ldr	r3, [r7, #4]
+ 503 01f0 1A44     		add	r2, r2, r3
+ 504 01f2 FB68     		ldr	r3, [r7, #12]
+ 505 01f4 5A62     		str	r2, [r3, #36]
+ 506 01f6 FB68     		ldr	r3, [r7, #12]
+ 507 01f8 5A6A     		ldr	r2, [r3, #36]
+ 508 01fa 154B     		ldr	r3, .L40
+ 509 01fc 1B68     		ldr	r3, [r3]
+ 510 01fe 9A42     		cmp	r2, r3
+ 511 0200 08D2     		bcs	.L37
+ 512              		.loc 1 294 0 is_stmt 0 discriminator 2
+ 513 0202 FB68     		ldr	r3, [r7, #12]
+ 514 0204 1B6A     		ldr	r3, [r3, #32]
+ 515 0206 5A1C     		adds	r2, r3, #1
+ 516 0208 FB68     		ldr	r3, [r7, #12]
+ 517 020a 1A62     		str	r2, [r3, #32]
+ 518 020c FB68     		ldr	r3, [r7, #12]
+ 519 020e 1B6A     		ldr	r3, [r3, #32]
+ 520 0210 002B     		cmp	r3, #0
+ 521 0212 02D0     		beq	.L38
+ 522              	.L37:
+ 523              		.loc 1 294 0 discriminator 3
+ 524 0214 FB68     		ldr	r3, [r7, #12]
+ 525 0216 1B6F     		ldr	r3, [r3, #112]
+ 526 0218 00E0     		b	.L39
+ 527              	.L38:
+ 528              		.loc 1 294 0 discriminator 4
+ 529 021a 0223     		movs	r3, #2
+ 530              	.L39:
+ 531              		.loc 1 294 0 discriminator 6
+ 532 021c FA68     		ldr	r2, [r7, #12]
+ 533 021e 1367     		str	r3, [r2, #112]
+ 295:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256Finalize(context, (uint8_t)
+ 296:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     ((message_bits & masks[length]) | markbit[length]));
+ 534              		.loc 1 296 0 is_stmt 1 discriminator 6
+ 535 0220 0C4A     		ldr	r2, .L40+4
+ 536 0222 7B68     		ldr	r3, [r7, #4]
+ 537 0224 1344     		add	r3, r3, r2
+ 538 0226 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 295:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256Finalize(context, (uint8_t)
+ 539              		.loc 1 295 0 discriminator 6
+ 540 0228 FB7A     		ldrb	r3, [r7, #11]
+ 541 022a 1340     		ands	r3, r3, r2
+ 542 022c DAB2     		uxtb	r2, r3
+ 543              		.loc 1 296 0 discriminator 6
+ 544 022e 0A49     		ldr	r1, .L40+8
+ 545 0230 7B68     		ldr	r3, [r7, #4]
+ 546 0232 0B44     		add	r3, r3, r1
+ 547 0234 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 295:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256Finalize(context, (uint8_t)
+ 548              		.loc 1 295 0 discriminator 6
+ 549 0236 1343     		orrs	r3, r3, r2
+ 550 0238 DBB2     		uxtb	r3, r3
+ 551 023a F868     		ldr	r0, [r7, #12]
+ 552 023c 1946     		mov	r1, r3
+ 553 023e 00F005FA 		bl	SHA224_256Finalize
+ 297:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 298:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return context->Corrupted;
+ 554              		.loc 1 298 0 discriminator 6
+ 555 0242 FB68     		ldr	r3, [r7, #12]
+ 556 0244 1B6F     		ldr	r3, [r3, #112]
+ 557              	.L32:
+ 299:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 558              		.loc 1 299 0
+ 559 0246 1846     		mov	r0, r3
+ 560 0248 1037     		adds	r7, r7, #16
+ 561              		.cfi_def_cfa_offset 8
+ 562 024a BD46     		mov	sp, r7
+ 563              		.cfi_def_cfa_register 13
+ 564              		@ sp needed
+ 565 024c 80BD     		pop	{r7, pc}
+ 566              	.L41:
+ 567 024e 00BF     		.align	2
+ 568              	.L40:
+ 569 0250 00000000 		.word	addTemp
+ 570 0254 40000000 		.word	masks.4415
+ 571 0258 48000000 		.word	markbit.4416
+ 572              		.cfi_endproc
+ 573              	.LFE6:
+ 575              		.align	2
+ 576              		.global	SHA256Result
+ 577              		.thumb
+ 578              		.thumb_func
+ 580              	SHA256Result:
+ 581              	.LFB7:
+ 300:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 301:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 302:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA256Result
+ 303:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 304:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 305:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This function will return the 256-bit message digest
+ 306:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   into the Message_Digest array provided by the caller.
+ 307:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   NOTE:
+ 308:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    The first octet of hash is stored in the element with index 0,
+ 309:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    the last octet of hash in the element with index 31.
+ 310:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 311:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 312:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 313:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to use to calculate the SHA hash.
+ 314:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Message_Digest[ ]: [out]
+ 315:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     Where the digest is returned.
+ 316:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 317:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 318:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 319:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 320:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** int SHA256Result(SHA256Context *context,
+ 321:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****                  uint8_t Message_Digest[SHA256HashSize])
+ 322:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 582              		.loc 1 322 0
+ 583              		.cfi_startproc
+ 584              		@ args = 0, pretend = 0, frame = 8
+ 585              		@ frame_needed = 1, uses_anonymous_args = 0
+ 586 025c 80B5     		push	{r7, lr}
+ 587              		.cfi_def_cfa_offset 8
+ 588              		.cfi_offset 7, -8
+ 589              		.cfi_offset 14, -4
+ 590 025e 82B0     		sub	sp, sp, #8
+ 591              		.cfi_def_cfa_offset 16
+ 592 0260 00AF     		add	r7, sp, #0
+ 593              		.cfi_def_cfa_register 7
+ 594 0262 7860     		str	r0, [r7, #4]
+ 595 0264 3960     		str	r1, [r7]
+ 323:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return SHA224_256ResultN(context, Message_Digest, SHA256HashSize);
+ 596              		.loc 1 323 0
+ 597 0266 7868     		ldr	r0, [r7, #4]
+ 598 0268 3968     		ldr	r1, [r7]
+ 599 026a 2022     		movs	r2, #32
+ 600 026c 00F0A8FA 		bl	SHA224_256ResultN
+ 601 0270 0346     		mov	r3, r0
+ 324:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 602              		.loc 1 324 0
+ 603 0272 1846     		mov	r0, r3
+ 604 0274 0837     		adds	r7, r7, #8
+ 605              		.cfi_def_cfa_offset 8
+ 606 0276 BD46     		mov	sp, r7
+ 607              		.cfi_def_cfa_register 13
+ 608              		@ sp needed
+ 609 0278 80BD     		pop	{r7, pc}
+ 610              		.cfi_endproc
+ 611              	.LFE7:
+ 613 027a 00BF     		.align	2
+ 614              		.thumb
+ 615              		.thumb_func
+ 617              	SHA224_256Reset:
+ 618              	.LFB8:
+ 325:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 326:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 327:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224_256Reset
+ 328:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 329:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 330:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This helper function will initialize the SHA256Context in
+ 331:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   preparation for computing a new SHA-224 or SHA-256 message digest.
+ 332:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 333:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 334:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 335:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to reset.
+ 336:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   H0[ ]: [in]
+ 337:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The initial hash value array to use.
+ 338:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 339:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 340:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 341:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 342:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static int SHA224_256Reset(SHA256Context *context, uint32_t *H0)
+ 343:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 619              		.loc 1 343 0
+ 620              		.cfi_startproc
+ 621              		@ args = 0, pretend = 0, frame = 8
+ 622              		@ frame_needed = 1, uses_anonymous_args = 0
+ 623              		@ link register save eliminated.
+ 624 027c 80B4     		push	{r7}
+ 625              		.cfi_def_cfa_offset 4
+ 626              		.cfi_offset 7, -4
+ 627 027e 83B0     		sub	sp, sp, #12
+ 628              		.cfi_def_cfa_offset 16
+ 629 0280 00AF     		add	r7, sp, #0
+ 630              		.cfi_def_cfa_register 7
+ 631 0282 7860     		str	r0, [r7, #4]
+ 632 0284 3960     		str	r1, [r7]
+ 344:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!context) return shaNull;
+ 633              		.loc 1 344 0
+ 634 0286 7B68     		ldr	r3, [r7, #4]
+ 635 0288 002B     		cmp	r3, #0
+ 636 028a 01D1     		bne	.L45
+ 637              		.loc 1 344 0 is_stmt 0 discriminator 1
+ 638 028c 0123     		movs	r3, #1
+ 639 028e 30E0     		b	.L46
+ 640              	.L45:
+ 345:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 346:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Length_High = context->Length_Low = 0;
+ 641              		.loc 1 346 0 is_stmt 1
+ 642 0290 7B68     		ldr	r3, [r7, #4]
+ 643 0292 0022     		movs	r2, #0
+ 644 0294 5A62     		str	r2, [r3, #36]
+ 645 0296 7B68     		ldr	r3, [r7, #4]
+ 646 0298 5A6A     		ldr	r2, [r3, #36]
+ 647 029a 7B68     		ldr	r3, [r7, #4]
+ 648 029c 1A62     		str	r2, [r3, #32]
+ 347:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block_Index  = 0;
+ 649              		.loc 1 347 0
+ 650 029e 7B68     		ldr	r3, [r7, #4]
+ 651 02a0 0022     		movs	r2, #0
+ 652 02a2 1A85     		strh	r2, [r3, #40]	@ movhi
+ 348:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 349:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[0] = H0[0];
+ 653              		.loc 1 349 0
+ 654 02a4 3B68     		ldr	r3, [r7]
+ 655 02a6 1A68     		ldr	r2, [r3]
+ 656 02a8 7B68     		ldr	r3, [r7, #4]
+ 657 02aa 1A60     		str	r2, [r3]
+ 350:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[1] = H0[1];
+ 658              		.loc 1 350 0
+ 659 02ac 3B68     		ldr	r3, [r7]
+ 660 02ae 5A68     		ldr	r2, [r3, #4]
+ 661 02b0 7B68     		ldr	r3, [r7, #4]
+ 662 02b2 5A60     		str	r2, [r3, #4]
+ 351:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[2] = H0[2];
+ 663              		.loc 1 351 0
+ 664 02b4 3B68     		ldr	r3, [r7]
+ 665 02b6 9A68     		ldr	r2, [r3, #8]
+ 666 02b8 7B68     		ldr	r3, [r7, #4]
+ 667 02ba 9A60     		str	r2, [r3, #8]
+ 352:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[3] = H0[3];
+ 668              		.loc 1 352 0
+ 669 02bc 3B68     		ldr	r3, [r7]
+ 670 02be DA68     		ldr	r2, [r3, #12]
+ 671 02c0 7B68     		ldr	r3, [r7, #4]
+ 672 02c2 DA60     		str	r2, [r3, #12]
+ 353:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[4] = H0[4];
+ 673              		.loc 1 353 0
+ 674 02c4 3B68     		ldr	r3, [r7]
+ 675 02c6 1A69     		ldr	r2, [r3, #16]
+ 676 02c8 7B68     		ldr	r3, [r7, #4]
+ 677 02ca 1A61     		str	r2, [r3, #16]
+ 354:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[5] = H0[5];
+ 678              		.loc 1 354 0
+ 679 02cc 3B68     		ldr	r3, [r7]
+ 680 02ce 5A69     		ldr	r2, [r3, #20]
+ 681 02d0 7B68     		ldr	r3, [r7, #4]
+ 682 02d2 5A61     		str	r2, [r3, #20]
+ 355:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[6] = H0[6];
+ 683              		.loc 1 355 0
+ 684 02d4 3B68     		ldr	r3, [r7]
+ 685 02d6 9A69     		ldr	r2, [r3, #24]
+ 686 02d8 7B68     		ldr	r3, [r7, #4]
+ 687 02da 9A61     		str	r2, [r3, #24]
+ 356:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[7] = H0[7];
+ 688              		.loc 1 356 0
+ 689 02dc 3B68     		ldr	r3, [r7]
+ 690 02de DA69     		ldr	r2, [r3, #28]
+ 691 02e0 7B68     		ldr	r3, [r7, #4]
+ 692 02e2 DA61     		str	r2, [r3, #28]
+ 357:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 358:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Computed  = 0;
+ 693              		.loc 1 358 0
+ 694 02e4 7B68     		ldr	r3, [r7, #4]
+ 695 02e6 0022     		movs	r2, #0
+ 696 02e8 DA66     		str	r2, [r3, #108]
+ 359:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Corrupted = shaSuccess;
+ 697              		.loc 1 359 0
+ 698 02ea 7B68     		ldr	r3, [r7, #4]
+ 699 02ec 0022     		movs	r2, #0
+ 700 02ee 1A67     		str	r2, [r3, #112]
+ 360:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 361:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return shaSuccess;
+ 701              		.loc 1 361 0
+ 702 02f0 0023     		movs	r3, #0
+ 703              	.L46:
+ 362:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 704              		.loc 1 362 0
+ 705 02f2 1846     		mov	r0, r3
+ 706 02f4 0C37     		adds	r7, r7, #12
+ 707              		.cfi_def_cfa_offset 4
+ 708 02f6 BD46     		mov	sp, r7
+ 709              		.cfi_def_cfa_register 13
+ 710              		@ sp needed
+ 711 02f8 5DF8047B 		ldr	r7, [sp], #4
+ 712              		.cfi_restore 7
+ 713              		.cfi_def_cfa_offset 0
+ 714 02fc 7047     		bx	lr
+ 715              		.cfi_endproc
+ 716              	.LFE8:
+ 718 02fe 00BF     		.align	2
+ 719              		.thumb
+ 720              		.thumb_func
+ 722              	SHA224_256ProcessMessageBlock:
+ 723              	.LFB9:
+ 363:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 364:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 365:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224_256ProcessMessageBlock
+ 366:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 367:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 368:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This helper function will process the next 512 bits of the
+ 369:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   message stored in the Message_Block array.
+ 370:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 371:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 372:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 373:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 374:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 375:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 376:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Nothing.
+ 377:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 378:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Comments:
+ 379:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Many of the variable names in this code, especially the
+ 380:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   single character names, were used because those were the
+ 381:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   names used in the Secure Hash Standard.
+ 382:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 383:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256ProcessMessageBlock(SHA256Context *context)
+ 384:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 724              		.loc 1 384 0
+ 725              		.cfi_startproc
+ 726              		@ args = 0, pretend = 0, frame = 312
+ 727              		@ frame_needed = 1, uses_anonymous_args = 0
+ 728              		@ link register save eliminated.
+ 729 0300 80B4     		push	{r7}
+ 730              		.cfi_def_cfa_offset 4
+ 731              		.cfi_offset 7, -4
+ 732 0302 CFB0     		sub	sp, sp, #316
+ 733              		.cfi_def_cfa_offset 320
+ 734 0304 00AF     		add	r7, sp, #0
+ 735              		.cfi_def_cfa_register 7
+ 736 0306 3B1D     		adds	r3, r7, #4
+ 737 0308 1860     		str	r0, [r3]
+ 385:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   /* Constants defined in FIPS 180-3, section 4.2.2 */
+ 386:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   static const uint32_t K[64] = {
+ 387:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b,
+ 388:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01,
+ 389:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7,
+ 390:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
+ 391:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152,
+ 392:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
+ 393:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
+ 394:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+ 395:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819,
+ 396:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08,
+ 397:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f,
+ 398:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+ 399:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+ 400:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   };
+ 401:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   int        t, t4;                   /* Loop counter */
+ 402:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint32_t   temp1, temp2;            /* Temporary word value */
+ 403:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint32_t   W[64];                   /* Word sequence */
+ 404:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   uint32_t   A, B, C, D, E, F, G, H;  /* Word buffers */
+ 405:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 406:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   /*
+ 407:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * Initialize the first 16 words in the array W
+ 408:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    */
+ 409:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (t = t4 = 0; t < 16; t++, t4 += 4)
+ 738              		.loc 1 409 0
+ 739 030a 0023     		movs	r3, #0
+ 740 030c C7F83031 		str	r3, [r7, #304]
+ 741 0310 D7F83031 		ldr	r3, [r7, #304]
+ 742 0314 C7F83431 		str	r3, [r7, #308]
+ 743 0318 35E0     		b	.L48
+ 744              	.L49:
+ 410:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = (((uint32_t)context->Message_Block[t4]) << 24) |
+ 745              		.loc 1 410 0 discriminator 3
+ 746 031a 3B1D     		adds	r3, r7, #4
+ 747 031c 1A68     		ldr	r2, [r3]
+ 748 031e D7F83031 		ldr	r3, [r7, #304]
+ 749 0322 1344     		add	r3, r3, r2
+ 750 0324 2833     		adds	r3, r3, #40
+ 751 0326 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 752 0328 1A06     		lsls	r2, r3, #24
+ 411:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 1]) << 16) |
+ 753              		.loc 1 411 0 discriminator 3
+ 754 032a D7F83031 		ldr	r3, [r7, #304]
+ 755 032e 0133     		adds	r3, r3, #1
+ 756 0330 391D     		adds	r1, r7, #4
+ 757 0332 0968     		ldr	r1, [r1]
+ 758 0334 0B44     		add	r3, r3, r1
+ 759 0336 93F82A30 		ldrb	r3, [r3, #42]	@ zero_extendqisi2
+ 760 033a 1B04     		lsls	r3, r3, #16
+ 410:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = (((uint32_t)context->Message_Block[t4]) << 24) |
+ 761              		.loc 1 410 0 discriminator 3
+ 762 033c 1A43     		orrs	r2, r2, r3
+ 412:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 2]) << 8) |
+ 763              		.loc 1 412 0 discriminator 3
+ 764 033e D7F83031 		ldr	r3, [r7, #304]
+ 765 0342 0233     		adds	r3, r3, #2
+ 766 0344 391D     		adds	r1, r7, #4
+ 767 0346 0968     		ldr	r1, [r1]
+ 768 0348 0B44     		add	r3, r3, r1
+ 769 034a 93F82A30 		ldrb	r3, [r3, #42]	@ zero_extendqisi2
+ 770 034e 1B02     		lsls	r3, r3, #8
+ 411:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 1]) << 16) |
+ 771              		.loc 1 411 0 discriminator 3
+ 772 0350 1343     		orrs	r3, r3, r2
+ 413:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 3]));
+ 773              		.loc 1 413 0 discriminator 3
+ 774 0352 D7F83021 		ldr	r2, [r7, #304]
+ 775 0356 0332     		adds	r2, r2, #3
+ 776 0358 391D     		adds	r1, r7, #4
+ 777 035a 0968     		ldr	r1, [r1]
+ 778 035c 0A44     		add	r2, r2, r1
+ 779 035e 92F82A20 		ldrb	r2, [r2, #42]	@ zero_extendqisi2
+ 412:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 2]) << 8) |
+ 780              		.loc 1 412 0 discriminator 3
+ 781 0362 43EA0201 		orr	r1, r3, r2
+ 410:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****            (((uint32_t)context->Message_Block[t4 + 1]) << 16) |
+ 782              		.loc 1 410 0 discriminator 3
+ 783 0366 07F10803 		add	r3, r7, #8
+ 784 036a D7F83421 		ldr	r2, [r7, #308]
+ 785 036e 43F82210 		str	r1, [r3, r2, lsl #2]
+ 409:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = (((uint32_t)context->Message_Block[t4]) << 24) |
+ 786              		.loc 1 409 0 discriminator 3
+ 787 0372 D7F83431 		ldr	r3, [r7, #308]
+ 788 0376 0133     		adds	r3, r3, #1
+ 789 0378 C7F83431 		str	r3, [r7, #308]
+ 790 037c D7F83031 		ldr	r3, [r7, #304]
+ 791 0380 0433     		adds	r3, r3, #4
+ 792 0382 C7F83031 		str	r3, [r7, #304]
+ 793              	.L48:
+ 409:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = (((uint32_t)context->Message_Block[t4]) << 24) |
+ 794              		.loc 1 409 0 is_stmt 0 discriminator 1
+ 795 0386 D7F83431 		ldr	r3, [r7, #308]
+ 796 038a 0F2B     		cmp	r3, #15
+ 797 038c C5DD     		ble	.L49
+ 414:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (t = 16; t < 64; t++)
+ 798              		.loc 1 414 0 is_stmt 1
+ 799 038e 1023     		movs	r3, #16
+ 800 0390 C7F83431 		str	r3, [r7, #308]
+ 801 0394 57E0     		b	.L50
+ 802              	.L51:
+ 415:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = SHA256_sigma1(W[t-2]) + W[t-7] +
+ 803              		.loc 1 415 0 discriminator 3
+ 804 0396 D7F83431 		ldr	r3, [r7, #308]
+ 805 039a 9A1E     		subs	r2, r3, #2
+ 806 039c 07F10803 		add	r3, r7, #8
+ 807 03a0 53F82230 		ldr	r3, [r3, r2, lsl #2]
+ 808 03a4 4FEA7342 		ror	r2, r3, #17
+ 809 03a8 D7F83431 		ldr	r3, [r7, #308]
+ 810 03ac 991E     		subs	r1, r3, #2
+ 811 03ae 07F10803 		add	r3, r7, #8
+ 812 03b2 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 813 03b6 4FEAF343 		ror	r3, r3, #19
+ 814 03ba 5A40     		eors	r2, r2, r3
+ 815 03bc D7F83431 		ldr	r3, [r7, #308]
+ 816 03c0 991E     		subs	r1, r3, #2
+ 817 03c2 07F10803 		add	r3, r7, #8
+ 818 03c6 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 819 03ca 9B0A     		lsrs	r3, r3, #10
+ 820 03cc 5A40     		eors	r2, r2, r3
+ 821 03ce D7F83431 		ldr	r3, [r7, #308]
+ 822 03d2 D91F     		subs	r1, r3, #7
+ 823 03d4 07F10803 		add	r3, r7, #8
+ 824 03d8 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 825 03dc 1A44     		add	r2, r2, r3
+ 416:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****         SHA256_sigma0(W[t-15]) + W[t-16];
+ 826              		.loc 1 416 0 discriminator 3
+ 827 03de D7F83431 		ldr	r3, [r7, #308]
+ 828 03e2 A3F10F01 		sub	r1, r3, #15
+ 829 03e6 07F10803 		add	r3, r7, #8
+ 830 03ea 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 831 03ee 4FEAF311 		ror	r1, r3, #7
+ 832 03f2 D7F83431 		ldr	r3, [r7, #308]
+ 833 03f6 A3F10F00 		sub	r0, r3, #15
+ 834 03fa 07F10803 		add	r3, r7, #8
+ 835 03fe 53F82030 		ldr	r3, [r3, r0, lsl #2]
+ 836 0402 4FEAB343 		ror	r3, r3, #18
+ 837 0406 5940     		eors	r1, r1, r3
+ 838 0408 D7F83431 		ldr	r3, [r7, #308]
+ 839 040c A3F10F00 		sub	r0, r3, #15
+ 840 0410 07F10803 		add	r3, r7, #8
+ 841 0414 53F82030 		ldr	r3, [r3, r0, lsl #2]
+ 842 0418 DB08     		lsrs	r3, r3, #3
+ 843 041a 4B40     		eors	r3, r3, r1
+ 415:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = SHA256_sigma1(W[t-2]) + W[t-7] +
+ 844              		.loc 1 415 0 discriminator 3
+ 845 041c 1A44     		add	r2, r2, r3
+ 846              		.loc 1 416 0 discriminator 3
+ 847 041e D7F83431 		ldr	r3, [r7, #308]
+ 848 0422 A3F11001 		sub	r1, r3, #16
+ 849 0426 07F10803 		add	r3, r7, #8
+ 850 042a 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 851 042e D118     		adds	r1, r2, r3
+ 415:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     W[t] = SHA256_sigma1(W[t-2]) + W[t-7] +
+ 852              		.loc 1 415 0 discriminator 3
+ 853 0430 07F10803 		add	r3, r7, #8
+ 854 0434 D7F83421 		ldr	r2, [r7, #308]
+ 855 0438 43F82210 		str	r1, [r3, r2, lsl #2]
+ 414:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (t = 16; t < 64; t++)
+ 856              		.loc 1 414 0 discriminator 3
+ 857 043c D7F83431 		ldr	r3, [r7, #308]
+ 858 0440 0133     		adds	r3, r3, #1
+ 859 0442 C7F83431 		str	r3, [r7, #308]
+ 860              	.L50:
+ 414:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (t = 16; t < 64; t++)
+ 861              		.loc 1 414 0 is_stmt 0 discriminator 1
+ 862 0446 D7F83431 		ldr	r3, [r7, #308]
+ 863 044a 3F2B     		cmp	r3, #63
+ 864 044c A3DD     		ble	.L51
+ 417:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 418:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   A = context->Intermediate_Hash[0];
+ 865              		.loc 1 418 0 is_stmt 1
+ 866 044e 3B1D     		adds	r3, r7, #4
+ 867 0450 1B68     		ldr	r3, [r3]
+ 868 0452 1B68     		ldr	r3, [r3]
+ 869 0454 C7F82C31 		str	r3, [r7, #300]
+ 419:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   B = context->Intermediate_Hash[1];
+ 870              		.loc 1 419 0
+ 871 0458 3B1D     		adds	r3, r7, #4
+ 872 045a 1B68     		ldr	r3, [r3]
+ 873 045c 5B68     		ldr	r3, [r3, #4]
+ 874 045e C7F82831 		str	r3, [r7, #296]
+ 420:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   C = context->Intermediate_Hash[2];
+ 875              		.loc 1 420 0
+ 876 0462 3B1D     		adds	r3, r7, #4
+ 877 0464 1B68     		ldr	r3, [r3]
+ 878 0466 9B68     		ldr	r3, [r3, #8]
+ 879 0468 C7F82431 		str	r3, [r7, #292]
+ 421:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   D = context->Intermediate_Hash[3];
+ 880              		.loc 1 421 0
+ 881 046c 3B1D     		adds	r3, r7, #4
+ 882 046e 1B68     		ldr	r3, [r3]
+ 883 0470 DB68     		ldr	r3, [r3, #12]
+ 884 0472 C7F82031 		str	r3, [r7, #288]
+ 422:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   E = context->Intermediate_Hash[4];
+ 885              		.loc 1 422 0
+ 886 0476 3B1D     		adds	r3, r7, #4
+ 887 0478 1B68     		ldr	r3, [r3]
+ 888 047a 1B69     		ldr	r3, [r3, #16]
+ 889 047c C7F81C31 		str	r3, [r7, #284]
+ 423:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   F = context->Intermediate_Hash[5];
+ 890              		.loc 1 423 0
+ 891 0480 3B1D     		adds	r3, r7, #4
+ 892 0482 1B68     		ldr	r3, [r3]
+ 893 0484 5B69     		ldr	r3, [r3, #20]
+ 894 0486 C7F81831 		str	r3, [r7, #280]
+ 424:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   G = context->Intermediate_Hash[6];
+ 895              		.loc 1 424 0
+ 896 048a 3B1D     		adds	r3, r7, #4
+ 897 048c 1B68     		ldr	r3, [r3]
+ 898 048e 9B69     		ldr	r3, [r3, #24]
+ 899 0490 C7F81431 		str	r3, [r7, #276]
+ 425:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   H = context->Intermediate_Hash[7];
+ 900              		.loc 1 425 0
+ 901 0494 3B1D     		adds	r3, r7, #4
+ 902 0496 1B68     		ldr	r3, [r3]
+ 903 0498 DB69     		ldr	r3, [r3, #28]
+ 904 049a C7F81031 		str	r3, [r7, #272]
+ 426:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 427:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (t = 0; t < 64; t++) {
+ 905              		.loc 1 427 0
+ 906 049e 0023     		movs	r3, #0
+ 907 04a0 C7F83431 		str	r3, [r7, #308]
+ 908 04a4 79E0     		b	.L52
+ 909              	.L53:
+ 428:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     temp1 = H + SHA256_SIGMA1(E) + SHA_Ch(E,F,G) + K[t] + W[t];
+ 910              		.loc 1 428 0 discriminator 3
+ 911 04a6 D7F81C31 		ldr	r3, [r7, #284]
+ 912 04aa 4FEAB312 		ror	r2, r3, #6
+ 913 04ae D7F81C31 		ldr	r3, [r7, #284]
+ 914 04b2 4FEAF323 		ror	r3, r3, #11
+ 915 04b6 5A40     		eors	r2, r2, r3
+ 916 04b8 D7F81C31 		ldr	r3, [r7, #284]
+ 917 04bc 4FEA7363 		ror	r3, r3, #25
+ 918 04c0 5A40     		eors	r2, r2, r3
+ 919 04c2 D7F81031 		ldr	r3, [r7, #272]
+ 920 04c6 1A44     		add	r2, r2, r3
+ 921 04c8 D7F81C11 		ldr	r1, [r7, #284]
+ 922 04cc D7F81831 		ldr	r3, [r7, #280]
+ 923 04d0 1940     		ands	r1, r1, r3
+ 924 04d2 D7F81C31 		ldr	r3, [r7, #284]
+ 925 04d6 D843     		mvns	r0, r3
+ 926 04d8 D7F81431 		ldr	r3, [r7, #276]
+ 927 04dc 0340     		ands	r3, r3, r0
+ 928 04de 4B40     		eors	r3, r3, r1
+ 929 04e0 1A44     		add	r2, r2, r3
+ 930 04e2 5949     		ldr	r1, .L54
+ 931 04e4 D7F83431 		ldr	r3, [r7, #308]
+ 932 04e8 51F82330 		ldr	r3, [r1, r3, lsl #2]
+ 933 04ec 1A44     		add	r2, r2, r3
+ 934 04ee 07F10803 		add	r3, r7, #8
+ 935 04f2 D7F83411 		ldr	r1, [r7, #308]
+ 936 04f6 53F82130 		ldr	r3, [r3, r1, lsl #2]
+ 937 04fa 1344     		add	r3, r3, r2
+ 938 04fc C7F80C31 		str	r3, [r7, #268]
+ 429:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     temp2 = SHA256_SIGMA0(A) + SHA_Maj(A,B,C);
+ 939              		.loc 1 429 0 discriminator 3
+ 940 0500 D7F82C31 		ldr	r3, [r7, #300]
+ 941 0504 4FEAB302 		ror	r2, r3, #2
+ 942 0508 D7F82C31 		ldr	r3, [r7, #300]
+ 943 050c 4FEA7333 		ror	r3, r3, #13
+ 944 0510 5A40     		eors	r2, r2, r3
+ 945 0512 D7F82C31 		ldr	r3, [r7, #300]
+ 946 0516 4FEAB353 		ror	r3, r3, #22
+ 947 051a 5A40     		eors	r2, r2, r3
+ 948 051c D7F82C11 		ldr	r1, [r7, #300]
+ 949 0520 D7F82831 		ldr	r3, [r7, #296]
+ 950 0524 1940     		ands	r1, r1, r3
+ 951 0526 D7F82C01 		ldr	r0, [r7, #300]
+ 952 052a D7F82431 		ldr	r3, [r7, #292]
+ 953 052e 0340     		ands	r3, r3, r0
+ 954 0530 5940     		eors	r1, r1, r3
+ 955 0532 D7F82801 		ldr	r0, [r7, #296]
+ 956 0536 D7F82431 		ldr	r3, [r7, #292]
+ 957 053a 0340     		ands	r3, r3, r0
+ 958 053c 4B40     		eors	r3, r3, r1
+ 959 053e 1344     		add	r3, r3, r2
+ 960 0540 C7F80831 		str	r3, [r7, #264]
+ 430:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     H = G;
+ 961              		.loc 1 430 0 discriminator 3
+ 962 0544 D7F81431 		ldr	r3, [r7, #276]
+ 963 0548 C7F81031 		str	r3, [r7, #272]
+ 431:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     G = F;
+ 964              		.loc 1 431 0 discriminator 3
+ 965 054c D7F81831 		ldr	r3, [r7, #280]
+ 966 0550 C7F81431 		str	r3, [r7, #276]
+ 432:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     F = E;
+ 967              		.loc 1 432 0 discriminator 3
+ 968 0554 D7F81C31 		ldr	r3, [r7, #284]
+ 969 0558 C7F81831 		str	r3, [r7, #280]
+ 433:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     E = D + temp1;
+ 970              		.loc 1 433 0 discriminator 3
+ 971 055c D7F82021 		ldr	r2, [r7, #288]
+ 972 0560 D7F80C31 		ldr	r3, [r7, #268]
+ 973 0564 1344     		add	r3, r3, r2
+ 974 0566 C7F81C31 		str	r3, [r7, #284]
+ 434:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     D = C;
+ 975              		.loc 1 434 0 discriminator 3
+ 976 056a D7F82431 		ldr	r3, [r7, #292]
+ 977 056e C7F82031 		str	r3, [r7, #288]
+ 435:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     C = B;
+ 978              		.loc 1 435 0 discriminator 3
+ 979 0572 D7F82831 		ldr	r3, [r7, #296]
+ 980 0576 C7F82431 		str	r3, [r7, #292]
+ 436:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     B = A;
+ 981              		.loc 1 436 0 discriminator 3
+ 982 057a D7F82C31 		ldr	r3, [r7, #300]
+ 983 057e C7F82831 		str	r3, [r7, #296]
+ 437:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     A = temp1 + temp2;
+ 984              		.loc 1 437 0 discriminator 3
+ 985 0582 D7F80C21 		ldr	r2, [r7, #268]
+ 986 0586 D7F80831 		ldr	r3, [r7, #264]
+ 987 058a 1344     		add	r3, r3, r2
+ 988 058c C7F82C31 		str	r3, [r7, #300]
+ 427:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     temp1 = H + SHA256_SIGMA1(E) + SHA_Ch(E,F,G) + K[t] + W[t];
+ 989              		.loc 1 427 0 discriminator 3
+ 990 0590 D7F83431 		ldr	r3, [r7, #308]
+ 991 0594 0133     		adds	r3, r3, #1
+ 992 0596 C7F83431 		str	r3, [r7, #308]
+ 993              	.L52:
+ 427:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     temp1 = H + SHA256_SIGMA1(E) + SHA_Ch(E,F,G) + K[t] + W[t];
+ 994              		.loc 1 427 0 is_stmt 0 discriminator 1
+ 995 059a D7F83431 		ldr	r3, [r7, #308]
+ 996 059e 3F2B     		cmp	r3, #63
+ 997 05a0 81DD     		ble	.L53
+ 438:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   }
+ 439:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 440:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[0] += A;
+ 998              		.loc 1 440 0 is_stmt 1
+ 999 05a2 3B1D     		adds	r3, r7, #4
+ 1000 05a4 1B68     		ldr	r3, [r3]
+ 1001 05a6 1A68     		ldr	r2, [r3]
+ 1002 05a8 D7F82C31 		ldr	r3, [r7, #300]
+ 1003 05ac 1A44     		add	r2, r2, r3
+ 1004 05ae 3B1D     		adds	r3, r7, #4
+ 1005 05b0 1B68     		ldr	r3, [r3]
+ 1006 05b2 1A60     		str	r2, [r3]
+ 441:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[1] += B;
+ 1007              		.loc 1 441 0
+ 1008 05b4 3B1D     		adds	r3, r7, #4
+ 1009 05b6 1B68     		ldr	r3, [r3]
+ 1010 05b8 5A68     		ldr	r2, [r3, #4]
+ 1011 05ba D7F82831 		ldr	r3, [r7, #296]
+ 1012 05be 1A44     		add	r2, r2, r3
+ 1013 05c0 3B1D     		adds	r3, r7, #4
+ 1014 05c2 1B68     		ldr	r3, [r3]
+ 1015 05c4 5A60     		str	r2, [r3, #4]
+ 442:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[2] += C;
+ 1016              		.loc 1 442 0
+ 1017 05c6 3B1D     		adds	r3, r7, #4
+ 1018 05c8 1B68     		ldr	r3, [r3]
+ 1019 05ca 9A68     		ldr	r2, [r3, #8]
+ 1020 05cc D7F82431 		ldr	r3, [r7, #292]
+ 1021 05d0 1A44     		add	r2, r2, r3
+ 1022 05d2 3B1D     		adds	r3, r7, #4
+ 1023 05d4 1B68     		ldr	r3, [r3]
+ 1024 05d6 9A60     		str	r2, [r3, #8]
+ 443:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[3] += D;
+ 1025              		.loc 1 443 0
+ 1026 05d8 3B1D     		adds	r3, r7, #4
+ 1027 05da 1B68     		ldr	r3, [r3]
+ 1028 05dc DA68     		ldr	r2, [r3, #12]
+ 1029 05de D7F82031 		ldr	r3, [r7, #288]
+ 1030 05e2 1A44     		add	r2, r2, r3
+ 1031 05e4 3B1D     		adds	r3, r7, #4
+ 1032 05e6 1B68     		ldr	r3, [r3]
+ 1033 05e8 DA60     		str	r2, [r3, #12]
+ 444:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[4] += E;
+ 1034              		.loc 1 444 0
+ 1035 05ea 3B1D     		adds	r3, r7, #4
+ 1036 05ec 1B68     		ldr	r3, [r3]
+ 1037 05ee 1A69     		ldr	r2, [r3, #16]
+ 1038 05f0 D7F81C31 		ldr	r3, [r7, #284]
+ 1039 05f4 1A44     		add	r2, r2, r3
+ 1040 05f6 3B1D     		adds	r3, r7, #4
+ 1041 05f8 1B68     		ldr	r3, [r3]
+ 1042 05fa 1A61     		str	r2, [r3, #16]
+ 445:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[5] += F;
+ 1043              		.loc 1 445 0
+ 1044 05fc 3B1D     		adds	r3, r7, #4
+ 1045 05fe 1B68     		ldr	r3, [r3]
+ 1046 0600 5A69     		ldr	r2, [r3, #20]
+ 1047 0602 D7F81831 		ldr	r3, [r7, #280]
+ 1048 0606 1A44     		add	r2, r2, r3
+ 1049 0608 3B1D     		adds	r3, r7, #4
+ 1050 060a 1B68     		ldr	r3, [r3]
+ 1051 060c 5A61     		str	r2, [r3, #20]
+ 446:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[6] += G;
+ 1052              		.loc 1 446 0
+ 1053 060e 3B1D     		adds	r3, r7, #4
+ 1054 0610 1B68     		ldr	r3, [r3]
+ 1055 0612 9A69     		ldr	r2, [r3, #24]
+ 1056 0614 D7F81431 		ldr	r3, [r7, #276]
+ 1057 0618 1A44     		add	r2, r2, r3
+ 1058 061a 3B1D     		adds	r3, r7, #4
+ 1059 061c 1B68     		ldr	r3, [r3]
+ 1060 061e 9A61     		str	r2, [r3, #24]
+ 447:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Intermediate_Hash[7] += H;
+ 1061              		.loc 1 447 0
+ 1062 0620 3B1D     		adds	r3, r7, #4
+ 1063 0622 1B68     		ldr	r3, [r3]
+ 1064 0624 DA69     		ldr	r2, [r3, #28]
+ 1065 0626 D7F81031 		ldr	r3, [r7, #272]
+ 1066 062a 1A44     		add	r2, r2, r3
+ 1067 062c 3B1D     		adds	r3, r7, #4
+ 1068 062e 1B68     		ldr	r3, [r3]
+ 1069 0630 DA61     		str	r2, [r3, #28]
+ 448:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 449:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block_Index = 0;
+ 1070              		.loc 1 449 0
+ 1071 0632 3B1D     		adds	r3, r7, #4
+ 1072 0634 1B68     		ldr	r3, [r3]
+ 1073 0636 0022     		movs	r2, #0
+ 1074 0638 1A85     		strh	r2, [r3, #40]	@ movhi
+ 450:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 1075              		.loc 1 450 0
+ 1076 063a 07F59E77 		add	r7, r7, #316
+ 1077              		.cfi_def_cfa_offset 4
+ 1078 063e BD46     		mov	sp, r7
+ 1079              		.cfi_def_cfa_register 13
+ 1080              		@ sp needed
+ 1081 0640 5DF8047B 		ldr	r7, [sp], #4
+ 1082              		.cfi_restore 7
+ 1083              		.cfi_def_cfa_offset 0
+ 1084 0644 7047     		bx	lr
+ 1085              	.L55:
+ 1086 0646 00BF     		.align	2
+ 1087              	.L54:
+ 1088 0648 00000000 		.word	K.4428
+ 1089              		.cfi_endproc
+ 1090              	.LFE9:
+ 1092              		.align	2
+ 1093              		.thumb
+ 1094              		.thumb_func
+ 1096              	SHA224_256Finalize:
+ 1097              	.LFB10:
+ 451:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 452:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 453:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224_256Finalize
+ 454:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 455:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 456:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This helper function finishes off the digest calculations.
+ 457:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 458:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 459:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 460:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The SHA context to update.
+ 461:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Pad_Byte: [in]
+ 462:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The last byte to add to the message block before the 0-padding
+ 463:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     and length.  This will contain the last bits of the message
+ 464:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     followed by another single bit.  If the message was an
+ 465:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     exact multiple of 8-bits long, Pad_Byte will be 0x80.
+ 466:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 467:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 468:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 469:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 470:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256Finalize(SHA256Context *context,
+ 471:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     uint8_t Pad_Byte)
+ 472:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 1098              		.loc 1 472 0
+ 1099              		.cfi_startproc
+ 1100              		@ args = 0, pretend = 0, frame = 16
+ 1101              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1102 064c 80B5     		push	{r7, lr}
+ 1103              		.cfi_def_cfa_offset 8
+ 1104              		.cfi_offset 7, -8
+ 1105              		.cfi_offset 14, -4
+ 1106 064e 84B0     		sub	sp, sp, #16
+ 1107              		.cfi_def_cfa_offset 24
+ 1108 0650 00AF     		add	r7, sp, #0
+ 1109              		.cfi_def_cfa_register 7
+ 1110 0652 7860     		str	r0, [r7, #4]
+ 1111 0654 0B46     		mov	r3, r1
+ 1112 0656 FB70     		strb	r3, [r7, #3]
+ 473:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   int i;
+ 474:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256PadMessage(context, Pad_Byte);
+ 1113              		.loc 1 474 0
+ 1114 0658 FB78     		ldrb	r3, [r7, #3]	@ zero_extendqisi2
+ 1115 065a 7868     		ldr	r0, [r7, #4]
+ 1116 065c 1946     		mov	r1, r3
+ 1117 065e 00F01BF8 		bl	SHA224_256PadMessage
+ 475:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   /* message may be sensitive, so clear it out */
+ 476:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (i = 0; i < SHA256_Message_Block_Size; ++i)
+ 1118              		.loc 1 476 0
+ 1119 0662 0023     		movs	r3, #0
+ 1120 0664 FB60     		str	r3, [r7, #12]
+ 1121 0666 08E0     		b	.L57
+ 1122              	.L58:
+ 477:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[i] = 0;
+ 1123              		.loc 1 477 0 discriminator 3
+ 1124 0668 7A68     		ldr	r2, [r7, #4]
+ 1125 066a FB68     		ldr	r3, [r7, #12]
+ 1126 066c 1344     		add	r3, r3, r2
+ 1127 066e 2833     		adds	r3, r3, #40
+ 1128 0670 0022     		movs	r2, #0
+ 1129 0672 9A70     		strb	r2, [r3, #2]
+ 476:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[i] = 0;
+ 1130              		.loc 1 476 0 discriminator 3
+ 1131 0674 FB68     		ldr	r3, [r7, #12]
+ 1132 0676 0133     		adds	r3, r3, #1
+ 1133 0678 FB60     		str	r3, [r7, #12]
+ 1134              	.L57:
+ 476:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[i] = 0;
+ 1135              		.loc 1 476 0 is_stmt 0 discriminator 1
+ 1136 067a FB68     		ldr	r3, [r7, #12]
+ 1137 067c 3F2B     		cmp	r3, #63
+ 1138 067e F3DD     		ble	.L58
+ 478:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Length_High = 0;     /* and clear length */
+ 1139              		.loc 1 478 0 is_stmt 1
+ 1140 0680 7B68     		ldr	r3, [r7, #4]
+ 1141 0682 0022     		movs	r2, #0
+ 1142 0684 1A62     		str	r2, [r3, #32]
+ 479:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Length_Low = 0;
+ 1143              		.loc 1 479 0
+ 1144 0686 7B68     		ldr	r3, [r7, #4]
+ 1145 0688 0022     		movs	r2, #0
+ 1146 068a 5A62     		str	r2, [r3, #36]
+ 480:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Computed = 1;
+ 1147              		.loc 1 480 0
+ 1148 068c 7B68     		ldr	r3, [r7, #4]
+ 1149 068e 0122     		movs	r2, #1
+ 1150 0690 DA66     		str	r2, [r3, #108]
+ 481:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 1151              		.loc 1 481 0
+ 1152 0692 1037     		adds	r7, r7, #16
+ 1153              		.cfi_def_cfa_offset 8
+ 1154 0694 BD46     		mov	sp, r7
+ 1155              		.cfi_def_cfa_register 13
+ 1156              		@ sp needed
+ 1157 0696 80BD     		pop	{r7, pc}
+ 1158              		.cfi_endproc
+ 1159              	.LFE10:
+ 1161              		.align	2
+ 1162              		.thumb
+ 1163              		.thumb_func
+ 1165              	SHA224_256PadMessage:
+ 1166              	.LFB11:
+ 482:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 483:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 484:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224_256PadMessage
+ 485:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 486:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 487:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   According to the standard, the message must be padded to the next
+ 488:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   even multiple of 512 bits.  The first padding bit must be a '1'.
+ 489:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   The last 64 bits represent the length of the original message.
+ 490:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   All bits in between should be 0.  This helper function will pad
+ 491:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   the message according to those rules by filling the
+ 492:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Message_Block array accordingly.  When it returns, it can be
+ 493:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   assumed that the message digest has been computed.
+ 494:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 495:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 496:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 497:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to pad.
+ 498:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Pad_Byte: [in]
+ 499:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The last byte to add to the message block before the 0-padding
+ 500:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     and length.  This will contain the last bits of the message
+ 501:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     followed by another single bit.  If the message was an
+ 502:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     exact multiple of 8-bits long, Pad_Byte will be 0x80.
+ 503:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 504:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 505:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Nothing.
+ 506:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 507:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static void SHA224_256PadMessage(SHA256Context *context,
+ 508:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     uint8_t Pad_Byte)
+ 509:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 1167              		.loc 1 509 0
+ 1168              		.cfi_startproc
+ 1169              		@ args = 0, pretend = 0, frame = 8
+ 1170              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1171 0698 80B5     		push	{r7, lr}
+ 1172              		.cfi_def_cfa_offset 8
+ 1173              		.cfi_offset 7, -8
+ 1174              		.cfi_offset 14, -4
+ 1175 069a 82B0     		sub	sp, sp, #8
+ 1176              		.cfi_def_cfa_offset 16
+ 1177 069c 00AF     		add	r7, sp, #0
+ 1178              		.cfi_def_cfa_register 7
+ 1179 069e 7860     		str	r0, [r7, #4]
+ 1180 06a0 0B46     		mov	r3, r1
+ 1181 06a2 FB70     		strb	r3, [r7, #3]
+ 510:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   /*
+ 511:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * Check to see if the current message block is too small to hold
+ 512:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * the initial padding bits and length.  If so, we will pad the
+ 513:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * block, process it, and then continue padding into a second
+ 514:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * block.
+ 515:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    */
+ 516:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Message_Block_Index >= (SHA256_Message_Block_Size-8)) {
+ 1182              		.loc 1 516 0
+ 1183 06a4 7B68     		ldr	r3, [r7, #4]
+ 1184 06a6 1B8D     		ldrh	r3, [r3, #40]
+ 1185 06a8 1BB2     		sxth	r3, r3
+ 1186 06aa 372B     		cmp	r3, #55
+ 1187 06ac 27DD     		ble	.L60
+ 517:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] = Pad_Byte;
+ 1188              		.loc 1 517 0
+ 1189 06ae 7B68     		ldr	r3, [r7, #4]
+ 1190 06b0 1B8D     		ldrh	r3, [r3, #40]
+ 1191 06b2 9BB2     		uxth	r3, r3
+ 1192 06b4 9AB2     		uxth	r2, r3
+ 1193 06b6 0132     		adds	r2, r2, #1
+ 1194 06b8 92B2     		uxth	r2, r2
+ 1195 06ba 91B2     		uxth	r1, r2
+ 1196 06bc 7A68     		ldr	r2, [r7, #4]
+ 1197 06be 1185     		strh	r1, [r2, #40]	@ movhi
+ 1198 06c0 1BB2     		sxth	r3, r3
+ 1199 06c2 7A68     		ldr	r2, [r7, #4]
+ 1200 06c4 1344     		add	r3, r3, r2
+ 1201 06c6 FA78     		ldrb	r2, [r7, #3]
+ 1202 06c8 83F82A20 		strb	r2, [r3, #42]
+ 518:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     while (context->Message_Block_Index < SHA256_Message_Block_Size)
+ 1203              		.loc 1 518 0
+ 1204 06cc 0EE0     		b	.L61
+ 1205              	.L62:
+ 519:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       context->Message_Block[context->Message_Block_Index++] = 0;
+ 1206              		.loc 1 519 0
+ 1207 06ce 7B68     		ldr	r3, [r7, #4]
+ 1208 06d0 1B8D     		ldrh	r3, [r3, #40]
+ 1209 06d2 9BB2     		uxth	r3, r3
+ 1210 06d4 9AB2     		uxth	r2, r3
+ 1211 06d6 0132     		adds	r2, r2, #1
+ 1212 06d8 92B2     		uxth	r2, r2
+ 1213 06da 91B2     		uxth	r1, r2
+ 1214 06dc 7A68     		ldr	r2, [r7, #4]
+ 1215 06de 1185     		strh	r1, [r2, #40]	@ movhi
+ 1216 06e0 1BB2     		sxth	r3, r3
+ 1217 06e2 7A68     		ldr	r2, [r7, #4]
+ 1218 06e4 1344     		add	r3, r3, r2
+ 1219 06e6 0022     		movs	r2, #0
+ 1220 06e8 83F82A20 		strb	r2, [r3, #42]
+ 1221              	.L61:
+ 518:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     while (context->Message_Block_Index < SHA256_Message_Block_Size)
+ 1222              		.loc 1 518 0
+ 1223 06ec 7B68     		ldr	r3, [r7, #4]
+ 1224 06ee 1B8D     		ldrh	r3, [r3, #40]
+ 1225 06f0 1BB2     		sxth	r3, r3
+ 1226 06f2 3F2B     		cmp	r3, #63
+ 1227 06f4 EBDD     		ble	.L62
+ 520:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     SHA224_256ProcessMessageBlock(context);
+ 1228              		.loc 1 520 0
+ 1229 06f6 7868     		ldr	r0, [r7, #4]
+ 1230 06f8 FFF702FE 		bl	SHA224_256ProcessMessageBlock
+ 1231 06fc 0EE0     		b	.L63
+ 1232              	.L60:
+ 521:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   } else
+ 522:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] = Pad_Byte;
+ 1233              		.loc 1 522 0
+ 1234 06fe 7B68     		ldr	r3, [r7, #4]
+ 1235 0700 1B8D     		ldrh	r3, [r3, #40]
+ 1236 0702 9BB2     		uxth	r3, r3
+ 1237 0704 9AB2     		uxth	r2, r3
+ 1238 0706 0132     		adds	r2, r2, #1
+ 1239 0708 92B2     		uxth	r2, r2
+ 1240 070a 91B2     		uxth	r1, r2
+ 1241 070c 7A68     		ldr	r2, [r7, #4]
+ 1242 070e 1185     		strh	r1, [r2, #40]	@ movhi
+ 1243 0710 1BB2     		sxth	r3, r3
+ 1244 0712 7A68     		ldr	r2, [r7, #4]
+ 1245 0714 1344     		add	r3, r3, r2
+ 1246 0716 FA78     		ldrb	r2, [r7, #3]
+ 1247 0718 83F82A20 		strb	r2, [r3, #42]
+ 1248              	.L63:
+ 523:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 524:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   while (context->Message_Block_Index < (SHA256_Message_Block_Size-8))
+ 1249              		.loc 1 524 0
+ 1250 071c 0EE0     		b	.L64
+ 1251              	.L65:
+ 525:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] = 0;
+ 1252              		.loc 1 525 0
+ 1253 071e 7B68     		ldr	r3, [r7, #4]
+ 1254 0720 1B8D     		ldrh	r3, [r3, #40]
+ 1255 0722 9BB2     		uxth	r3, r3
+ 1256 0724 9AB2     		uxth	r2, r3
+ 1257 0726 0132     		adds	r2, r2, #1
+ 1258 0728 92B2     		uxth	r2, r2
+ 1259 072a 91B2     		uxth	r1, r2
+ 1260 072c 7A68     		ldr	r2, [r7, #4]
+ 1261 072e 1185     		strh	r1, [r2, #40]	@ movhi
+ 1262 0730 1BB2     		sxth	r3, r3
+ 1263 0732 7A68     		ldr	r2, [r7, #4]
+ 1264 0734 1344     		add	r3, r3, r2
+ 1265 0736 0022     		movs	r2, #0
+ 1266 0738 83F82A20 		strb	r2, [r3, #42]
+ 1267              	.L64:
+ 524:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     context->Message_Block[context->Message_Block_Index++] = 0;
+ 1268              		.loc 1 524 0
+ 1269 073c 7B68     		ldr	r3, [r7, #4]
+ 1270 073e 1B8D     		ldrh	r3, [r3, #40]
+ 1271 0740 1BB2     		sxth	r3, r3
+ 1272 0742 372B     		cmp	r3, #55
+ 1273 0744 EBDD     		ble	.L65
+ 526:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 527:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   /*
+ 528:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    * Store the message length as the last 8 octets
+ 529:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****    */
+ 530:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[56] = (uint8_t)(context->Length_High >> 24);
+ 1274              		.loc 1 530 0
+ 1275 0746 7B68     		ldr	r3, [r7, #4]
+ 1276 0748 1B6A     		ldr	r3, [r3, #32]
+ 1277 074a 1B0E     		lsrs	r3, r3, #24
+ 1278 074c DAB2     		uxtb	r2, r3
+ 1279 074e 7B68     		ldr	r3, [r7, #4]
+ 1280 0750 83F86220 		strb	r2, [r3, #98]
+ 531:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[57] = (uint8_t)(context->Length_High >> 16);
+ 1281              		.loc 1 531 0
+ 1282 0754 7B68     		ldr	r3, [r7, #4]
+ 1283 0756 1B6A     		ldr	r3, [r3, #32]
+ 1284 0758 1B0C     		lsrs	r3, r3, #16
+ 1285 075a DAB2     		uxtb	r2, r3
+ 1286 075c 7B68     		ldr	r3, [r7, #4]
+ 1287 075e 83F86320 		strb	r2, [r3, #99]
+ 532:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[58] = (uint8_t)(context->Length_High >> 8);
+ 1288              		.loc 1 532 0
+ 1289 0762 7B68     		ldr	r3, [r7, #4]
+ 1290 0764 1B6A     		ldr	r3, [r3, #32]
+ 1291 0766 1B0A     		lsrs	r3, r3, #8
+ 1292 0768 DAB2     		uxtb	r2, r3
+ 1293 076a 7B68     		ldr	r3, [r7, #4]
+ 1294 076c 83F86420 		strb	r2, [r3, #100]
+ 533:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[59] = (uint8_t)(context->Length_High);
+ 1295              		.loc 1 533 0
+ 1296 0770 7B68     		ldr	r3, [r7, #4]
+ 1297 0772 1B6A     		ldr	r3, [r3, #32]
+ 1298 0774 DAB2     		uxtb	r2, r3
+ 1299 0776 7B68     		ldr	r3, [r7, #4]
+ 1300 0778 83F86520 		strb	r2, [r3, #101]
+ 534:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[60] = (uint8_t)(context->Length_Low >> 24);
+ 1301              		.loc 1 534 0
+ 1302 077c 7B68     		ldr	r3, [r7, #4]
+ 1303 077e 5B6A     		ldr	r3, [r3, #36]
+ 1304 0780 1B0E     		lsrs	r3, r3, #24
+ 1305 0782 DAB2     		uxtb	r2, r3
+ 1306 0784 7B68     		ldr	r3, [r7, #4]
+ 1307 0786 83F86620 		strb	r2, [r3, #102]
+ 535:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[61] = (uint8_t)(context->Length_Low >> 16);
+ 1308              		.loc 1 535 0
+ 1309 078a 7B68     		ldr	r3, [r7, #4]
+ 1310 078c 5B6A     		ldr	r3, [r3, #36]
+ 1311 078e 1B0C     		lsrs	r3, r3, #16
+ 1312 0790 DAB2     		uxtb	r2, r3
+ 1313 0792 7B68     		ldr	r3, [r7, #4]
+ 1314 0794 83F86720 		strb	r2, [r3, #103]
+ 536:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[62] = (uint8_t)(context->Length_Low >> 8);
+ 1315              		.loc 1 536 0
+ 1316 0798 7B68     		ldr	r3, [r7, #4]
+ 1317 079a 5B6A     		ldr	r3, [r3, #36]
+ 1318 079c 1B0A     		lsrs	r3, r3, #8
+ 1319 079e DAB2     		uxtb	r2, r3
+ 1320 07a0 7B68     		ldr	r3, [r7, #4]
+ 1321 07a2 83F86820 		strb	r2, [r3, #104]
+ 537:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   context->Message_Block[63] = (uint8_t)(context->Length_Low);
+ 1322              		.loc 1 537 0
+ 1323 07a6 7B68     		ldr	r3, [r7, #4]
+ 1324 07a8 5B6A     		ldr	r3, [r3, #36]
+ 1325 07aa DAB2     		uxtb	r2, r3
+ 1326 07ac 7B68     		ldr	r3, [r7, #4]
+ 1327 07ae 83F86920 		strb	r2, [r3, #105]
+ 538:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 539:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   SHA224_256ProcessMessageBlock(context);
+ 1328              		.loc 1 539 0
+ 1329 07b2 7868     		ldr	r0, [r7, #4]
+ 1330 07b4 FFF7A4FD 		bl	SHA224_256ProcessMessageBlock
+ 540:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 1331              		.loc 1 540 0
+ 1332 07b8 0837     		adds	r7, r7, #8
+ 1333              		.cfi_def_cfa_offset 8
+ 1334 07ba BD46     		mov	sp, r7
+ 1335              		.cfi_def_cfa_register 13
+ 1336              		@ sp needed
+ 1337 07bc 80BD     		pop	{r7, pc}
+ 1338              		.cfi_endproc
+ 1339              	.LFE11:
+ 1341 07be 00BF     		.align	2
+ 1342              		.thumb
+ 1343              		.thumb_func
+ 1345              	SHA224_256ResultN:
+ 1346              	.LFB12:
+ 541:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 542:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** /*
+ 543:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * SHA224_256ResultN
+ 544:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 545:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Description:
+ 546:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   This helper function will return the 224-bit or 256-bit message
+ 547:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   digest into the Message_Digest array provided by the caller.
+ 548:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   NOTE:
+ 549:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    The first octet of hash is stored in the element with index 0,
+ 550:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *    the last octet of hash in the element with index 27/31.
+ 551:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 552:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Parameters:
+ 553:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   context: [in/out]
+ 554:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The context to use to calculate the SHA hash.
+ 555:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   Message_Digest[ ]: [out]
+ 556:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     Where the digest is returned.
+ 557:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   HashSize: [in]
+ 558:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *     The size of the hash, either 28 or 32.
+ 559:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *
+ 560:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  * Returns:
+ 561:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  *   sha Error Code.
+ 562:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****  */
+ 563:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** static int SHA224_256ResultN(SHA256Context *context,
+ 564:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     uint8_t Message_Digest[ ], int HashSize)
+ 565:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** {
+ 1347              		.loc 1 565 0
+ 1348              		.cfi_startproc
+ 1349              		@ args = 0, pretend = 0, frame = 24
+ 1350              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1351 07c0 80B5     		push	{r7, lr}
+ 1352              		.cfi_def_cfa_offset 8
+ 1353              		.cfi_offset 7, -8
+ 1354              		.cfi_offset 14, -4
+ 1355 07c2 86B0     		sub	sp, sp, #24
+ 1356              		.cfi_def_cfa_offset 32
+ 1357 07c4 00AF     		add	r7, sp, #0
+ 1358              		.cfi_def_cfa_register 7
+ 1359 07c6 F860     		str	r0, [r7, #12]
+ 1360 07c8 B960     		str	r1, [r7, #8]
+ 1361 07ca 7A60     		str	r2, [r7, #4]
+ 566:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   int i;
+ 567:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 568:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!context) return shaNull;
+ 1362              		.loc 1 568 0
+ 1363 07cc FB68     		ldr	r3, [r7, #12]
+ 1364 07ce 002B     		cmp	r3, #0
+ 1365 07d0 01D1     		bne	.L67
+ 1366              		.loc 1 568 0 is_stmt 0 discriminator 1
+ 1367 07d2 0123     		movs	r3, #1
+ 1368 07d4 2FE0     		b	.L68
+ 1369              	.L67:
+ 569:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!Message_Digest) return shaNull;
+ 1370              		.loc 1 569 0 is_stmt 1
+ 1371 07d6 BB68     		ldr	r3, [r7, #8]
+ 1372 07d8 002B     		cmp	r3, #0
+ 1373 07da 01D1     		bne	.L69
+ 1374              		.loc 1 569 0 is_stmt 0 discriminator 1
+ 1375 07dc 0123     		movs	r3, #1
+ 1376 07de 2AE0     		b	.L68
+ 1377              	.L69:
+ 570:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (context->Corrupted) return context->Corrupted;
+ 1378              		.loc 1 570 0 is_stmt 1
+ 1379 07e0 FB68     		ldr	r3, [r7, #12]
+ 1380 07e2 1B6F     		ldr	r3, [r3, #112]
+ 1381 07e4 002B     		cmp	r3, #0
+ 1382 07e6 02D0     		beq	.L70
+ 1383              		.loc 1 570 0 is_stmt 0 discriminator 1
+ 1384 07e8 FB68     		ldr	r3, [r7, #12]
+ 1385 07ea 1B6F     		ldr	r3, [r3, #112]
+ 1386 07ec 23E0     		b	.L68
+ 1387              	.L70:
+ 571:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 572:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   if (!context->Computed)
+ 1388              		.loc 1 572 0 is_stmt 1
+ 1389 07ee FB68     		ldr	r3, [r7, #12]
+ 1390 07f0 DB6E     		ldr	r3, [r3, #108]
+ 1391 07f2 002B     		cmp	r3, #0
+ 1392 07f4 03D1     		bne	.L71
+ 573:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     SHA224_256Finalize(context, 0x80);
+ 1393              		.loc 1 573 0
+ 1394 07f6 F868     		ldr	r0, [r7, #12]
+ 1395 07f8 8021     		movs	r1, #128
+ 1396 07fa FFF727FF 		bl	SHA224_256Finalize
+ 1397              	.L71:
+ 574:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 575:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   for (i = 0; i < HashSize; ++i)
+ 1398              		.loc 1 575 0
+ 1399 07fe 0023     		movs	r3, #0
+ 1400 0800 7B61     		str	r3, [r7, #20]
+ 1401 0802 13E0     		b	.L72
+ 1402              	.L73:
+ 576:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     Message_Digest[i] = (uint8_t)
+ 1403              		.loc 1 576 0 discriminator 3
+ 1404 0804 7B69     		ldr	r3, [r7, #20]
+ 1405 0806 BA68     		ldr	r2, [r7, #8]
+ 1406 0808 1344     		add	r3, r3, r2
+ 577:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****       (context->Intermediate_Hash[i>>2] >> 8 * ( 3 - ( i & 0x03 ) ));
+ 1407              		.loc 1 577 0 discriminator 3
+ 1408 080a 7A69     		ldr	r2, [r7, #20]
+ 1409 080c 9110     		asrs	r1, r2, #2
+ 1410 080e FA68     		ldr	r2, [r7, #12]
+ 1411 0810 52F82110 		ldr	r1, [r2, r1, lsl #2]
+ 1412 0814 7A69     		ldr	r2, [r7, #20]
+ 1413 0816 D243     		mvns	r2, r2
+ 1414 0818 02F00302 		and	r2, r2, #3
+ 1415 081c D200     		lsls	r2, r2, #3
+ 1416 081e 21FA02F2 		lsr	r2, r1, r2
+ 576:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     Message_Digest[i] = (uint8_t)
+ 1417              		.loc 1 576 0 discriminator 3
+ 1418 0822 D2B2     		uxtb	r2, r2
+ 1419 0824 1A70     		strb	r2, [r3]
+ 575:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     Message_Digest[i] = (uint8_t)
+ 1420              		.loc 1 575 0 discriminator 3
+ 1421 0826 7B69     		ldr	r3, [r7, #20]
+ 1422 0828 0133     		adds	r3, r3, #1
+ 1423 082a 7B61     		str	r3, [r7, #20]
+ 1424              	.L72:
+ 575:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****     Message_Digest[i] = (uint8_t)
+ 1425              		.loc 1 575 0 is_stmt 0 discriminator 1
+ 1426 082c 7A69     		ldr	r2, [r7, #20]
+ 1427 082e 7B68     		ldr	r3, [r7, #4]
+ 1428 0830 9A42     		cmp	r2, r3
+ 1429 0832 E7DB     		blt	.L73
+ 578:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** 
+ 579:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c ****   return shaSuccess;
+ 1430              		.loc 1 579 0 is_stmt 1
+ 1431 0834 0023     		movs	r3, #0
+ 1432              	.L68:
+ 580:build/openmote-cc2538_armgcc/openapps/opencoap/sha224-256.c **** }
+ 1433              		.loc 1 580 0
+ 1434 0836 1846     		mov	r0, r3
+ 1435 0838 1837     		adds	r7, r7, #24
+ 1436              		.cfi_def_cfa_offset 8
+ 1437 083a BD46     		mov	sp, r7
+ 1438              		.cfi_def_cfa_register 13
+ 1439              		@ sp needed
+ 1440 083c 80BD     		pop	{r7, pc}
+ 1441              		.cfi_endproc
+ 1442              	.LFE12:
+ 1444              		.data
+ 1445              		.align	2
+ 1448              	masks.4415:
+ 1449 0040 00       		.byte	0
+ 1450 0041 80       		.byte	-128
+ 1451 0042 C0       		.byte	-64
+ 1452 0043 E0       		.byte	-32
+ 1453 0044 F0       		.byte	-16
+ 1454 0045 F8       		.byte	-8
+ 1455 0046 FC       		.byte	-4
+ 1456 0047 FE       		.byte	-2
+ 1457              		.align	2
+ 1460              	markbit.4416:
+ 1461 0048 80       		.byte	-128
+ 1462 0049 40       		.byte	64
+ 1463 004a 20       		.byte	32
+ 1464 004b 10       		.byte	16
+ 1465 004c 08       		.byte	8
+ 1466 004d 04       		.byte	4
+ 1467 004e 02       		.byte	2
+ 1468 004f 01       		.byte	1
+ 1469              		.section	.rodata
+ 1470              		.align	2
+ 1473              	K.4428:
+ 1474 0000 982F8A42 		.word	1116352408
+ 1475 0004 91443771 		.word	1899447441
+ 1476 0008 CFFBC0B5 		.word	-1245643825
+ 1477 000c A5DBB5E9 		.word	-373957723
+ 1478 0010 5BC25639 		.word	961987163
+ 1479 0014 F111F159 		.word	1508970993
+ 1480 0018 A4823F92 		.word	-1841331548
+ 1481 001c D55E1CAB 		.word	-1424204075
+ 1482 0020 98AA07D8 		.word	-670586216
+ 1483 0024 015B8312 		.word	310598401
+ 1484 0028 BE853124 		.word	607225278
+ 1485 002c C37D0C55 		.word	1426881987
+ 1486 0030 745DBE72 		.word	1925078388
+ 1487 0034 FEB1DE80 		.word	-2132889090
+ 1488 0038 A706DC9B 		.word	-1680079193
+ 1489 003c 74F19BC1 		.word	-1046744716
+ 1490 0040 C1699BE4 		.word	-459576895
+ 1491 0044 8647BEEF 		.word	-272742522
+ 1492 0048 C69DC10F 		.word	264347078
+ 1493 004c CCA10C24 		.word	604807628
+ 1494 0050 6F2CE92D 		.word	770255983
+ 1495 0054 AA84744A 		.word	1249150122
+ 1496 0058 DCA9B05C 		.word	1555081692
+ 1497 005c DA88F976 		.word	1996064986
+ 1498 0060 52513E98 		.word	-1740746414
+ 1499 0064 6DC631A8 		.word	-1473132947
+ 1500 0068 C82703B0 		.word	-1341970488
+ 1501 006c C77F59BF 		.word	-1084653625
+ 1502 0070 F30BE0C6 		.word	-958395405
+ 1503 0074 4791A7D5 		.word	-710438585
+ 1504 0078 5163CA06 		.word	113926993
+ 1505 007c 67292914 		.word	338241895
+ 1506 0080 850AB727 		.word	666307205
+ 1507 0084 38211B2E 		.word	773529912
+ 1508 0088 FC6D2C4D 		.word	1294757372
+ 1509 008c 130D3853 		.word	1396182291
+ 1510 0090 54730A65 		.word	1695183700
+ 1511 0094 BB0A6A76 		.word	1986661051
+ 1512 0098 2EC9C281 		.word	-2117940946
+ 1513 009c 852C7292 		.word	-1838011259
+ 1514 00a0 A1E8BFA2 		.word	-1564481375
+ 1515 00a4 4B661AA8 		.word	-1474664885
+ 1516 00a8 708B4BC2 		.word	-1035236496
+ 1517 00ac A3516CC7 		.word	-949202525
+ 1518 00b0 19E892D1 		.word	-778901479
+ 1519 00b4 240699D6 		.word	-694614492
+ 1520 00b8 85350EF4 		.word	-200395387
+ 1521 00bc 70A06A10 		.word	275423344
+ 1522 00c0 16C1A419 		.word	430227734
+ 1523 00c4 086C371E 		.word	506948616
+ 1524 00c8 4C774827 		.word	659060556
+ 1525 00cc B5BCB034 		.word	883997877
+ 1526 00d0 B30C1C39 		.word	958139571
+ 1527 00d4 4AAAD84E 		.word	1322822218
+ 1528 00d8 4FCA9C5B 		.word	1537002063
+ 1529 00dc F36F2E68 		.word	1747873779
+ 1530 00e0 EE828F74 		.word	1955562222
+ 1531 00e4 6F63A578 		.word	2024104815
+ 1532 00e8 1478C884 		.word	-2067236844
+ 1533 00ec 0802C78C 		.word	-1933114872
+ 1534 00f0 FAFFBE90 		.word	-1866530822
+ 1535 00f4 EB6C50A4 		.word	-1538233109
+ 1536 00f8 F7A3F9BE 		.word	-1090935817
+ 1537 00fc F27871C6 		.word	-965641998
+ 1538              		.text
+ 1539              	.Letext0:
+ 1540              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1541              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1542              		.file 4 "/usr/include/newlib/stdint.h"
+ 1543              		.file 5 "build/openmote-cc2538_armgcc/openapps/opencoap/sha.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 sha224-256.c
+     /tmp/ccdfbuGv.s:19     .bss:0000000000000000 $d
+     /tmp/ccdfbuGv.s:20     .bss:0000000000000000 addTemp
+     /tmp/ccdfbuGv.s:23     .data:0000000000000000 $d
+     /tmp/ccdfbuGv.s:26     .data:0000000000000000 SHA224_H0
+     /tmp/ccdfbuGv.s:38     .data:0000000000000020 SHA256_H0
+     /tmp/ccdfbuGv.s:48     .text:0000000000000000 $t
+     /tmp/ccdfbuGv.s:53     .text:0000000000000000 SHA224Reset
+     /tmp/ccdfbuGv.s:617    .text:000000000000027c SHA224_256Reset
+     /tmp/ccdfbuGv.s:85     .text:000000000000001c $d
+     /tmp/ccdfbuGv.s:89     .text:0000000000000020 $t
+     /tmp/ccdfbuGv.s:94     .text:0000000000000020 SHA224Input
+     /tmp/ccdfbuGv.s:252    .text:00000000000000a4 SHA256Input
+     /tmp/ccdfbuGv.s:133    .text:0000000000000040 SHA224FinalBits
+     /tmp/ccdfbuGv.s:426    .text:000000000000018c SHA256FinalBits
+     /tmp/ccdfbuGv.s:174    .text:0000000000000064 SHA224Result
+     /tmp/ccdfbuGv.s:1345   .text:00000000000007c0 SHA224_256ResultN
+     /tmp/ccdfbuGv.s:212    .text:0000000000000084 SHA256Reset
+     /tmp/ccdfbuGv.s:243    .text:00000000000000a0 $d
+     /tmp/ccdfbuGv.s:247    .text:00000000000000a4 $t
+     /tmp/ccdfbuGv.s:722    .text:0000000000000300 SHA224_256ProcessMessageBlock
+     /tmp/ccdfbuGv.s:417    .text:0000000000000188 $d
+     /tmp/ccdfbuGv.s:421    .text:000000000000018c $t
+     /tmp/ccdfbuGv.s:1096   .text:000000000000064c SHA224_256Finalize
+     /tmp/ccdfbuGv.s:569    .text:0000000000000250 $d
+     /tmp/ccdfbuGv.s:1448   .data:0000000000000040 masks.4415
+     /tmp/ccdfbuGv.s:1460   .data:0000000000000048 markbit.4416
+     /tmp/ccdfbuGv.s:575    .text:000000000000025c $t
+     /tmp/ccdfbuGv.s:580    .text:000000000000025c SHA256Result
+     /tmp/ccdfbuGv.s:1088   .text:0000000000000648 $d
+     /tmp/ccdfbuGv.s:1473   .rodata:0000000000000000 K.4428
+     /tmp/ccdfbuGv.s:1092   .text:000000000000064c $t
+     /tmp/ccdfbuGv.s:1165   .text:0000000000000698 SHA224_256PadMessage
+     /tmp/ccdfbuGv.s:1470   .rodata:0000000000000000 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.shaprivate.h.4.3d3bafff7070092b968ac0d9fac65b8e
+
+NO UNDEFINED SYMBOLS

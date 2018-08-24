@@ -1,0 +1,1540 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"idmanager.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	linklocalprefix:
+  48 0030 FE       		.byte	-2
+  49 0031 80       		.byte	-128
+  50 0032 00       		.byte	0
+  51 0033 00       		.byte	0
+  52 0034 00       		.byte	0
+  53 0035 00       		.byte	0
+  54 0036 00       		.byte	0
+  55 0037 00       		.byte	0
+  56              		.align	2
+  59              	all_routers_multicast:
+  60 0038 FF       		.byte	-1
+  61 0039 02       		.byte	2
+  62 003a 00       		.byte	0
+  63 003b 00       		.byte	0
+  64 003c 00       		.byte	0
+  65 003d 00       		.byte	0
+  66 003e 00       		.byte	0
+  67 003f 00       		.byte	0
+  68 0040 00       		.byte	0
+  69 0041 00       		.byte	0
+  70 0042 00       		.byte	0
+  71 0043 00       		.byte	0
+  72 0044 00       		.byte	0
+  73 0045 00       		.byte	0
+  74 0046 00       		.byte	0
+  75 0047 1A       		.byte	26
+  76              		.comm	idmanager_vars,91,4
+  77              		.text
+  78              		.align	2
+  79              		.global	idmanager_init
+  80              		.thumb
+  81              		.thumb_func
+  83              	idmanager_init:
+  84              	.LFB0:
+  85              		.file 1 "build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c"
+   1:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "opendefs.h"
+   2:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "idmanager.h"
+   3:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "eui64.h"
+   4:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "packetfunctions.h"
+   5:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "openserial.h"
+   6:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "neighbors.h"
+   7:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "schedule.h"
+   8:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #include "IEEE802154_security.h"
+   9:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  10:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** //=========================== variables =======================================
+  11:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  12:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** idmanager_vars_t idmanager_vars;
+  13:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  14:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** //=========================== prototypes ======================================
+  15:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  16:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** //=========================== public ==========================================
+  17:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  18:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_init(void) {
+  86              		.loc 1 18 0
+  87              		.cfi_startproc
+  88              		@ args = 0, pretend = 0, frame = 0
+  89              		@ frame_needed = 1, uses_anonymous_args = 0
+  90 0000 80B5     		push	{r7, lr}
+  91              		.cfi_def_cfa_offset 8
+  92              		.cfi_offset 7, -8
+  93              		.cfi_offset 14, -4
+  94 0002 00AF     		add	r7, sp, #0
+  95              		.cfi_def_cfa_register 7
+  19:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  20:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // reset local variables
+  21:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memset(&idmanager_vars, 0, sizeof(idmanager_vars_t));
+  96              		.loc 1 21 0
+  97 0004 2248     		ldr	r0, .L2
+  98 0006 0021     		movs	r1, #0
+  99 0008 5B22     		movs	r2, #91
+ 100 000a FFF7FEFF 		bl	memset
+  22:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // this is used to not wakeup in non-activeslot
+  23:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.slotSkip             = FALSE;
+ 101              		.loc 1 23 0
+ 102 000e 204B     		ldr	r3, .L2
+ 103 0010 0022     		movs	r2, #0
+ 104 0012 83F84520 		strb	r2, [r3, #69]
+  24:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  25:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // isDAGroot
+  26:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #ifdef DAGROOT
+  27:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.isDAGroot            = TRUE;
+  28:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #else
+  29:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.isDAGroot            = FALSE;
+ 105              		.loc 1 29 0
+ 106 0016 1E4B     		ldr	r3, .L2
+ 107 0018 0022     		movs	r2, #0
+ 108 001a 1A70     		strb	r2, [r3]
+  30:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #endif
+  31:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  32:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // myPANID
+  33:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPANID.type         = ADDR_PANID;
+ 109              		.loc 1 33 0
+ 110 001c 1C4B     		ldr	r3, .L2
+ 111 001e 0422     		movs	r2, #4
+ 112 0020 5A70     		strb	r2, [r3, #1]
+  34:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #ifdef PANID_DEFINED 
+  35:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPANID.panid[0]     = PANID_DEFINED & 0x00ff;
+  36:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPANID.panid[1]     =(PANID_DEFINED & 0xff00)>>8;
+  37:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #else
+  38:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPANID.panid[0]     = 0xbe;
+ 113              		.loc 1 38 0
+ 114 0022 1B4B     		ldr	r3, .L2
+ 115 0024 BE22     		movs	r2, #190
+ 116 0026 9A70     		strb	r2, [r3, #2]
+  39:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPANID.panid[1]     = 0xbe;
+ 117              		.loc 1 39 0
+ 118 0028 194B     		ldr	r3, .L2
+ 119 002a BE22     		movs	r2, #190
+ 120 002c DA70     		strb	r2, [r3, #3]
+  40:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #endif
+  41:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // myPrefix
+  42:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.type        = ADDR_PREFIX;
+ 121              		.loc 1 42 0
+ 122 002e 184B     		ldr	r3, .L2
+ 123 0030 0522     		movs	r2, #5
+ 124 0032 83F83420 		strb	r2, [r3, #52]
+  43:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #ifdef DAGROOT
+  44:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[0]   = 0xbb;
+  45:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[1]   = 0xbb;
+  46:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[2]   = 0x00;
+  47:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[3]   = 0x00;
+  48:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[4]   = 0x00;
+  49:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[5]   = 0x00;
+  50:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[6]   = 0x00;
+  51:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[7]   = 0x00;
+  52:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #else
+  53:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // set prefix to link-local
+  54:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[0]   = 0xfe;
+ 125              		.loc 1 54 0
+ 126 0036 164B     		ldr	r3, .L2
+ 127 0038 FE22     		movs	r2, #254
+ 128 003a 83F83520 		strb	r2, [r3, #53]
+  55:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[1]   = 0x80;
+ 129              		.loc 1 55 0
+ 130 003e 144B     		ldr	r3, .L2
+ 131 0040 8022     		movs	r2, #128
+ 132 0042 83F83620 		strb	r2, [r3, #54]
+  56:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[2]   = 0x00;
+ 133              		.loc 1 56 0
+ 134 0046 124B     		ldr	r3, .L2
+ 135 0048 0022     		movs	r2, #0
+ 136 004a 83F83720 		strb	r2, [r3, #55]
+  57:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[3]   = 0x00;
+ 137              		.loc 1 57 0
+ 138 004e 104B     		ldr	r3, .L2
+ 139 0050 0022     		movs	r2, #0
+ 140 0052 83F83820 		strb	r2, [r3, #56]
+  58:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[4]   = 0x00;
+ 141              		.loc 1 58 0
+ 142 0056 0E4B     		ldr	r3, .L2
+ 143 0058 0022     		movs	r2, #0
+ 144 005a 83F83920 		strb	r2, [r3, #57]
+  59:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[5]   = 0x00;
+ 145              		.loc 1 59 0
+ 146 005e 0C4B     		ldr	r3, .L2
+ 147 0060 0022     		movs	r2, #0
+ 148 0062 83F83A20 		strb	r2, [r3, #58]
+  60:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[6]   = 0x00;
+ 149              		.loc 1 60 0
+ 150 0066 0A4B     		ldr	r3, .L2
+ 151 0068 0022     		movs	r2, #0
+ 152 006a 83F83B20 		strb	r2, [r3, #59]
+  61:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.myPrefix.prefix[7]   = 0x00;
+ 153              		.loc 1 61 0
+ 154 006e 084B     		ldr	r3, .L2
+ 155 0070 0022     		movs	r2, #0
+ 156 0072 83F83C20 		strb	r2, [r3, #60]
+  62:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** #endif
+  63:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  64:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // my64bID
+  65:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.my64bID.type         = ADDR_64B;
+ 157              		.loc 1 65 0
+ 158 0076 064B     		ldr	r3, .L2
+ 159 0078 0222     		movs	r2, #2
+ 160 007a 83F82320 		strb	r2, [r3, #35]
+  66:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    eui64_get(idmanager_vars.my64bID.addr_64b);
+ 161              		.loc 1 66 0
+ 162 007e 0548     		ldr	r0, .L2+4
+ 163 0080 FFF7FEFF 		bl	eui64_get
+  67:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  68:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // my16bID
+  69:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    packetfunctions_mac64bToMac16b(&idmanager_vars.my64bID,&idmanager_vars.my16bID);
+ 164              		.loc 1 69 0
+ 165 0084 0448     		ldr	r0, .L2+8
+ 166 0086 0549     		ldr	r1, .L2+12
+ 167 0088 FFF7FEFF 		bl	packetfunctions_mac64bToMac16b
+  70:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 168              		.loc 1 70 0
+ 169 008c 80BD     		pop	{r7, pc}
+ 170              	.L3:
+ 171 008e 00BF     		.align	2
+ 172              	.L2:
+ 173 0090 00000000 		.word	idmanager_vars
+ 174 0094 24000000 		.word	idmanager_vars+36
+ 175 0098 23000000 		.word	idmanager_vars+35
+ 176 009c 12000000 		.word	idmanager_vars+18
+ 177              		.cfi_endproc
+ 178              	.LFE0:
+ 180              		.align	2
+ 181              		.global	idmanager_getIsDAGroot
+ 182              		.thumb
+ 183              		.thumb_func
+ 185              	idmanager_getIsDAGroot:
+ 186              	.LFB1:
+  71:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  72:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** bool idmanager_getIsDAGroot(void) {
+ 187              		.loc 1 72 0
+ 188              		.cfi_startproc
+ 189              		@ args = 0, pretend = 0, frame = 8
+ 190              		@ frame_needed = 1, uses_anonymous_args = 0
+ 191 00a0 80B5     		push	{r7, lr}
+ 192              		.cfi_def_cfa_offset 8
+ 193              		.cfi_offset 7, -8
+ 194              		.cfi_offset 14, -4
+ 195 00a2 82B0     		sub	sp, sp, #8
+ 196              		.cfi_def_cfa_offset 16
+ 197 00a4 00AF     		add	r7, sp, #0
+ 198              		.cfi_def_cfa_register 7
+  73:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    bool res;
+  74:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+  75:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  76:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 199              		.loc 1 76 0
+ 200 00a6 FFF7FEFF 		bl	IntMasterDisable
+  77:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    res=idmanager_vars.isDAGroot;
+ 201              		.loc 1 77 0
+ 202 00aa 054B     		ldr	r3, .L6
+ 203 00ac 1B78     		ldrb	r3, [r3]
+ 204 00ae FB71     		strb	r3, [r7, #7]
+  78:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    ENABLE_INTERRUPTS();
+ 205              		.loc 1 78 0
+ 206 00b0 FFF7FEFF 		bl	IntMasterEnable
+  79:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return res;
+ 207              		.loc 1 79 0
+ 208 00b4 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  80:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 209              		.loc 1 80 0
+ 210 00b6 1846     		mov	r0, r3
+ 211 00b8 0837     		adds	r7, r7, #8
+ 212              		.cfi_def_cfa_offset 8
+ 213 00ba BD46     		mov	sp, r7
+ 214              		.cfi_def_cfa_register 13
+ 215              		@ sp needed
+ 216 00bc 80BD     		pop	{r7, pc}
+ 217              	.L7:
+ 218 00be 00BF     		.align	2
+ 219              	.L6:
+ 220 00c0 00000000 		.word	idmanager_vars
+ 221              		.cfi_endproc
+ 222              	.LFE1:
+ 224              		.align	2
+ 225              		.global	idmanager_setIsDAGroot
+ 226              		.thumb
+ 227              		.thumb_func
+ 229              	idmanager_setIsDAGroot:
+ 230              	.LFB2:
+  81:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  82:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_setIsDAGroot(bool newRole) {
+ 231              		.loc 1 82 0
+ 232              		.cfi_startproc
+ 233              		@ args = 0, pretend = 0, frame = 8
+ 234              		@ frame_needed = 1, uses_anonymous_args = 0
+ 235 00c4 80B5     		push	{r7, lr}
+ 236              		.cfi_def_cfa_offset 8
+ 237              		.cfi_offset 7, -8
+ 238              		.cfi_offset 14, -4
+ 239 00c6 82B0     		sub	sp, sp, #8
+ 240              		.cfi_def_cfa_offset 16
+ 241 00c8 00AF     		add	r7, sp, #0
+ 242              		.cfi_def_cfa_register 7
+ 243 00ca 0346     		mov	r3, r0
+ 244 00cc FB71     		strb	r3, [r7, #7]
+  83:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+  84:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 245              		.loc 1 84 0
+ 246 00ce FFF7FEFF 		bl	IntMasterDisable
+  85:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_vars.isDAGroot = newRole;
+ 247              		.loc 1 85 0
+ 248 00d2 064A     		ldr	r2, .L9
+ 249 00d4 FB79     		ldrb	r3, [r7, #7]
+ 250 00d6 1370     		strb	r3, [r2]
+  86:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    icmpv6rpl_updateMyDAGrankAndParentSelection();
+ 251              		.loc 1 86 0
+ 252 00d8 FFF7FEFF 		bl	icmpv6rpl_updateMyDAGrankAndParentSelection
+  87:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    schedule_startDAGroot();
+ 253              		.loc 1 87 0
+ 254 00dc FFF7FEFF 		bl	schedule_startDAGroot
+  88:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    ENABLE_INTERRUPTS();
+ 255              		.loc 1 88 0
+ 256 00e0 FFF7FEFF 		bl	IntMasterEnable
+  89:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 257              		.loc 1 89 0
+ 258 00e4 0837     		adds	r7, r7, #8
+ 259              		.cfi_def_cfa_offset 8
+ 260 00e6 BD46     		mov	sp, r7
+ 261              		.cfi_def_cfa_register 13
+ 262              		@ sp needed
+ 263 00e8 80BD     		pop	{r7, pc}
+ 264              	.L10:
+ 265 00ea 00BF     		.align	2
+ 266              	.L9:
+ 267 00ec 00000000 		.word	idmanager_vars
+ 268              		.cfi_endproc
+ 269              	.LFE2:
+ 271              		.align	2
+ 272              		.global	idmanager_getIsSlotSkip
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	idmanager_getIsSlotSkip:
+ 277              	.LFB3:
+  90:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+  91:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** bool idmanager_getIsSlotSkip(void) {
+ 278              		.loc 1 91 0
+ 279              		.cfi_startproc
+ 280              		@ args = 0, pretend = 0, frame = 8
+ 281              		@ frame_needed = 1, uses_anonymous_args = 0
+ 282 00f0 80B5     		push	{r7, lr}
+ 283              		.cfi_def_cfa_offset 8
+ 284              		.cfi_offset 7, -8
+ 285              		.cfi_offset 14, -4
+ 286 00f2 82B0     		sub	sp, sp, #8
+ 287              		.cfi_def_cfa_offset 16
+ 288 00f4 00AF     		add	r7, sp, #0
+ 289              		.cfi_def_cfa_register 7
+  92:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    bool res;
+  93:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+  94:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+  95:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 290              		.loc 1 95 0
+ 291 00f6 FFF7FEFF 		bl	IntMasterDisable
+  96:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    res=idmanager_vars.slotSkip;
+ 292              		.loc 1 96 0
+ 293 00fa 054B     		ldr	r3, .L13
+ 294 00fc 93F84530 		ldrb	r3, [r3, #69]
+ 295 0100 FB71     		strb	r3, [r7, #7]
+  97:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    ENABLE_INTERRUPTS();
+ 296              		.loc 1 97 0
+ 297 0102 FFF7FEFF 		bl	IntMasterEnable
+  98:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return res;
+ 298              		.loc 1 98 0
+ 299 0106 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+  99:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 300              		.loc 1 99 0
+ 301 0108 1846     		mov	r0, r3
+ 302 010a 0837     		adds	r7, r7, #8
+ 303              		.cfi_def_cfa_offset 8
+ 304 010c BD46     		mov	sp, r7
+ 305              		.cfi_def_cfa_register 13
+ 306              		@ sp needed
+ 307 010e 80BD     		pop	{r7, pc}
+ 308              	.L14:
+ 309              		.align	2
+ 310              	.L13:
+ 311 0110 00000000 		.word	idmanager_vars
+ 312              		.cfi_endproc
+ 313              	.LFE3:
+ 315              		.align	2
+ 316              		.global	idmanager_getMyID
+ 317              		.thumb
+ 318              		.thumb_func
+ 320              	idmanager_getMyID:
+ 321              	.LFB4:
+ 100:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 101:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** open_addr_t* idmanager_getMyID(uint8_t type) {
+ 322              		.loc 1 101 0
+ 323              		.cfi_startproc
+ 324              		@ args = 0, pretend = 0, frame = 16
+ 325              		@ frame_needed = 1, uses_anonymous_args = 0
+ 326 0114 80B5     		push	{r7, lr}
+ 327              		.cfi_def_cfa_offset 8
+ 328              		.cfi_offset 7, -8
+ 329              		.cfi_offset 14, -4
+ 330 0116 84B0     		sub	sp, sp, #16
+ 331              		.cfi_def_cfa_offset 24
+ 332 0118 00AF     		add	r7, sp, #0
+ 333              		.cfi_def_cfa_register 7
+ 334 011a 0346     		mov	r3, r0
+ 335 011c FB71     		strb	r3, [r7, #7]
+ 102:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    open_addr_t* res;
+ 103:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+ 104:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 336              		.loc 1 104 0
+ 337 011e FFF7FEFF 		bl	IntMasterDisable
+ 105:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    switch (type) {
+ 338              		.loc 1 105 0
+ 339 0122 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 340 0124 013B     		subs	r3, r3, #1
+ 341 0126 042B     		cmp	r3, #4
+ 342 0128 18D8     		bhi	.L16
+ 343 012a 01A2     		adr	r2, .L18
+ 344 012c 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 345              		.p2align 2
+ 346              	.L18:
+ 347 0130 45010000 		.word	.L17+1
+ 348 0134 4B010000 		.word	.L19+1
+ 349 0138 5D010000 		.word	.L16+1
+ 350 013c 51010000 		.word	.L20+1
+ 351 0140 57010000 		.word	.L21+1
+ 352              		.p2align 1
+ 353              	.L17:
+ 106:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_16B:
+ 107:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= &idmanager_vars.my16bID;
+ 354              		.loc 1 107 0
+ 355 0144 0E4B     		ldr	r3, .L24
+ 356 0146 FB60     		str	r3, [r7, #12]
+ 108:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 357              		.loc 1 108 0
+ 358 0148 13E0     		b	.L22
+ 359              	.L19:
+ 109:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_64B:
+ 110:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= &idmanager_vars.my64bID;
+ 360              		.loc 1 110 0
+ 361 014a 0E4B     		ldr	r3, .L24+4
+ 362 014c FB60     		str	r3, [r7, #12]
+ 111:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 363              		.loc 1 111 0
+ 364 014e 10E0     		b	.L22
+ 365              	.L20:
+ 112:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PANID:
+ 113:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= &idmanager_vars.myPANID;
+ 366              		.loc 1 113 0
+ 367 0150 0D4B     		ldr	r3, .L24+8
+ 368 0152 FB60     		str	r3, [r7, #12]
+ 114:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 369              		.loc 1 114 0
+ 370 0154 0DE0     		b	.L22
+ 371              	.L21:
+ 115:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PREFIX:
+ 116:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= &idmanager_vars.myPrefix;
+ 372              		.loc 1 116 0
+ 373 0156 0D4B     		ldr	r3, .L24+12
+ 374 0158 FB60     		str	r3, [r7, #12]
+ 117:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 375              		.loc 1 117 0
+ 376 015a 0AE0     		b	.L22
+ 377              	.L16:
+ 118:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_128B:
+ 119:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         // you don't ask for my full address, rather for prefix, then 64b
+ 120:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      default:
+ 121:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         openserial_printCritical(COMPONENT_IDMANAGER,ERR_WRONG_ADDR_TYPE,
+ 378              		.loc 1 121 0
+ 379 015c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 380 015e 9BB2     		uxth	r3, r3
+ 381 0160 0220     		movs	r0, #2
+ 382 0162 3121     		movs	r1, #49
+ 383 0164 1A46     		mov	r2, r3
+ 384 0166 0023     		movs	r3, #0
+ 385 0168 FFF7FEFF 		bl	openserial_printCritical
+ 122:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)type,
+ 123:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)0);
+ 124:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= NULL;
+ 386              		.loc 1 124 0
+ 387 016c 0023     		movs	r3, #0
+ 388 016e FB60     		str	r3, [r7, #12]
+ 125:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 389              		.loc 1 125 0
+ 390 0170 00BF     		nop
+ 391              	.L22:
+ 126:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    }
+ 127:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    ENABLE_INTERRUPTS();
+ 392              		.loc 1 127 0
+ 393 0172 FFF7FEFF 		bl	IntMasterEnable
+ 128:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return res;
+ 394              		.loc 1 128 0
+ 395 0176 FB68     		ldr	r3, [r7, #12]
+ 129:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 396              		.loc 1 129 0
+ 397 0178 1846     		mov	r0, r3
+ 398 017a 1037     		adds	r7, r7, #16
+ 399              		.cfi_def_cfa_offset 8
+ 400 017c BD46     		mov	sp, r7
+ 401              		.cfi_def_cfa_register 13
+ 402              		@ sp needed
+ 403 017e 80BD     		pop	{r7, pc}
+ 404              	.L25:
+ 405              		.align	2
+ 406              	.L24:
+ 407 0180 12000000 		.word	idmanager_vars+18
+ 408 0184 23000000 		.word	idmanager_vars+35
+ 409 0188 01000000 		.word	idmanager_vars+1
+ 410 018c 34000000 		.word	idmanager_vars+52
+ 411              		.cfi_endproc
+ 412              	.LFE4:
+ 414              		.align	2
+ 415              		.global	idmanager_setMyID
+ 416              		.thumb
+ 417              		.thumb_func
+ 419              	idmanager_setMyID:
+ 420              	.LFB5:
+ 130:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 131:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** owerror_t idmanager_setMyID(open_addr_t* newID) {
+ 421              		.loc 1 131 0
+ 422              		.cfi_startproc
+ 423              		@ args = 0, pretend = 0, frame = 8
+ 424              		@ frame_needed = 1, uses_anonymous_args = 0
+ 425 0190 B0B5     		push	{r4, r5, r7, lr}
+ 426              		.cfi_def_cfa_offset 16
+ 427              		.cfi_offset 4, -16
+ 428              		.cfi_offset 5, -12
+ 429              		.cfi_offset 7, -8
+ 430              		.cfi_offset 14, -4
+ 431 0192 82B0     		sub	sp, sp, #8
+ 432              		.cfi_def_cfa_offset 24
+ 433 0194 00AF     		add	r7, sp, #0
+ 434              		.cfi_def_cfa_register 7
+ 435 0196 7860     		str	r0, [r7, #4]
+ 132:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+ 133:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 436              		.loc 1 133 0
+ 437 0198 FFF7FEFF 		bl	IntMasterDisable
+ 134:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    switch (newID->type) {
+ 438              		.loc 1 134 0
+ 439 019c 7B68     		ldr	r3, [r7, #4]
+ 440 019e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 441 01a0 013B     		subs	r3, r3, #1
+ 442 01a2 042B     		cmp	r3, #4
+ 443 01a4 44D8     		bhi	.L27
+ 444 01a6 01A2     		adr	r2, .L29
+ 445 01a8 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 446              		.p2align 2
+ 447              	.L29:
+ 448 01ac C1010000 		.word	.L28+1
+ 449 01b0 DD010000 		.word	.L30+1
+ 450 01b4 31020000 		.word	.L27+1
+ 451 01b8 F9010000 		.word	.L31+1
+ 452 01bc 15020000 		.word	.L32+1
+ 453              		.p2align 1
+ 454              	.L28:
+ 135:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_16B:
+ 136:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&idmanager_vars.my16bID,newID,sizeof(open_addr_t));
+ 455              		.loc 1 136 0
+ 456 01c0 254B     		ldr	r3, .L35
+ 457 01c2 7A68     		ldr	r2, [r7, #4]
+ 458 01c4 1233     		adds	r3, r3, #18
+ 459 01c6 1568     		ldr	r5, [r2]	@ unaligned
+ 460 01c8 5468     		ldr	r4, [r2, #4]	@ unaligned
+ 461 01ca 9068     		ldr	r0, [r2, #8]	@ unaligned
+ 462 01cc D168     		ldr	r1, [r2, #12]	@ unaligned
+ 463 01ce 1D60     		str	r5, [r3]	@ unaligned
+ 464 01d0 5C60     		str	r4, [r3, #4]	@ unaligned
+ 465 01d2 9860     		str	r0, [r3, #8]	@ unaligned
+ 466 01d4 D960     		str	r1, [r3, #12]	@ unaligned
+ 467 01d6 127C     		ldrb	r2, [r2, #16]
+ 468 01d8 1A74     		strb	r2, [r3, #16]
+ 137:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 469              		.loc 1 137 0
+ 470 01da 36E0     		b	.L33
+ 471              	.L30:
+ 138:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_64B:
+ 139:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&idmanager_vars.my64bID,newID,sizeof(open_addr_t));
+ 472              		.loc 1 139 0
+ 473 01dc 1E4B     		ldr	r3, .L35
+ 474 01de 7A68     		ldr	r2, [r7, #4]
+ 475 01e0 2333     		adds	r3, r3, #35
+ 476 01e2 1568     		ldr	r5, [r2]	@ unaligned
+ 477 01e4 5468     		ldr	r4, [r2, #4]	@ unaligned
+ 478 01e6 9068     		ldr	r0, [r2, #8]	@ unaligned
+ 479 01e8 D168     		ldr	r1, [r2, #12]	@ unaligned
+ 480 01ea 1D60     		str	r5, [r3]	@ unaligned
+ 481 01ec 5C60     		str	r4, [r3, #4]	@ unaligned
+ 482 01ee 9860     		str	r0, [r3, #8]	@ unaligned
+ 483 01f0 D960     		str	r1, [r3, #12]	@ unaligned
+ 484 01f2 127C     		ldrb	r2, [r2, #16]
+ 485 01f4 1A74     		strb	r2, [r3, #16]
+ 140:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 486              		.loc 1 140 0
+ 487 01f6 28E0     		b	.L33
+ 488              	.L31:
+ 141:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PANID:
+ 142:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&idmanager_vars.myPANID,newID,sizeof(open_addr_t));
+ 489              		.loc 1 142 0
+ 490 01f8 174B     		ldr	r3, .L35
+ 491 01fa 7A68     		ldr	r2, [r7, #4]
+ 492 01fc 0133     		adds	r3, r3, #1
+ 493 01fe 1568     		ldr	r5, [r2]	@ unaligned
+ 494 0200 5468     		ldr	r4, [r2, #4]	@ unaligned
+ 495 0202 9068     		ldr	r0, [r2, #8]	@ unaligned
+ 496 0204 D168     		ldr	r1, [r2, #12]	@ unaligned
+ 497 0206 1D60     		str	r5, [r3]	@ unaligned
+ 498 0208 5C60     		str	r4, [r3, #4]	@ unaligned
+ 499 020a 9860     		str	r0, [r3, #8]	@ unaligned
+ 500 020c D960     		str	r1, [r3, #12]	@ unaligned
+ 501 020e 127C     		ldrb	r2, [r2, #16]
+ 502 0210 1A74     		strb	r2, [r3, #16]
+ 143:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 503              		.loc 1 143 0
+ 504 0212 1AE0     		b	.L33
+ 505              	.L32:
+ 144:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PREFIX:
+ 145:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&idmanager_vars.myPrefix,newID,sizeof(open_addr_t));
+ 506              		.loc 1 145 0
+ 507 0214 104B     		ldr	r3, .L35
+ 508 0216 7A68     		ldr	r2, [r7, #4]
+ 509 0218 3433     		adds	r3, r3, #52
+ 510 021a 1568     		ldr	r5, [r2]	@ unaligned
+ 511 021c 5468     		ldr	r4, [r2, #4]	@ unaligned
+ 512 021e 9068     		ldr	r0, [r2, #8]	@ unaligned
+ 513 0220 D168     		ldr	r1, [r2, #12]	@ unaligned
+ 514 0222 1D60     		str	r5, [r3]	@ unaligned
+ 515 0224 5C60     		str	r4, [r3, #4]	@ unaligned
+ 516 0226 9860     		str	r0, [r3, #8]	@ unaligned
+ 517 0228 D960     		str	r1, [r3, #12]	@ unaligned
+ 518 022a 127C     		ldrb	r2, [r2, #16]
+ 519 022c 1A74     		strb	r2, [r3, #16]
+ 146:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 520              		.loc 1 146 0
+ 521 022e 0CE0     		b	.L33
+ 522              	.L27:
+ 147:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_128B:
+ 148:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         //don't set 128b, but rather prefix and 64b
+ 149:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      default:
+ 150:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         openserial_printCritical(COMPONENT_IDMANAGER,ERR_WRONG_ADDR_TYPE,
+ 151:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)newID->type,
+ 523              		.loc 1 151 0
+ 524 0230 7B68     		ldr	r3, [r7, #4]
+ 525 0232 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 150:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)newID->type,
+ 526              		.loc 1 150 0
+ 527 0234 9BB2     		uxth	r3, r3
+ 528 0236 0220     		movs	r0, #2
+ 529 0238 3121     		movs	r1, #49
+ 530 023a 1A46     		mov	r2, r3
+ 531 023c 0123     		movs	r3, #1
+ 532 023e FFF7FEFF 		bl	openserial_printCritical
+ 152:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)1);
+ 153:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 533              		.loc 1 153 0
+ 534 0242 FFF7FEFF 		bl	IntMasterEnable
+ 154:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return E_FAIL;
+ 535              		.loc 1 154 0
+ 536 0246 0123     		movs	r3, #1
+ 537 0248 02E0     		b	.L34
+ 538              	.L33:
+ 155:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    }
+ 156:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    ENABLE_INTERRUPTS();
+ 539              		.loc 1 156 0
+ 540 024a FFF7FEFF 		bl	IntMasterEnable
+ 157:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return E_SUCCESS;
+ 541              		.loc 1 157 0
+ 542 024e 0023     		movs	r3, #0
+ 543              	.L34:
+ 158:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 544              		.loc 1 158 0
+ 545 0250 1846     		mov	r0, r3
+ 546 0252 0837     		adds	r7, r7, #8
+ 547              		.cfi_def_cfa_offset 16
+ 548 0254 BD46     		mov	sp, r7
+ 549              		.cfi_def_cfa_register 13
+ 550              		@ sp needed
+ 551 0256 B0BD     		pop	{r4, r5, r7, pc}
+ 552              	.L36:
+ 553              		.align	2
+ 554              	.L35:
+ 555 0258 00000000 		.word	idmanager_vars
+ 556              		.cfi_endproc
+ 557              	.LFE5:
+ 559              		.align	2
+ 560              		.global	idmanager_isMyAddress
+ 561              		.thumb
+ 562              		.thumb_func
+ 564              	idmanager_isMyAddress:
+ 565              	.LFB6:
+ 159:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 160:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** bool idmanager_isMyAddress(open_addr_t* addr) {
+ 566              		.loc 1 160 0
+ 567              		.cfi_startproc
+ 568              		@ args = 0, pretend = 0, frame = 32
+ 569              		@ frame_needed = 1, uses_anonymous_args = 0
+ 570 025c 80B5     		push	{r7, lr}
+ 571              		.cfi_def_cfa_offset 8
+ 572              		.cfi_offset 7, -8
+ 573              		.cfi_offset 14, -4
+ 574 025e 88B0     		sub	sp, sp, #32
+ 575              		.cfi_def_cfa_offset 40
+ 576 0260 00AF     		add	r7, sp, #0
+ 577              		.cfi_def_cfa_register 7
+ 578 0262 7860     		str	r0, [r7, #4]
+ 161:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    open_addr_t temp_my128bID;
+ 162:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    bool res;
+ 163:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    INTERRUPT_DECLARATION();
+ 164:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    DISABLE_INTERRUPTS();
+ 579              		.loc 1 164 0
+ 580 0264 FFF7FEFF 		bl	IntMasterDisable
+ 165:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 166:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    switch (addr->type) {
+ 581              		.loc 1 166 0
+ 582 0268 7B68     		ldr	r3, [r7, #4]
+ 583 026a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 584 026c 013B     		subs	r3, r3, #1
+ 585 026e 042B     		cmp	r3, #4
+ 586 0270 52D8     		bhi	.L38
+ 587 0272 01A2     		adr	r2, .L40
+ 588 0274 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 589              		.p2align 2
+ 590              	.L40:
+ 591 0278 8D020000 		.word	.L39+1
+ 592 027c A1020000 		.word	.L41+1
+ 593 0280 B5020000 		.word	.L42+1
+ 594 0284 F1020000 		.word	.L43+1
+ 595 0288 05030000 		.word	.L44+1
+ 596              		.p2align 1
+ 597              	.L39:
+ 167:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_16B:
+ 168:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= packetfunctions_sameAddress(addr,&idmanager_vars.my16bID);
+ 598              		.loc 1 168 0
+ 599 028c 7868     		ldr	r0, [r7, #4]
+ 600 028e 2A49     		ldr	r1, .L47
+ 601 0290 FFF7FEFF 		bl	packetfunctions_sameAddress
+ 602 0294 0346     		mov	r3, r0
+ 603 0296 FB77     		strb	r3, [r7, #31]
+ 169:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 604              		.loc 1 169 0
+ 605 0298 FFF7FEFF 		bl	IntMasterEnable
+ 170:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return res;
+ 606              		.loc 1 170 0
+ 607 029c FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 608 029e 47E0     		b	.L46
+ 609              	.L41:
+ 171:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_64B:
+ 172:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= packetfunctions_sameAddress(addr,&idmanager_vars.my64bID);
+ 610              		.loc 1 172 0
+ 611 02a0 7868     		ldr	r0, [r7, #4]
+ 612 02a2 2649     		ldr	r1, .L47+4
+ 613 02a4 FFF7FEFF 		bl	packetfunctions_sameAddress
+ 614 02a8 0346     		mov	r3, r0
+ 615 02aa FB77     		strb	r3, [r7, #31]
+ 173:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 616              		.loc 1 173 0
+ 617 02ac FFF7FEFF 		bl	IntMasterEnable
+ 174:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return res;
+ 618              		.loc 1 174 0
+ 619 02b0 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 620 02b2 3DE0     		b	.L46
+ 621              	.L42:
+ 175:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_128B:
+ 176:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         // build temporary my128bID
+ 177:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         temp_my128bID.type = ADDR_128B;
+ 622              		.loc 1 177 0
+ 623 02b4 0323     		movs	r3, #3
+ 624 02b6 3B73     		strb	r3, [r7, #12]
+ 178:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&temp_my128bID.addr_128b[0],&idmanager_vars.myPrefix.prefix,8);
+ 625              		.loc 1 178 0
+ 626 02b8 214A     		ldr	r2, .L47+8
+ 627 02ba 07F10D03 		add	r3, r7, #13
+ 628 02be 3532     		adds	r2, r2, #53
+ 629 02c0 1168     		ldr	r1, [r2]	@ unaligned
+ 630 02c2 5268     		ldr	r2, [r2, #4]	@ unaligned
+ 631 02c4 1960     		str	r1, [r3]	@ unaligned
+ 632 02c6 5A60     		str	r2, [r3, #4]	@ unaligned
+ 179:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         memcpy(&temp_my128bID.addr_128b[8],&idmanager_vars.my64bID.addr_64b,8);
+ 633              		.loc 1 179 0
+ 634 02c8 1D4A     		ldr	r2, .L47+8
+ 635 02ca 07F11503 		add	r3, r7, #21
+ 636 02ce 2432     		adds	r2, r2, #36
+ 637 02d0 1168     		ldr	r1, [r2]	@ unaligned
+ 638 02d2 5268     		ldr	r2, [r2, #4]	@ unaligned
+ 639 02d4 1960     		str	r1, [r3]	@ unaligned
+ 640 02d6 5A60     		str	r2, [r3, #4]	@ unaligned
+ 180:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 181:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= packetfunctions_sameAddress(addr,&temp_my128bID);
+ 641              		.loc 1 181 0
+ 642 02d8 07F10C03 		add	r3, r7, #12
+ 643 02dc 7868     		ldr	r0, [r7, #4]
+ 644 02de 1946     		mov	r1, r3
+ 645 02e0 FFF7FEFF 		bl	packetfunctions_sameAddress
+ 646 02e4 0346     		mov	r3, r0
+ 647 02e6 FB77     		strb	r3, [r7, #31]
+ 182:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 648              		.loc 1 182 0
+ 649 02e8 FFF7FEFF 		bl	IntMasterEnable
+ 183:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return res;
+ 650              		.loc 1 183 0
+ 651 02ec FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 652 02ee 1FE0     		b	.L46
+ 653              	.L43:
+ 184:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PANID:
+ 185:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= packetfunctions_sameAddress(addr,&idmanager_vars.myPANID);
+ 654              		.loc 1 185 0
+ 655 02f0 7868     		ldr	r0, [r7, #4]
+ 656 02f2 1449     		ldr	r1, .L47+12
+ 657 02f4 FFF7FEFF 		bl	packetfunctions_sameAddress
+ 658 02f8 0346     		mov	r3, r0
+ 659 02fa FB77     		strb	r3, [r7, #31]
+ 186:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 660              		.loc 1 186 0
+ 661 02fc FFF7FEFF 		bl	IntMasterEnable
+ 187:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return res;
+ 662              		.loc 1 187 0
+ 663 0300 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 664 0302 15E0     		b	.L46
+ 665              	.L44:
+ 188:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ADDR_PREFIX:
+ 189:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         res= packetfunctions_sameAddress(addr,&idmanager_vars.myPrefix);
+ 666              		.loc 1 189 0
+ 667 0304 7868     		ldr	r0, [r7, #4]
+ 668 0306 1049     		ldr	r1, .L47+16
+ 669 0308 FFF7FEFF 		bl	packetfunctions_sameAddress
+ 670 030c 0346     		mov	r3, r0
+ 671 030e FB77     		strb	r3, [r7, #31]
+ 190:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 672              		.loc 1 190 0
+ 673 0310 FFF7FEFF 		bl	IntMasterEnable
+ 191:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return res;
+ 674              		.loc 1 191 0
+ 675 0314 FB7F     		ldrb	r3, [r7, #31]	@ zero_extendqisi2
+ 676 0316 0BE0     		b	.L46
+ 677              	.L38:
+ 192:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      default:
+ 193:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         openserial_printCritical(COMPONENT_IDMANAGER,ERR_WRONG_ADDR_TYPE,
+ 194:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)addr->type,
+ 678              		.loc 1 194 0
+ 679 0318 7B68     		ldr	r3, [r7, #4]
+ 680 031a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 193:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)addr->type,
+ 681              		.loc 1 193 0
+ 682 031c 9BB2     		uxth	r3, r3
+ 683 031e 0220     		movs	r0, #2
+ 684 0320 3121     		movs	r1, #49
+ 685 0322 1A46     		mov	r2, r3
+ 686 0324 0223     		movs	r3, #2
+ 687 0326 FFF7FEFF 		bl	openserial_printCritical
+ 195:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****               (errorparameter_t)2);
+ 196:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         ENABLE_INTERRUPTS();
+ 688              		.loc 1 196 0
+ 689 032a FFF7FEFF 		bl	IntMasterEnable
+ 197:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         return FALSE;
+ 690              		.loc 1 197 0
+ 691 032e 0023     		movs	r3, #0
+ 692              	.L46:
+ 198:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    }
+ 199:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 693              		.loc 1 199 0 discriminator 1
+ 694 0330 1846     		mov	r0, r3
+ 695 0332 2037     		adds	r7, r7, #32
+ 696              		.cfi_def_cfa_offset 8
+ 697 0334 BD46     		mov	sp, r7
+ 698              		.cfi_def_cfa_register 13
+ 699              		@ sp needed
+ 700 0336 80BD     		pop	{r7, pc}
+ 701              	.L48:
+ 702              		.align	2
+ 703              	.L47:
+ 704 0338 12000000 		.word	idmanager_vars+18
+ 705 033c 23000000 		.word	idmanager_vars+35
+ 706 0340 00000000 		.word	idmanager_vars
+ 707 0344 01000000 		.word	idmanager_vars+1
+ 708 0348 34000000 		.word	idmanager_vars+52
+ 709              		.cfi_endproc
+ 710              	.LFE6:
+ 712              		.align	2
+ 713              		.global	idmanager_triggerAboutRoot
+ 714              		.thumb
+ 715              		.thumb_func
+ 717              	idmanager_triggerAboutRoot:
+ 718              	.LFB7:
+ 200:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 201:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_triggerAboutRoot(void) {
+ 719              		.loc 1 201 0
+ 720              		.cfi_startproc
+ 721              		@ args = 0, pretend = 0, frame = 72
+ 722              		@ frame_needed = 1, uses_anonymous_args = 0
+ 723 034c 80B5     		push	{r7, lr}
+ 724              		.cfi_def_cfa_offset 8
+ 725              		.cfi_offset 7, -8
+ 726              		.cfi_offset 14, -4
+ 727 034e 92B0     		sub	sp, sp, #72
+ 728              		.cfi_def_cfa_offset 80
+ 729 0350 00AF     		add	r7, sp, #0
+ 730              		.cfi_def_cfa_register 7
+ 202:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    uint8_t         number_bytes_from_input_buffer;
+ 203:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    uint8_t         input_buffer[1+8+1+16];
+ 204:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    open_addr_t     myPrefix;
+ 205:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    uint8_t         dodagid[16];
+ 206:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    uint8_t         keyIndex;
+ 207:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    uint8_t*        keyValue;
+ 208:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 209:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    //=== get command from OpenSerial
+ 210:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    number_bytes_from_input_buffer = openserial_getInputBuffer(input_buffer,sizeof(input_buffer));
+ 731              		.loc 1 210 0
+ 732 0352 07F12403 		add	r3, r7, #36
+ 733 0356 1846     		mov	r0, r3
+ 734 0358 1A21     		movs	r1, #26
+ 735 035a FFF7FEFF 		bl	openserial_getInputBuffer
+ 736 035e 0346     		mov	r3, r0
+ 737 0360 87F84730 		strb	r3, [r7, #71]
+ 211:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    if (number_bytes_from_input_buffer!=sizeof(input_buffer)) {
+ 738              		.loc 1 211 0
+ 739 0364 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
+ 740 0368 1A2B     		cmp	r3, #26
+ 741 036a 09D0     		beq	.L50
+ 212:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****       openserial_printError(COMPONENT_IDMANAGER,ERR_INPUTBUFFER_LENGTH,
+ 742              		.loc 1 212 0
+ 743 036c 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
+ 744 0370 9BB2     		uxth	r3, r3
+ 745 0372 0220     		movs	r0, #2
+ 746 0374 3421     		movs	r1, #52
+ 747 0376 1A46     		mov	r2, r3
+ 748 0378 0023     		movs	r3, #0
+ 749 037a FFF7FEFF 		bl	openserial_printError
+ 213:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****             (errorparameter_t)number_bytes_from_input_buffer,
+ 214:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****             (errorparameter_t)0);
+ 215:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****       return;
+ 750              		.loc 1 215 0
+ 751 037e 62E0     		b	.L49
+ 752              	.L50:
+ 216:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    };
+ 217:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 218:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    //=== handle command
+ 219:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 220:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // take action (byte 0)
+ 221:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    switch (input_buffer[0]) {
+ 753              		.loc 1 221 0
+ 754 0380 97F82430 		ldrb	r3, [r7, #36]	@ zero_extendqisi2
+ 755 0384 542B     		cmp	r3, #84
+ 756 0386 14D0     		beq	.L53
+ 757 0388 592B     		cmp	r3, #89
+ 758 038a 02D0     		beq	.L54
+ 759 038c 4E2B     		cmp	r3, #78
+ 760 038e 08D0     		beq	.L55
+ 761 0390 24E0     		b	.L52
+ 762              	.L54:
+ 222:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ACTION_YES:
+ 223:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         idmanager_setIsDAGroot(TRUE);
+ 763              		.loc 1 223 0
+ 764 0392 0120     		movs	r0, #1
+ 765 0394 FFF7FEFF 		bl	idmanager_setIsDAGroot
+ 224:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         idmanager_vars.slotSkip = FALSE;
+ 766              		.loc 1 224 0
+ 767 0398 2C4B     		ldr	r3, .L60
+ 768 039a 0022     		movs	r2, #0
+ 769 039c 83F84520 		strb	r2, [r3, #69]
+ 225:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 770              		.loc 1 225 0
+ 771 03a0 1CE0     		b	.L52
+ 772              	.L55:
+ 226:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ACTION_NO:
+ 227:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         idmanager_setIsDAGroot(FALSE);
+ 773              		.loc 1 227 0
+ 774 03a2 0020     		movs	r0, #0
+ 775 03a4 FFF7FEFF 		bl	idmanager_setIsDAGroot
+ 228:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         idmanager_vars.slotSkip = TRUE;
+ 776              		.loc 1 228 0
+ 777 03a8 284B     		ldr	r3, .L60
+ 778 03aa 0122     		movs	r2, #1
+ 779 03ac 83F84520 		strb	r2, [r3, #69]
+ 229:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 780              		.loc 1 229 0
+ 781 03b0 14E0     		b	.L52
+ 782              	.L53:
+ 230:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****      case ACTION_TOGGLE:
+ 231:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         if (idmanager_getIsDAGroot()) {
+ 783              		.loc 1 231 0
+ 784 03b2 FFF7FEFF 		bl	idmanager_getIsDAGroot
+ 785 03b6 0346     		mov	r3, r0
+ 786 03b8 002B     		cmp	r3, #0
+ 787 03ba 07D0     		beq	.L56
+ 232:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****            idmanager_setIsDAGroot(FALSE);
+ 788              		.loc 1 232 0
+ 789 03bc 0020     		movs	r0, #0
+ 790 03be FFF7FEFF 		bl	idmanager_setIsDAGroot
+ 233:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****            idmanager_vars.slotSkip = TRUE;
+ 791              		.loc 1 233 0
+ 792 03c2 224B     		ldr	r3, .L60
+ 793 03c4 0122     		movs	r2, #1
+ 794 03c6 83F84520 		strb	r2, [r3, #69]
+ 234:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         } else {
+ 235:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****            idmanager_setIsDAGroot(TRUE);
+ 236:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****            idmanager_vars.slotSkip = FALSE;
+ 237:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         }
+ 238:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         break;
+ 795              		.loc 1 238 0
+ 796 03ca 06E0     		b	.L59
+ 797              	.L56:
+ 235:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****            idmanager_vars.slotSkip = FALSE;
+ 798              		.loc 1 235 0
+ 799 03cc 0120     		movs	r0, #1
+ 800 03ce FFF7FEFF 		bl	idmanager_setIsDAGroot
+ 236:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****         }
+ 801              		.loc 1 236 0
+ 802 03d2 1E4B     		ldr	r3, .L60
+ 803 03d4 0022     		movs	r2, #0
+ 804 03d6 83F84520 		strb	r2, [r3, #69]
+ 805              	.L59:
+ 806              		.loc 1 238 0
+ 807 03da 00BF     		nop
+ 808              	.L52:
+ 239:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    }
+ 240:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 241:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // store prefix (bytes 1-8)
+ 242:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    myPrefix.type = ADDR_PREFIX;
+ 809              		.loc 1 242 0
+ 810 03dc 0523     		movs	r3, #5
+ 811 03de 3B74     		strb	r3, [r7, #16]
+ 243:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(
+ 812              		.loc 1 243 0
+ 813 03e0 07F11103 		add	r3, r7, #17
+ 814 03e4 07F12502 		add	r2, r7, #37
+ 815 03e8 1168     		ldr	r1, [r2]	@ unaligned
+ 816 03ea 5268     		ldr	r2, [r2, #4]	@ unaligned
+ 817 03ec 1960     		str	r1, [r3]	@ unaligned
+ 818 03ee 5A60     		str	r2, [r3, #4]	@ unaligned
+ 244:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****       myPrefix.prefix,
+ 245:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****       &input_buffer[1],
+ 246:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****       sizeof(myPrefix.prefix)
+ 247:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    );
+ 248:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    idmanager_setMyID(&myPrefix);
+ 819              		.loc 1 248 0
+ 820 03f0 07F11003 		add	r3, r7, #16
+ 821 03f4 1846     		mov	r0, r3
+ 822 03f6 FFF7FEFF 		bl	idmanager_setMyID
+ 249:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****   
+ 250:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // indicate DODAGid to RPL
+ 251:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(&dodagid[0],idmanager_vars.myPrefix.prefix,8);  // prefix
+ 823              		.loc 1 251 0
+ 824 03fa 144A     		ldr	r2, .L60
+ 825 03fc 3B46     		mov	r3, r7
+ 826 03fe 3532     		adds	r2, r2, #53
+ 827 0400 1068     		ldr	r0, [r2]	@ unaligned
+ 828 0402 5168     		ldr	r1, [r2, #4]	@ unaligned
+ 829 0404 03C3     		stmia	r3!, {r0, r1}
+ 252:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(&dodagid[8],idmanager_vars.my64bID.addr_64b,8); // eui64
+ 830              		.loc 1 252 0
+ 831 0406 114A     		ldr	r2, .L60
+ 832 0408 07F10803 		add	r3, r7, #8
+ 833 040c 2432     		adds	r2, r2, #36
+ 834 040e 1068     		ldr	r0, [r2]	@ unaligned
+ 835 0410 5168     		ldr	r1, [r2, #4]	@ unaligned
+ 836 0412 03C3     		stmia	r3!, {r0, r1}
+ 253:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    icmpv6rpl_writeDODAGid(dodagid);
+ 837              		.loc 1 253 0
+ 838 0414 3B46     		mov	r3, r7
+ 839 0416 1846     		mov	r0, r3
+ 840 0418 FFF7FEFF 		bl	icmpv6rpl_writeDODAGid
+ 254:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 255:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // store L2 security key index and key value
+ 256:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    // for the moment, keys K1 and K2 are the same
+ 257:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    keyIndex = input_buffer[9];
+ 841              		.loc 1 257 0
+ 842 041c 97F82D30 		ldrb	r3, [r7, #45]
+ 843 0420 87F84630 		strb	r3, [r7, #70]
+ 258:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    keyValue = &input_buffer[10];
+ 844              		.loc 1 258 0
+ 845 0424 07F12403 		add	r3, r7, #36
+ 846 0428 0A33     		adds	r3, r3, #10
+ 847 042a 3B64     		str	r3, [r7, #64]
+ 259:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    IEEE802154_security_setBeaconKey(keyIndex, keyValue);
+ 848              		.loc 1 259 0
+ 849 042c 97F84630 		ldrb	r3, [r7, #70]	@ zero_extendqisi2
+ 850 0430 1846     		mov	r0, r3
+ 851 0432 396C     		ldr	r1, [r7, #64]
+ 852 0434 FFF7FEFF 		bl	IEEE802154_security_setBeaconKey
+ 260:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    IEEE802154_security_setDataKey(keyIndex, keyValue);
+ 853              		.loc 1 260 0
+ 854 0438 97F84630 		ldrb	r3, [r7, #70]	@ zero_extendqisi2
+ 855 043c 1846     		mov	r0, r3
+ 856 043e 396C     		ldr	r1, [r7, #64]
+ 857 0440 FFF7FEFF 		bl	IEEE802154_security_setDataKey
+ 261:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 262:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return;
+ 858              		.loc 1 262 0
+ 859 0444 00BF     		nop
+ 860              	.L49:
+ 263:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 861              		.loc 1 263 0
+ 862 0446 4837     		adds	r7, r7, #72
+ 863              		.cfi_def_cfa_offset 8
+ 864 0448 BD46     		mov	sp, r7
+ 865              		.cfi_def_cfa_register 13
+ 866              		@ sp needed
+ 867 044a 80BD     		pop	{r7, pc}
+ 868              	.L61:
+ 869              		.align	2
+ 870              	.L60:
+ 871 044c 00000000 		.word	idmanager_vars
+ 872              		.cfi_endproc
+ 873              	.LFE7:
+ 875              		.align	2
+ 876              		.global	idmanager_setJoinKey
+ 877              		.thumb
+ 878              		.thumb_func
+ 880              	idmanager_setJoinKey:
+ 881              	.LFB8:
+ 264:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 265:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_setJoinKey(uint8_t *key) {
+ 882              		.loc 1 265 0
+ 883              		.cfi_startproc
+ 884              		@ args = 0, pretend = 0, frame = 8
+ 885              		@ frame_needed = 1, uses_anonymous_args = 0
+ 886              		@ link register save eliminated.
+ 887 0450 90B4     		push	{r4, r7}
+ 888              		.cfi_def_cfa_offset 8
+ 889              		.cfi_offset 4, -8
+ 890              		.cfi_offset 7, -4
+ 891 0452 82B0     		sub	sp, sp, #8
+ 892              		.cfi_def_cfa_offset 16
+ 893 0454 00AF     		add	r7, sp, #0
+ 894              		.cfi_def_cfa_register 7
+ 895 0456 7860     		str	r0, [r7, #4]
+ 266:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****     memcpy(idmanager_vars.joinKey, key, 16);
+ 896              		.loc 1 266 0
+ 897 0458 074B     		ldr	r3, .L63
+ 898 045a 7A68     		ldr	r2, [r7, #4]
+ 899 045c 4633     		adds	r3, r3, #70
+ 900 045e 1468     		ldr	r4, [r2]	@ unaligned
+ 901 0460 5068     		ldr	r0, [r2, #4]	@ unaligned
+ 902 0462 9168     		ldr	r1, [r2, #8]	@ unaligned
+ 903 0464 D268     		ldr	r2, [r2, #12]	@ unaligned
+ 904 0466 1C60     		str	r4, [r3]	@ unaligned
+ 905 0468 5860     		str	r0, [r3, #4]	@ unaligned
+ 906 046a 9960     		str	r1, [r3, #8]	@ unaligned
+ 907 046c DA60     		str	r2, [r3, #12]	@ unaligned
+ 267:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 908              		.loc 1 267 0
+ 909 046e 0837     		adds	r7, r7, #8
+ 910              		.cfi_def_cfa_offset 8
+ 911 0470 BD46     		mov	sp, r7
+ 912              		.cfi_def_cfa_register 13
+ 913              		@ sp needed
+ 914 0472 90BC     		pop	{r4, r7}
+ 915              		.cfi_restore 7
+ 916              		.cfi_restore 4
+ 917              		.cfi_def_cfa_offset 0
+ 918 0474 7047     		bx	lr
+ 919              	.L64:
+ 920 0476 00BF     		.align	2
+ 921              	.L63:
+ 922 0478 00000000 		.word	idmanager_vars
+ 923              		.cfi_endproc
+ 924              	.LFE8:
+ 926              		.align	2
+ 927              		.global	idmanager_getJoinKey
+ 928              		.thumb
+ 929              		.thumb_func
+ 931              	idmanager_getJoinKey:
+ 932              	.LFB9:
+ 268:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 269:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_getJoinKey(uint8_t **pKey) {
+ 933              		.loc 1 269 0
+ 934              		.cfi_startproc
+ 935              		@ args = 0, pretend = 0, frame = 8
+ 936              		@ frame_needed = 1, uses_anonymous_args = 0
+ 937              		@ link register save eliminated.
+ 938 047c 80B4     		push	{r7}
+ 939              		.cfi_def_cfa_offset 4
+ 940              		.cfi_offset 7, -4
+ 941 047e 83B0     		sub	sp, sp, #12
+ 942              		.cfi_def_cfa_offset 16
+ 943 0480 00AF     		add	r7, sp, #0
+ 944              		.cfi_def_cfa_register 7
+ 945 0482 7860     		str	r0, [r7, #4]
+ 270:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****     *pKey = idmanager_vars.joinKey;
+ 946              		.loc 1 270 0
+ 947 0484 7B68     		ldr	r3, [r7, #4]
+ 948 0486 044A     		ldr	r2, .L67
+ 949 0488 1A60     		str	r2, [r3]
+ 271:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****     return; 
+ 950              		.loc 1 271 0
+ 951 048a 00BF     		nop
+ 272:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 952              		.loc 1 272 0
+ 953 048c 0C37     		adds	r7, r7, #12
+ 954              		.cfi_def_cfa_offset 4
+ 955 048e BD46     		mov	sp, r7
+ 956              		.cfi_def_cfa_register 13
+ 957              		@ sp needed
+ 958 0490 5DF8047B 		ldr	r7, [sp], #4
+ 959              		.cfi_restore 7
+ 960              		.cfi_def_cfa_offset 0
+ 961 0494 7047     		bx	lr
+ 962              	.L68:
+ 963 0496 00BF     		.align	2
+ 964              	.L67:
+ 965 0498 46000000 		.word	idmanager_vars+70
+ 966              		.cfi_endproc
+ 967              	.LFE9:
+ 969              		.align	2
+ 970              		.global	idmanager_setJoinAsn
+ 971              		.thumb
+ 972              		.thumb_func
+ 974              	idmanager_setJoinAsn:
+ 975              	.LFB10:
+ 273:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 274:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** void idmanager_setJoinAsn(asn_t* asn) {
+ 976              		.loc 1 274 0
+ 977              		.cfi_startproc
+ 978              		@ args = 0, pretend = 0, frame = 8
+ 979              		@ frame_needed = 1, uses_anonymous_args = 0
+ 980              		@ link register save eliminated.
+ 981 049c 80B4     		push	{r7}
+ 982              		.cfi_def_cfa_offset 4
+ 983              		.cfi_offset 7, -4
+ 984 049e 83B0     		sub	sp, sp, #12
+ 985              		.cfi_def_cfa_offset 16
+ 986 04a0 00AF     		add	r7, sp, #0
+ 987              		.cfi_def_cfa_register 7
+ 988 04a2 7860     		str	r0, [r7, #4]
+ 275:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****     memcpy(&idmanager_vars.joinAsn, asn, sizeof(asn_t));
+ 989              		.loc 1 275 0
+ 990 04a4 054B     		ldr	r3, .L70
+ 991 04a6 7A68     		ldr	r2, [r7, #4]
+ 992 04a8 5633     		adds	r3, r3, #86
+ 993 04aa 1168     		ldr	r1, [r2]	@ unaligned
+ 994 04ac 1960     		str	r1, [r3]	@ unaligned
+ 995 04ae 1279     		ldrb	r2, [r2, #4]
+ 996 04b0 1A71     		strb	r2, [r3, #4]
+ 276:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 997              		.loc 1 276 0
+ 998 04b2 0C37     		adds	r7, r7, #12
+ 999              		.cfi_def_cfa_offset 4
+ 1000 04b4 BD46     		mov	sp, r7
+ 1001              		.cfi_def_cfa_register 13
+ 1002              		@ sp needed
+ 1003 04b6 5DF8047B 		ldr	r7, [sp], #4
+ 1004              		.cfi_restore 7
+ 1005              		.cfi_def_cfa_offset 0
+ 1006 04ba 7047     		bx	lr
+ 1007              	.L71:
+ 1008              		.align	2
+ 1009              	.L70:
+ 1010 04bc 00000000 		.word	idmanager_vars
+ 1011              		.cfi_endproc
+ 1012              	.LFE10:
+ 1014              		.align	2
+ 1015              		.global	debugPrint_id
+ 1016              		.thumb
+ 1017              		.thumb_func
+ 1019              	debugPrint_id:
+ 1020              	.LFB11:
+ 277:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 278:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** /**
+ 279:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** \brief Trigger this module to print status information, over serial.
+ 280:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 281:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** debugPrint_* functions are used by the openserial module to continuously print
+ 282:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** status information about several modules in the OpenWSN stack.
+ 283:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 284:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** \returns TRUE if this function printed something, FALSE otherwise.
+ 285:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** */
+ 286:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** bool debugPrint_id(void) {
+ 1021              		.loc 1 286 0
+ 1022              		.cfi_startproc
+ 1023              		@ args = 0, pretend = 0, frame = 24
+ 1024              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1025 04c0 80B5     		push	{r7, lr}
+ 1026              		.cfi_def_cfa_offset 8
+ 1027              		.cfi_offset 7, -8
+ 1028              		.cfi_offset 14, -4
+ 1029 04c2 86B0     		sub	sp, sp, #24
+ 1030              		.cfi_def_cfa_offset 32
+ 1031 04c4 00AF     		add	r7, sp, #0
+ 1032              		.cfi_def_cfa_register 7
+ 287:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    debugIDManagerEntry_t output;
+ 288:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 289:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    output.isDAGroot = idmanager_vars.isDAGroot;
+ 1033              		.loc 1 289 0
+ 1034 04c6 134B     		ldr	r3, .L74
+ 1035 04c8 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1036 04ca 3B70     		strb	r3, [r7]
+ 290:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(output.myPANID,idmanager_vars.myPANID.panid,2);
+ 1037              		.loc 1 290 0
+ 1038 04cc 114A     		ldr	r2, .L74
+ 1039 04ce 7B1C     		adds	r3, r7, #1
+ 1040 04d0 0232     		adds	r2, r2, #2
+ 1041 04d2 1288     		ldrh	r2, [r2]	@ unaligned
+ 1042 04d4 1A80     		strh	r2, [r3]	@ unaligned
+ 291:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(output.my16bID,idmanager_vars.my16bID.addr_16b,2);
+ 1043              		.loc 1 291 0
+ 1044 04d6 0F4A     		ldr	r2, .L74
+ 1045 04d8 FB1C     		adds	r3, r7, #3
+ 1046 04da 1332     		adds	r2, r2, #19
+ 1047 04dc 1288     		ldrh	r2, [r2]	@ unaligned
+ 1048 04de 1A80     		strh	r2, [r3]	@ unaligned
+ 292:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(output.my64bID,idmanager_vars.my64bID.addr_64b,8);
+ 1049              		.loc 1 292 0
+ 1050 04e0 0C4A     		ldr	r2, .L74
+ 1051 04e2 7B1D     		adds	r3, r7, #5
+ 1052 04e4 2432     		adds	r2, r2, #36
+ 1053 04e6 1168     		ldr	r1, [r2]	@ unaligned
+ 1054 04e8 5268     		ldr	r2, [r2, #4]	@ unaligned
+ 1055 04ea 1960     		str	r1, [r3]	@ unaligned
+ 1056 04ec 5A60     		str	r2, [r3, #4]	@ unaligned
+ 293:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    memcpy(output.myPrefix,idmanager_vars.myPrefix.prefix,8);
+ 1057              		.loc 1 293 0
+ 1058 04ee 094A     		ldr	r2, .L74
+ 1059 04f0 07F10D03 		add	r3, r7, #13
+ 1060 04f4 3532     		adds	r2, r2, #53
+ 1061 04f6 1168     		ldr	r1, [r2]	@ unaligned
+ 1062 04f8 5268     		ldr	r2, [r2, #4]	@ unaligned
+ 1063 04fa 1960     		str	r1, [r3]	@ unaligned
+ 1064 04fc 5A60     		str	r2, [r3, #4]	@ unaligned
+ 294:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    
+ 295:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    openserial_printStatus(STATUS_ID,(uint8_t*)&output,sizeof(debugIDManagerEntry_t));
+ 1065              		.loc 1 295 0
+ 1066 04fe 3B46     		mov	r3, r7
+ 1067 0500 0120     		movs	r0, #1
+ 1068 0502 1946     		mov	r1, r3
+ 1069 0504 1522     		movs	r2, #21
+ 1070 0506 FFF7FEFF 		bl	openserial_printStatus
+ 296:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return TRUE;
+ 1071              		.loc 1 296 0
+ 1072 050a 0123     		movs	r3, #1
+ 297:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 1073              		.loc 1 297 0
+ 1074 050c 1846     		mov	r0, r3
+ 1075 050e 1837     		adds	r7, r7, #24
+ 1076              		.cfi_def_cfa_offset 8
+ 1077 0510 BD46     		mov	sp, r7
+ 1078              		.cfi_def_cfa_register 13
+ 1079              		@ sp needed
+ 1080 0512 80BD     		pop	{r7, pc}
+ 1081              	.L75:
+ 1082              		.align	2
+ 1083              	.L74:
+ 1084 0514 00000000 		.word	idmanager_vars
+ 1085              		.cfi_endproc
+ 1086              	.LFE11:
+ 1088              		.align	2
+ 1089              		.global	debugPrint_joined
+ 1090              		.thumb
+ 1091              		.thumb_func
+ 1093              	debugPrint_joined:
+ 1094              	.LFB12:
+ 298:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** 
+ 299:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** bool debugPrint_joined(void) {
+ 1095              		.loc 1 299 0
+ 1096              		.cfi_startproc
+ 1097              		@ args = 0, pretend = 0, frame = 8
+ 1098              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1099 0518 80B5     		push	{r7, lr}
+ 1100              		.cfi_def_cfa_offset 8
+ 1101              		.cfi_offset 7, -8
+ 1102              		.cfi_offset 14, -4
+ 1103 051a 82B0     		sub	sp, sp, #8
+ 1104              		.cfi_def_cfa_offset 16
+ 1105 051c 00AF     		add	r7, sp, #0
+ 1106              		.cfi_def_cfa_register 7
+ 300:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    asn_t output;
+ 301:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    output.byte4         =  idmanager_vars.joinAsn.byte4;
+ 1107              		.loc 1 301 0
+ 1108 051e 0D4B     		ldr	r3, .L78
+ 1109 0520 93F85630 		ldrb	r3, [r3, #86]	@ zero_extendqisi2
+ 1110 0524 3B70     		strb	r3, [r7]
+ 302:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    output.bytes2and3    =  idmanager_vars.joinAsn.bytes2and3;
+ 1111              		.loc 1 302 0
+ 1112 0526 0B4B     		ldr	r3, .L78
+ 1113 0528 B3F85730 		ldrh	r3, [r3, #87]	@ unaligned
+ 1114 052c 9BB2     		uxth	r3, r3
+ 1115 052e A7F80130 		strh	r3, [r7, #1]	@ unaligned
+ 303:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    output.bytes0and1    =  idmanager_vars.joinAsn.bytes0and1;
+ 1116              		.loc 1 303 0
+ 1117 0532 084B     		ldr	r3, .L78
+ 1118 0534 B3F85930 		ldrh	r3, [r3, #89]	@ unaligned
+ 1119 0538 9BB2     		uxth	r3, r3
+ 1120 053a A7F80330 		strh	r3, [r7, #3]	@ unaligned
+ 304:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    openserial_printStatus(STATUS_JOINED,(uint8_t*)&output,sizeof(output));
+ 1121              		.loc 1 304 0
+ 1122 053e 3B46     		mov	r3, r7
+ 1123 0540 0B20     		movs	r0, #11
+ 1124 0542 1946     		mov	r1, r3
+ 1125 0544 0522     		movs	r2, #5
+ 1126 0546 FFF7FEFF 		bl	openserial_printStatus
+ 305:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c ****    return TRUE;
+ 1127              		.loc 1 305 0
+ 1128 054a 0123     		movs	r3, #1
+ 306:build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.c **** }
+ 1129              		.loc 1 306 0
+ 1130 054c 1846     		mov	r0, r3
+ 1131 054e 0837     		adds	r7, r7, #8
+ 1132              		.cfi_def_cfa_offset 8
+ 1133 0550 BD46     		mov	sp, r7
+ 1134              		.cfi_def_cfa_register 13
+ 1135              		@ sp needed
+ 1136 0552 80BD     		pop	{r7, pc}
+ 1137              	.L79:
+ 1138              		.align	2
+ 1139              	.L78:
+ 1140 0554 00000000 		.word	idmanager_vars
+ 1141              		.cfi_endproc
+ 1142              	.LFE12:
+ 1144              	.Letext0:
+ 1145              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1146              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1147              		.file 4 "inc/opendefs.h"
+ 1148              		.file 5 "build/openmote-cc2538_armgcc/openstack/cross-layers/idmanager.h"
+ 1149              		.file 6 "bsp/boards/openmote-cc2538/board_info.h"
+ 1150              		.file 7 "openstack/03b-IPv6/icmpv6rpl.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 idmanager.c
+     /tmp/ccU9qMHy.s:19     .rodata:0000000000000000 $d
+     /tmp/ccU9qMHy.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccU9qMHy.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/ccU9qMHy.s:32     .rodata:0000000000000010 infouCName
+     /tmp/ccU9qMHy.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/ccU9qMHy.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/ccU9qMHy.s:47     .rodata:0000000000000030 linklocalprefix
+     /tmp/ccU9qMHy.s:59     .rodata:0000000000000038 all_routers_multicast
+                            *COM*:000000000000005b idmanager_vars
+     /tmp/ccU9qMHy.s:78     .text:0000000000000000 $t
+     /tmp/ccU9qMHy.s:83     .text:0000000000000000 idmanager_init
+     /tmp/ccU9qMHy.s:173    .text:0000000000000090 $d
+     /tmp/ccU9qMHy.s:180    .text:00000000000000a0 $t
+     /tmp/ccU9qMHy.s:185    .text:00000000000000a0 idmanager_getIsDAGroot
+     /tmp/ccU9qMHy.s:220    .text:00000000000000c0 $d
+     /tmp/ccU9qMHy.s:224    .text:00000000000000c4 $t
+     /tmp/ccU9qMHy.s:229    .text:00000000000000c4 idmanager_setIsDAGroot
+     /tmp/ccU9qMHy.s:267    .text:00000000000000ec $d
+     /tmp/ccU9qMHy.s:271    .text:00000000000000f0 $t
+     /tmp/ccU9qMHy.s:276    .text:00000000000000f0 idmanager_getIsSlotSkip
+     /tmp/ccU9qMHy.s:311    .text:0000000000000110 $d
+     /tmp/ccU9qMHy.s:315    .text:0000000000000114 $t
+     /tmp/ccU9qMHy.s:320    .text:0000000000000114 idmanager_getMyID
+     /tmp/ccU9qMHy.s:347    .text:0000000000000130 $d
+     /tmp/ccU9qMHy.s:352    .text:0000000000000144 $t
+     /tmp/ccU9qMHy.s:407    .text:0000000000000180 $d
+     /tmp/ccU9qMHy.s:414    .text:0000000000000190 $t
+     /tmp/ccU9qMHy.s:419    .text:0000000000000190 idmanager_setMyID
+     /tmp/ccU9qMHy.s:448    .text:00000000000001ac $d
+     /tmp/ccU9qMHy.s:453    .text:00000000000001c0 $t
+     /tmp/ccU9qMHy.s:555    .text:0000000000000258 $d
+     /tmp/ccU9qMHy.s:559    .text:000000000000025c $t
+     /tmp/ccU9qMHy.s:564    .text:000000000000025c idmanager_isMyAddress
+     /tmp/ccU9qMHy.s:591    .text:0000000000000278 $d
+     /tmp/ccU9qMHy.s:596    .text:000000000000028c $t
+     /tmp/ccU9qMHy.s:704    .text:0000000000000338 $d
+     /tmp/ccU9qMHy.s:712    .text:000000000000034c $t
+     /tmp/ccU9qMHy.s:717    .text:000000000000034c idmanager_triggerAboutRoot
+     /tmp/ccU9qMHy.s:871    .text:000000000000044c $d
+     /tmp/ccU9qMHy.s:875    .text:0000000000000450 $t
+     /tmp/ccU9qMHy.s:880    .text:0000000000000450 idmanager_setJoinKey
+     /tmp/ccU9qMHy.s:922    .text:0000000000000478 $d
+     /tmp/ccU9qMHy.s:926    .text:000000000000047c $t
+     /tmp/ccU9qMHy.s:931    .text:000000000000047c idmanager_getJoinKey
+     /tmp/ccU9qMHy.s:965    .text:0000000000000498 $d
+     /tmp/ccU9qMHy.s:969    .text:000000000000049c $t
+     /tmp/ccU9qMHy.s:974    .text:000000000000049c idmanager_setJoinAsn
+     /tmp/ccU9qMHy.s:1010   .text:00000000000004bc $d
+     /tmp/ccU9qMHy.s:1014   .text:00000000000004c0 $t
+     /tmp/ccU9qMHy.s:1019   .text:00000000000004c0 debugPrint_id
+     /tmp/ccU9qMHy.s:1084   .text:0000000000000514 $d
+     /tmp/ccU9qMHy.s:1088   .text:0000000000000518 $t
+     /tmp/ccU9qMHy.s:1093   .text:0000000000000518 debugPrint_joined
+     /tmp/ccU9qMHy.s:1140   .text:0000000000000554 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+                           .group:0000000000000000 wm4.stdio.h.27.3fc80220048df77954e38daec3bb9670
+                           .group:0000000000000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:0000000000000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:0000000000000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:0000000000000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:0000000000000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:0000000000000000 wm4.stdio.h.68.a99a2db1e55915cfd1b035cc1e9fcff1
+                           .group:0000000000000000 wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949
+                           .group:0000000000000000 wm4.openserial.h.32.c1b1c4db184af4a79a2b8ff62d908d4d
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.icmpv6rpl.h.15.ea1c33c2ed88145f3bad15ef7ace3b0f
+                           .group:0000000000000000 wm4.neighbors.h.15.2a77b1a66a5fa826e9ff514b195b0560
+                           .group:0000000000000000 wm4.schedule.h.2.1e56c0a55af41b0871de1bf3babafbff
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.IEEE802154_security.h.35.26212369b49c5e0c3bd4f8181fa7153e
+
+UNDEFINED SYMBOLS
+memset
+eui64_get
+packetfunctions_mac64bToMac16b
+IntMasterDisable
+IntMasterEnable
+icmpv6rpl_updateMyDAGrankAndParentSelection
+schedule_startDAGroot
+openserial_printCritical
+packetfunctions_sameAddress
+openserial_getInputBuffer
+openserial_printError
+icmpv6rpl_writeDODAGid
+IEEE802154_security_setBeaconKey
+IEEE802154_security_setDataKey
+openserial_printStatus

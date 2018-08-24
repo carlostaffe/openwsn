@@ -1,0 +1,1361 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"leds.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39              		.text
+  40              		.align	2
+  41              		.global	leds_init
+  42              		.thumb
+  43              		.thumb_func
+  45              	leds_init:
+  46              	.LFB0:
+  47              		.file 1 "build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c"
+   1:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** /**
+   2:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****  * Author: Xavier Vilajosana (xvilajosana@eecs.berkeley.edu)
+   3:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****  *         Pere Tuset (peretuset@openmote.com)
+   4:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****  * Date:   July 2013
+   5:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****  * Description: CC2538-specific definition of the "leds" bsp module.
+   6:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****  */
+   7:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+   8:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include <stdint.h>
+   9:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  10:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include <headers/hw_memmap.h>
+  11:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include <headers/hw_types.h>
+  12:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  13:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include <source/gpio.h>
+  14:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  15:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include "board.h"
+  16:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #include "leds.h"
+  17:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  18:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** //=========================== defines =========================================
+  19:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  20:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // Board LED defines
+  21:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_BASE            GPIO_C_BASE
+  22:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_1               GPIO_PIN_4      //!< PC4 -- red
+  23:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_2               GPIO_PIN_5      //!< PC5 -- orange
+  24:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_3               GPIO_PIN_6      //!< PC6 -- yellow
+  25:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_4               GPIO_PIN_7      //!< PC7 -- green
+  26:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  27:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** #define BSP_LED_ALL             (BSP_LED_1 | \
+  28:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****                                  BSP_LED_2 | \
+  29:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****                                  BSP_LED_3 | \
+  30:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****                                  BSP_LED_4)     //!< Bitmask of all LEDs
+  31:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  32:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** //=========================== variables =======================================
+  33:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  34:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** //=========================== prototypes ======================================
+  35:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  36:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void bspLedSet(uint8_t ui8Leds);
+  37:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void bspLedClear(uint8_t ui8Leds);
+  38:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void bspLedToggle(uint8_t ui8Leds);
+  39:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  40:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** //=========================== public ==========================================
+  41:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  42:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_init(void) {
+  48              		.loc 1 42 0
+  49              		.cfi_startproc
+  50              		@ args = 0, pretend = 0, frame = 0
+  51              		@ frame_needed = 1, uses_anonymous_args = 0
+  52 0000 80B5     		push	{r7, lr}
+  53              		.cfi_def_cfa_offset 8
+  54              		.cfi_offset 7, -8
+  55              		.cfi_offset 14, -4
+  56 0002 00AF     		add	r7, sp, #0
+  57              		.cfi_def_cfa_register 7
+  43:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     GPIOPinTypeGPIOOutput(BSP_LED_BASE, BSP_LED_ALL);
+  58              		.loc 1 43 0
+  59 0004 0448     		ldr	r0, .L2
+  60 0006 F021     		movs	r1, #240
+  61 0008 FFF7FEFF 		bl	GPIOPinTypeGPIOOutput
+  44:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     GPIOPinWrite(BSP_LED_BASE, BSP_LED_ALL, 0);
+  62              		.loc 1 44 0
+  63 000c 0248     		ldr	r0, .L2
+  64 000e F021     		movs	r1, #240
+  65 0010 0022     		movs	r2, #0
+  66 0012 FFF7FEFF 		bl	GPIOPinWrite
+  45:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+  67              		.loc 1 45 0
+  68 0016 80BD     		pop	{r7, pc}
+  69              	.L3:
+  70              		.align	2
+  71              	.L2:
+  72 0018 00B00D40 		.word	1074638848
+  73              		.cfi_endproc
+  74              	.LFE0:
+  76              		.align	2
+  77              		.global	leds_error_on
+  78              		.thumb
+  79              		.thumb_func
+  81              	leds_error_on:
+  82              	.LFB1:
+  46:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  47:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // red
+  48:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_error_on(void) {
+  83              		.loc 1 48 0
+  84              		.cfi_startproc
+  85              		@ args = 0, pretend = 0, frame = 0
+  86              		@ frame_needed = 1, uses_anonymous_args = 0
+  87 001c 80B5     		push	{r7, lr}
+  88              		.cfi_def_cfa_offset 8
+  89              		.cfi_offset 7, -8
+  90              		.cfi_offset 14, -4
+  91 001e 00AF     		add	r7, sp, #0
+  92              		.cfi_def_cfa_register 7
+  49:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedSet(BSP_LED_1);
+  93              		.loc 1 49 0
+  94 0020 1020     		movs	r0, #16
+  95 0022 FFF7FEFF 		bl	bspLedSet
+  50:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+  96              		.loc 1 50 0
+  97 0026 80BD     		pop	{r7, pc}
+  98              		.cfi_endproc
+  99              	.LFE1:
+ 101              		.align	2
+ 102              		.global	leds_error_off
+ 103              		.thumb
+ 104              		.thumb_func
+ 106              	leds_error_off:
+ 107              	.LFB2:
+  51:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_error_off(void) {
+ 108              		.loc 1 51 0
+ 109              		.cfi_startproc
+ 110              		@ args = 0, pretend = 0, frame = 0
+ 111              		@ frame_needed = 1, uses_anonymous_args = 0
+ 112 0028 80B5     		push	{r7, lr}
+ 113              		.cfi_def_cfa_offset 8
+ 114              		.cfi_offset 7, -8
+ 115              		.cfi_offset 14, -4
+ 116 002a 00AF     		add	r7, sp, #0
+ 117              		.cfi_def_cfa_register 7
+  52:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_1);
+ 118              		.loc 1 52 0
+ 119 002c 1020     		movs	r0, #16
+ 120 002e FFF7FEFF 		bl	bspLedClear
+  53:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 121              		.loc 1 53 0
+ 122 0032 80BD     		pop	{r7, pc}
+ 123              		.cfi_endproc
+ 124              	.LFE2:
+ 126              		.align	2
+ 127              		.global	leds_error_toggle
+ 128              		.thumb
+ 129              		.thumb_func
+ 131              	leds_error_toggle:
+ 132              	.LFB3:
+  54:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_error_toggle(void) {
+ 133              		.loc 1 54 0
+ 134              		.cfi_startproc
+ 135              		@ args = 0, pretend = 0, frame = 0
+ 136              		@ frame_needed = 1, uses_anonymous_args = 0
+ 137 0034 80B5     		push	{r7, lr}
+ 138              		.cfi_def_cfa_offset 8
+ 139              		.cfi_offset 7, -8
+ 140              		.cfi_offset 14, -4
+ 141 0036 00AF     		add	r7, sp, #0
+ 142              		.cfi_def_cfa_register 7
+  55:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedToggle(BSP_LED_1);
+ 143              		.loc 1 55 0
+ 144 0038 1020     		movs	r0, #16
+ 145 003a FFF7FEFF 		bl	bspLedToggle
+  56:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 146              		.loc 1 56 0
+ 147 003e 80BD     		pop	{r7, pc}
+ 148              		.cfi_endproc
+ 149              	.LFE3:
+ 151              		.align	2
+ 152              		.global	leds_error_isOn
+ 153              		.thumb
+ 154              		.thumb_func
+ 156              	leds_error_isOn:
+ 157              	.LFB4:
+  57:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** uint8_t leds_error_isOn(void) {
+ 158              		.loc 1 57 0
+ 159              		.cfi_startproc
+ 160              		@ args = 0, pretend = 0, frame = 8
+ 161              		@ frame_needed = 1, uses_anonymous_args = 0
+ 162 0040 80B5     		push	{r7, lr}
+ 163              		.cfi_def_cfa_offset 8
+ 164              		.cfi_offset 7, -8
+ 165              		.cfi_offset 14, -4
+ 166 0042 82B0     		sub	sp, sp, #8
+ 167              		.cfi_def_cfa_offset 16
+ 168 0044 00AF     		add	r7, sp, #0
+ 169              		.cfi_def_cfa_register 7
+  58:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_1);
+ 170              		.loc 1 58 0
+ 171 0046 0748     		ldr	r0, .L9
+ 172 0048 1021     		movs	r1, #16
+ 173 004a FFF7FEFF 		bl	GPIOPinRead
+ 174 004e 7860     		str	r0, [r7, #4]
+  59:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     return (uint8_t)(ui32Toggle & BSP_LED_1)>>4;
+ 175              		.loc 1 59 0
+ 176 0050 7B68     		ldr	r3, [r7, #4]
+ 177 0052 DBB2     		uxtb	r3, r3
+ 178 0054 03F01003 		and	r3, r3, #16
+ 179 0058 1B11     		asrs	r3, r3, #4
+ 180 005a DBB2     		uxtb	r3, r3
+  60:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 181              		.loc 1 60 0
+ 182 005c 1846     		mov	r0, r3
+ 183 005e 0837     		adds	r7, r7, #8
+ 184              		.cfi_def_cfa_offset 8
+ 185 0060 BD46     		mov	sp, r7
+ 186              		.cfi_def_cfa_register 13
+ 187              		@ sp needed
+ 188 0062 80BD     		pop	{r7, pc}
+ 189              	.L10:
+ 190              		.align	2
+ 191              	.L9:
+ 192 0064 00B00D40 		.word	1074638848
+ 193              		.cfi_endproc
+ 194              	.LFE4:
+ 196              		.align	2
+ 197              		.global	leds_sync_on
+ 198              		.thumb
+ 199              		.thumb_func
+ 201              	leds_sync_on:
+ 202              	.LFB5:
+  61:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  62:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // orange
+  63:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_sync_on(void) {
+ 203              		.loc 1 63 0
+ 204              		.cfi_startproc
+ 205              		@ args = 0, pretend = 0, frame = 0
+ 206              		@ frame_needed = 1, uses_anonymous_args = 0
+ 207 0068 80B5     		push	{r7, lr}
+ 208              		.cfi_def_cfa_offset 8
+ 209              		.cfi_offset 7, -8
+ 210              		.cfi_offset 14, -4
+ 211 006a 00AF     		add	r7, sp, #0
+ 212              		.cfi_def_cfa_register 7
+  64:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedSet(BSP_LED_2);
+ 213              		.loc 1 64 0
+ 214 006c 2020     		movs	r0, #32
+ 215 006e FFF7FEFF 		bl	bspLedSet
+  65:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 216              		.loc 1 65 0
+ 217 0072 80BD     		pop	{r7, pc}
+ 218              		.cfi_endproc
+ 219              	.LFE5:
+ 221              		.align	2
+ 222              		.global	leds_sync_off
+ 223              		.thumb
+ 224              		.thumb_func
+ 226              	leds_sync_off:
+ 227              	.LFB6:
+  66:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_sync_off(void) {
+ 228              		.loc 1 66 0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 1, uses_anonymous_args = 0
+ 232 0074 80B5     		push	{r7, lr}
+ 233              		.cfi_def_cfa_offset 8
+ 234              		.cfi_offset 7, -8
+ 235              		.cfi_offset 14, -4
+ 236 0076 00AF     		add	r7, sp, #0
+ 237              		.cfi_def_cfa_register 7
+  67:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_2);
+ 238              		.loc 1 67 0
+ 239 0078 2020     		movs	r0, #32
+ 240 007a FFF7FEFF 		bl	bspLedClear
+  68:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 241              		.loc 1 68 0
+ 242 007e 80BD     		pop	{r7, pc}
+ 243              		.cfi_endproc
+ 244              	.LFE6:
+ 246              		.align	2
+ 247              		.global	leds_sync_toggle
+ 248              		.thumb
+ 249              		.thumb_func
+ 251              	leds_sync_toggle:
+ 252              	.LFB7:
+  69:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_sync_toggle(void) {
+ 253              		.loc 1 69 0
+ 254              		.cfi_startproc
+ 255              		@ args = 0, pretend = 0, frame = 0
+ 256              		@ frame_needed = 1, uses_anonymous_args = 0
+ 257 0080 80B5     		push	{r7, lr}
+ 258              		.cfi_def_cfa_offset 8
+ 259              		.cfi_offset 7, -8
+ 260              		.cfi_offset 14, -4
+ 261 0082 00AF     		add	r7, sp, #0
+ 262              		.cfi_def_cfa_register 7
+  70:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedToggle(BSP_LED_2);
+ 263              		.loc 1 70 0
+ 264 0084 2020     		movs	r0, #32
+ 265 0086 FFF7FEFF 		bl	bspLedToggle
+  71:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 266              		.loc 1 71 0
+ 267 008a 80BD     		pop	{r7, pc}
+ 268              		.cfi_endproc
+ 269              	.LFE7:
+ 271              		.align	2
+ 272              		.global	leds_sync_isOn
+ 273              		.thumb
+ 274              		.thumb_func
+ 276              	leds_sync_isOn:
+ 277              	.LFB8:
+  72:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** uint8_t leds_sync_isOn(void) {
+ 278              		.loc 1 72 0
+ 279              		.cfi_startproc
+ 280              		@ args = 0, pretend = 0, frame = 8
+ 281              		@ frame_needed = 1, uses_anonymous_args = 0
+ 282 008c 80B5     		push	{r7, lr}
+ 283              		.cfi_def_cfa_offset 8
+ 284              		.cfi_offset 7, -8
+ 285              		.cfi_offset 14, -4
+ 286 008e 82B0     		sub	sp, sp, #8
+ 287              		.cfi_def_cfa_offset 16
+ 288 0090 00AF     		add	r7, sp, #0
+ 289              		.cfi_def_cfa_register 7
+  73:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_2);
+ 290              		.loc 1 73 0
+ 291 0092 0748     		ldr	r0, .L16
+ 292 0094 2021     		movs	r1, #32
+ 293 0096 FFF7FEFF 		bl	GPIOPinRead
+ 294 009a 7860     		str	r0, [r7, #4]
+  74:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     return (uint8_t)(ui32Toggle & BSP_LED_2)>>5;
+ 295              		.loc 1 74 0
+ 296 009c 7B68     		ldr	r3, [r7, #4]
+ 297 009e DBB2     		uxtb	r3, r3
+ 298 00a0 03F02003 		and	r3, r3, #32
+ 299 00a4 5B11     		asrs	r3, r3, #5
+ 300 00a6 DBB2     		uxtb	r3, r3
+  75:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 301              		.loc 1 75 0
+ 302 00a8 1846     		mov	r0, r3
+ 303 00aa 0837     		adds	r7, r7, #8
+ 304              		.cfi_def_cfa_offset 8
+ 305 00ac BD46     		mov	sp, r7
+ 306              		.cfi_def_cfa_register 13
+ 307              		@ sp needed
+ 308 00ae 80BD     		pop	{r7, pc}
+ 309              	.L17:
+ 310              		.align	2
+ 311              	.L16:
+ 312 00b0 00B00D40 		.word	1074638848
+ 313              		.cfi_endproc
+ 314              	.LFE8:
+ 316              		.align	2
+ 317              		.global	leds_radio_on
+ 318              		.thumb
+ 319              		.thumb_func
+ 321              	leds_radio_on:
+ 322              	.LFB9:
+  76:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  77:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // green
+  78:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_radio_on(void) {
+ 323              		.loc 1 78 0
+ 324              		.cfi_startproc
+ 325              		@ args = 0, pretend = 0, frame = 0
+ 326              		@ frame_needed = 1, uses_anonymous_args = 0
+ 327 00b4 80B5     		push	{r7, lr}
+ 328              		.cfi_def_cfa_offset 8
+ 329              		.cfi_offset 7, -8
+ 330              		.cfi_offset 14, -4
+ 331 00b6 00AF     		add	r7, sp, #0
+ 332              		.cfi_def_cfa_register 7
+  79:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedSet(BSP_LED_4);
+ 333              		.loc 1 79 0
+ 334 00b8 8020     		movs	r0, #128
+ 335 00ba FFF7FEFF 		bl	bspLedSet
+  80:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 336              		.loc 1 80 0
+ 337 00be 80BD     		pop	{r7, pc}
+ 338              		.cfi_endproc
+ 339              	.LFE9:
+ 341              		.align	2
+ 342              		.global	leds_radio_off
+ 343              		.thumb
+ 344              		.thumb_func
+ 346              	leds_radio_off:
+ 347              	.LFB10:
+  81:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_radio_off(void) {
+ 348              		.loc 1 81 0
+ 349              		.cfi_startproc
+ 350              		@ args = 0, pretend = 0, frame = 0
+ 351              		@ frame_needed = 1, uses_anonymous_args = 0
+ 352 00c0 80B5     		push	{r7, lr}
+ 353              		.cfi_def_cfa_offset 8
+ 354              		.cfi_offset 7, -8
+ 355              		.cfi_offset 14, -4
+ 356 00c2 00AF     		add	r7, sp, #0
+ 357              		.cfi_def_cfa_register 7
+  82:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_4);
+ 358              		.loc 1 82 0
+ 359 00c4 8020     		movs	r0, #128
+ 360 00c6 FFF7FEFF 		bl	bspLedClear
+  83:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 361              		.loc 1 83 0
+ 362 00ca 80BD     		pop	{r7, pc}
+ 363              		.cfi_endproc
+ 364              	.LFE10:
+ 366              		.align	2
+ 367              		.global	leds_radio_toggle
+ 368              		.thumb
+ 369              		.thumb_func
+ 371              	leds_radio_toggle:
+ 372              	.LFB11:
+  84:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_radio_toggle(void) {
+ 373              		.loc 1 84 0
+ 374              		.cfi_startproc
+ 375              		@ args = 0, pretend = 0, frame = 0
+ 376              		@ frame_needed = 1, uses_anonymous_args = 0
+ 377 00cc 80B5     		push	{r7, lr}
+ 378              		.cfi_def_cfa_offset 8
+ 379              		.cfi_offset 7, -8
+ 380              		.cfi_offset 14, -4
+ 381 00ce 00AF     		add	r7, sp, #0
+ 382              		.cfi_def_cfa_register 7
+  85:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedToggle(BSP_LED_4);
+ 383              		.loc 1 85 0
+ 384 00d0 8020     		movs	r0, #128
+ 385 00d2 FFF7FEFF 		bl	bspLedToggle
+  86:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 386              		.loc 1 86 0
+ 387 00d6 80BD     		pop	{r7, pc}
+ 388              		.cfi_endproc
+ 389              	.LFE11:
+ 391              		.align	2
+ 392              		.global	leds_radio_isOn
+ 393              		.thumb
+ 394              		.thumb_func
+ 396              	leds_radio_isOn:
+ 397              	.LFB12:
+  87:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** uint8_t leds_radio_isOn(void) {
+ 398              		.loc 1 87 0
+ 399              		.cfi_startproc
+ 400              		@ args = 0, pretend = 0, frame = 8
+ 401              		@ frame_needed = 1, uses_anonymous_args = 0
+ 402 00d8 80B5     		push	{r7, lr}
+ 403              		.cfi_def_cfa_offset 8
+ 404              		.cfi_offset 7, -8
+ 405              		.cfi_offset 14, -4
+ 406 00da 82B0     		sub	sp, sp, #8
+ 407              		.cfi_def_cfa_offset 16
+ 408 00dc 00AF     		add	r7, sp, #0
+ 409              		.cfi_def_cfa_register 7
+  88:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_4);
+ 410              		.loc 1 88 0
+ 411 00de 0648     		ldr	r0, .L23
+ 412 00e0 8021     		movs	r1, #128
+ 413 00e2 FFF7FEFF 		bl	GPIOPinRead
+ 414 00e6 7860     		str	r0, [r7, #4]
+  89:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     return (uint8_t)(ui32Toggle & BSP_LED_4)>>7;
+ 415              		.loc 1 89 0
+ 416 00e8 7B68     		ldr	r3, [r7, #4]
+ 417 00ea DBB2     		uxtb	r3, r3
+ 418 00ec DB09     		lsrs	r3, r3, #7
+ 419 00ee DBB2     		uxtb	r3, r3
+  90:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 420              		.loc 1 90 0
+ 421 00f0 1846     		mov	r0, r3
+ 422 00f2 0837     		adds	r7, r7, #8
+ 423              		.cfi_def_cfa_offset 8
+ 424 00f4 BD46     		mov	sp, r7
+ 425              		.cfi_def_cfa_register 13
+ 426              		@ sp needed
+ 427 00f6 80BD     		pop	{r7, pc}
+ 428              	.L24:
+ 429              		.align	2
+ 430              	.L23:
+ 431 00f8 00B00D40 		.word	1074638848
+ 432              		.cfi_endproc
+ 433              	.LFE12:
+ 435              		.align	2
+ 436              		.global	leds_debug_on
+ 437              		.thumb
+ 438              		.thumb_func
+ 440              	leds_debug_on:
+ 441              	.LFB13:
+  91:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+  92:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // yellow
+  93:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_debug_on(void) {
+ 442              		.loc 1 93 0
+ 443              		.cfi_startproc
+ 444              		@ args = 0, pretend = 0, frame = 0
+ 445              		@ frame_needed = 1, uses_anonymous_args = 0
+ 446 00fc 80B5     		push	{r7, lr}
+ 447              		.cfi_def_cfa_offset 8
+ 448              		.cfi_offset 7, -8
+ 449              		.cfi_offset 14, -4
+ 450 00fe 00AF     		add	r7, sp, #0
+ 451              		.cfi_def_cfa_register 7
+  94:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedSet(BSP_LED_3);
+ 452              		.loc 1 94 0
+ 453 0100 4020     		movs	r0, #64
+ 454 0102 FFF7FEFF 		bl	bspLedSet
+  95:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 455              		.loc 1 95 0
+ 456 0106 80BD     		pop	{r7, pc}
+ 457              		.cfi_endproc
+ 458              	.LFE13:
+ 460              		.align	2
+ 461              		.global	leds_debug_off
+ 462              		.thumb
+ 463              		.thumb_func
+ 465              	leds_debug_off:
+ 466              	.LFB14:
+  96:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_debug_off(void) {
+ 467              		.loc 1 96 0
+ 468              		.cfi_startproc
+ 469              		@ args = 0, pretend = 0, frame = 0
+ 470              		@ frame_needed = 1, uses_anonymous_args = 0
+ 471 0108 80B5     		push	{r7, lr}
+ 472              		.cfi_def_cfa_offset 8
+ 473              		.cfi_offset 7, -8
+ 474              		.cfi_offset 14, -4
+ 475 010a 00AF     		add	r7, sp, #0
+ 476              		.cfi_def_cfa_register 7
+  97:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_3);
+ 477              		.loc 1 97 0
+ 478 010c 4020     		movs	r0, #64
+ 479 010e FFF7FEFF 		bl	bspLedClear
+  98:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 480              		.loc 1 98 0
+ 481 0112 80BD     		pop	{r7, pc}
+ 482              		.cfi_endproc
+ 483              	.LFE14:
+ 485              		.align	2
+ 486              		.global	leds_debug_toggle
+ 487              		.thumb
+ 488              		.thumb_func
+ 490              	leds_debug_toggle:
+ 491              	.LFB15:
+  99:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void    leds_debug_toggle(void) {
+ 492              		.loc 1 99 0
+ 493              		.cfi_startproc
+ 494              		@ args = 0, pretend = 0, frame = 0
+ 495              		@ frame_needed = 1, uses_anonymous_args = 0
+ 496 0114 80B5     		push	{r7, lr}
+ 497              		.cfi_def_cfa_offset 8
+ 498              		.cfi_offset 7, -8
+ 499              		.cfi_offset 14, -4
+ 500 0116 00AF     		add	r7, sp, #0
+ 501              		.cfi_def_cfa_register 7
+ 100:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedToggle(BSP_LED_3);
+ 502              		.loc 1 100 0
+ 503 0118 4020     		movs	r0, #64
+ 504 011a FFF7FEFF 		bl	bspLedToggle
+ 101:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 505              		.loc 1 101 0
+ 506 011e 80BD     		pop	{r7, pc}
+ 507              		.cfi_endproc
+ 508              	.LFE15:
+ 510              		.align	2
+ 511              		.global	leds_debug_isOn
+ 512              		.thumb
+ 513              		.thumb_func
+ 515              	leds_debug_isOn:
+ 516              	.LFB16:
+ 102:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** uint8_t leds_debug_isOn(void) {
+ 517              		.loc 1 102 0
+ 518              		.cfi_startproc
+ 519              		@ args = 0, pretend = 0, frame = 8
+ 520              		@ frame_needed = 1, uses_anonymous_args = 0
+ 521 0120 80B5     		push	{r7, lr}
+ 522              		.cfi_def_cfa_offset 8
+ 523              		.cfi_offset 7, -8
+ 524              		.cfi_offset 14, -4
+ 525 0122 82B0     		sub	sp, sp, #8
+ 526              		.cfi_def_cfa_offset 16
+ 527 0124 00AF     		add	r7, sp, #0
+ 528              		.cfi_def_cfa_register 7
+ 103:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_3);
+ 529              		.loc 1 103 0
+ 530 0126 0748     		ldr	r0, .L30
+ 531 0128 4021     		movs	r1, #64
+ 532 012a FFF7FEFF 		bl	GPIOPinRead
+ 533 012e 7860     		str	r0, [r7, #4]
+ 104:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     return (uint8_t)(ui32Toggle & BSP_LED_3)>>6;
+ 534              		.loc 1 104 0
+ 535 0130 7B68     		ldr	r3, [r7, #4]
+ 536 0132 DBB2     		uxtb	r3, r3
+ 537 0134 03F04003 		and	r3, r3, #64
+ 538 0138 9B11     		asrs	r3, r3, #6
+ 539 013a DBB2     		uxtb	r3, r3
+ 105:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 540              		.loc 1 105 0
+ 541 013c 1846     		mov	r0, r3
+ 542 013e 0837     		adds	r7, r7, #8
+ 543              		.cfi_def_cfa_offset 8
+ 544 0140 BD46     		mov	sp, r7
+ 545              		.cfi_def_cfa_register 13
+ 546              		@ sp needed
+ 547 0142 80BD     		pop	{r7, pc}
+ 548              	.L31:
+ 549              		.align	2
+ 550              	.L30:
+ 551 0144 00B00D40 		.word	1074638848
+ 552              		.cfi_endproc
+ 553              	.LFE16:
+ 555              		.align	2
+ 556              		.global	leds_all_on
+ 557              		.thumb
+ 558              		.thumb_func
+ 560              	leds_all_on:
+ 561              	.LFB17:
+ 106:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 107:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** // all
+ 108:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_all_on(void) {
+ 562              		.loc 1 108 0
+ 563              		.cfi_startproc
+ 564              		@ args = 0, pretend = 0, frame = 0
+ 565              		@ frame_needed = 1, uses_anonymous_args = 0
+ 566 0148 80B5     		push	{r7, lr}
+ 567              		.cfi_def_cfa_offset 8
+ 568              		.cfi_offset 7, -8
+ 569              		.cfi_offset 14, -4
+ 570 014a 00AF     		add	r7, sp, #0
+ 571              		.cfi_def_cfa_register 7
+ 109:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedSet(BSP_LED_ALL);
+ 572              		.loc 1 109 0
+ 573 014c F020     		movs	r0, #240
+ 574 014e FFF7FEFF 		bl	bspLedSet
+ 110:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 575              		.loc 1 110 0
+ 576 0152 80BD     		pop	{r7, pc}
+ 577              		.cfi_endproc
+ 578              	.LFE17:
+ 580              		.align	2
+ 581              		.global	leds_all_off
+ 582              		.thumb
+ 583              		.thumb_func
+ 585              	leds_all_off:
+ 586              	.LFB18:
+ 111:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_all_off(void) {
+ 587              		.loc 1 111 0
+ 588              		.cfi_startproc
+ 589              		@ args = 0, pretend = 0, frame = 0
+ 590              		@ frame_needed = 1, uses_anonymous_args = 0
+ 591 0154 80B5     		push	{r7, lr}
+ 592              		.cfi_def_cfa_offset 8
+ 593              		.cfi_offset 7, -8
+ 594              		.cfi_offset 14, -4
+ 595 0156 00AF     		add	r7, sp, #0
+ 596              		.cfi_def_cfa_register 7
+ 112:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_ALL);
+ 597              		.loc 1 112 0
+ 598 0158 F020     		movs	r0, #240
+ 599 015a FFF7FEFF 		bl	bspLedClear
+ 113:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 600              		.loc 1 113 0
+ 601 015e 80BD     		pop	{r7, pc}
+ 602              		.cfi_endproc
+ 603              	.LFE18:
+ 605              		.align	2
+ 606              		.global	leds_all_toggle
+ 607              		.thumb
+ 608              		.thumb_func
+ 610              	leds_all_toggle:
+ 611              	.LFB19:
+ 114:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_all_toggle(void) {
+ 612              		.loc 1 114 0
+ 613              		.cfi_startproc
+ 614              		@ args = 0, pretend = 0, frame = 0
+ 615              		@ frame_needed = 1, uses_anonymous_args = 0
+ 616 0160 80B5     		push	{r7, lr}
+ 617              		.cfi_def_cfa_offset 8
+ 618              		.cfi_offset 7, -8
+ 619              		.cfi_offset 14, -4
+ 620 0162 00AF     		add	r7, sp, #0
+ 621              		.cfi_def_cfa_register 7
+ 115:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedToggle(BSP_LED_ALL);
+ 622              		.loc 1 115 0
+ 623 0164 F020     		movs	r0, #240
+ 624 0166 FFF7FEFF 		bl	bspLedToggle
+ 116:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 625              		.loc 1 116 0
+ 626 016a 80BD     		pop	{r7, pc}
+ 627              		.cfi_endproc
+ 628              	.LFE19:
+ 630              		.align	2
+ 631              		.global	leds_error_blink
+ 632              		.thumb
+ 633              		.thumb_func
+ 635              	leds_error_blink:
+ 636              	.LFB20:
+ 117:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 118:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_error_blink(void) {
+ 637              		.loc 1 118 0
+ 638              		.cfi_startproc
+ 639              		@ args = 0, pretend = 0, frame = 8
+ 640              		@ frame_needed = 1, uses_anonymous_args = 0
+ 641 016c 80B5     		push	{r7, lr}
+ 642              		.cfi_def_cfa_offset 8
+ 643              		.cfi_offset 7, -8
+ 644              		.cfi_offset 14, -4
+ 645 016e 82B0     		sub	sp, sp, #8
+ 646              		.cfi_def_cfa_offset 16
+ 647 0170 00AF     		add	r7, sp, #0
+ 648              		.cfi_def_cfa_register 7
+ 119:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint8_t i;
+ 120:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     volatile uint16_t delay;
+ 121:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 122:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // turn all LEDs off
+ 123:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_ALL);
+ 649              		.loc 1 123 0
+ 650 0172 F020     		movs	r0, #240
+ 651 0174 FFF7FEFF 		bl	bspLedClear
+ 124:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 125:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // blink error LED for ~10s
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     for (i=0;i<80;i++) {
+ 652              		.loc 1 126 0
+ 653 0178 0023     		movs	r3, #0
+ 654 017a FB71     		strb	r3, [r7, #7]
+ 655 017c 1FE0     		b	.L36
+ 656              	.L41:
+ 127:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedToggle(BSP_LED_1);
+ 657              		.loc 1 127 0
+ 658 017e 1020     		movs	r0, #16
+ 659 0180 FFF7FEFF 		bl	bspLedToggle
+ 128:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 660              		.loc 1 128 0
+ 661 0184 4FF6FF73 		movw	r3, #65535
+ 662 0188 BB80     		strh	r3, [r7, #4]	@ movhi
+ 663 018a 04E0     		b	.L37
+ 664              	.L38:
+ 665              		.loc 1 128 0 is_stmt 0 discriminator 3
+ 666 018c BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 667 018e 9BB2     		uxth	r3, r3
+ 668 0190 013B     		subs	r3, r3, #1
+ 669 0192 9BB2     		uxth	r3, r3
+ 670 0194 BB80     		strh	r3, [r7, #4]	@ movhi
+ 671              	.L37:
+ 672              		.loc 1 128 0 discriminator 1
+ 673 0196 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 674 0198 9BB2     		uxth	r3, r3
+ 675 019a 002B     		cmp	r3, #0
+ 676 019c F6D1     		bne	.L38
+ 129:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 677              		.loc 1 129 0 is_stmt 1
+ 678 019e 4FF6FF73 		movw	r3, #65535
+ 679 01a2 BB80     		strh	r3, [r7, #4]	@ movhi
+ 680 01a4 04E0     		b	.L39
+ 681              	.L40:
+ 682              		.loc 1 129 0 is_stmt 0 discriminator 3
+ 683 01a6 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 684 01a8 9BB2     		uxth	r3, r3
+ 685 01aa 013B     		subs	r3, r3, #1
+ 686 01ac 9BB2     		uxth	r3, r3
+ 687 01ae BB80     		strh	r3, [r7, #4]	@ movhi
+ 688              	.L39:
+ 689              		.loc 1 129 0 discriminator 1
+ 690 01b0 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 691 01b2 9BB2     		uxth	r3, r3
+ 692 01b4 002B     		cmp	r3, #0
+ 693 01b6 F6D1     		bne	.L40
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedToggle(BSP_LED_1);
+ 694              		.loc 1 126 0 is_stmt 1 discriminator 2
+ 695 01b8 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 696 01ba 0133     		adds	r3, r3, #1
+ 697 01bc FB71     		strb	r3, [r7, #7]
+ 698              	.L36:
+ 126:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedToggle(BSP_LED_1);
+ 699              		.loc 1 126 0 is_stmt 0 discriminator 1
+ 700 01be FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 701 01c0 4F2B     		cmp	r3, #79
+ 702 01c2 DCD9     		bls	.L41
+ 130:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     }
+ 131:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 703              		.loc 1 131 0 is_stmt 1
+ 704 01c4 0837     		adds	r7, r7, #8
+ 705              		.cfi_def_cfa_offset 8
+ 706 01c6 BD46     		mov	sp, r7
+ 707              		.cfi_def_cfa_register 13
+ 708              		@ sp needed
+ 709 01c8 80BD     		pop	{r7, pc}
+ 710              		.cfi_endproc
+ 711              	.LFE20:
+ 713 01ca 00BF     		.align	2
+ 714              		.global	leds_circular_shift
+ 715              		.thumb
+ 716              		.thumb_func
+ 718              	leds_circular_shift:
+ 719              	.LFB21:
+ 132:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 133:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_circular_shift(void) {
+ 720              		.loc 1 133 0
+ 721              		.cfi_startproc
+ 722              		@ args = 0, pretend = 0, frame = 8
+ 723              		@ frame_needed = 1, uses_anonymous_args = 0
+ 724 01cc 80B5     		push	{r7, lr}
+ 725              		.cfi_def_cfa_offset 8
+ 726              		.cfi_offset 7, -8
+ 727              		.cfi_offset 14, -4
+ 728 01ce 82B0     		sub	sp, sp, #8
+ 729              		.cfi_def_cfa_offset 16
+ 730 01d0 00AF     		add	r7, sp, #0
+ 731              		.cfi_def_cfa_register 7
+ 134:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint8_t i;
+ 135:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     volatile uint16_t delay;
+ 136:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 137:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // turn all LEDs off
+ 138:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_ALL);
+ 732              		.loc 1 138 0
+ 733 01d2 F020     		movs	r0, #240
+ 734 01d4 FFF7FEFF 		bl	bspLedClear
+ 139:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 140:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // incrementally turn LED on
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     for (i=0;i<10;i++) {
+ 735              		.loc 1 141 0
+ 736 01d8 0023     		movs	r3, #0
+ 737 01da FB71     		strb	r3, [r7, #7]
+ 738 01dc 4EE0     		b	.L43
+ 739              	.L52:
+ 142:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 740              		.loc 1 142 0
+ 741 01de 1020     		movs	r0, #16
+ 742 01e0 FFF7FEFF 		bl	bspLedSet
+ 143:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 743              		.loc 1 143 0
+ 744 01e4 4FF6FF73 		movw	r3, #65535
+ 745 01e8 BB80     		strh	r3, [r7, #4]	@ movhi
+ 746 01ea 04E0     		b	.L44
+ 747              	.L45:
+ 748              		.loc 1 143 0 is_stmt 0 discriminator 3
+ 749 01ec BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 750 01ee 9BB2     		uxth	r3, r3
+ 751 01f0 013B     		subs	r3, r3, #1
+ 752 01f2 9BB2     		uxth	r3, r3
+ 753 01f4 BB80     		strh	r3, [r7, #4]	@ movhi
+ 754              	.L44:
+ 755              		.loc 1 143 0 discriminator 1
+ 756 01f6 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 757 01f8 9BB2     		uxth	r3, r3
+ 758 01fa 002B     		cmp	r3, #0
+ 759 01fc F6D1     		bne	.L45
+ 144:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedClear(BSP_LED_1);
+ 760              		.loc 1 144 0 is_stmt 1
+ 761 01fe 1020     		movs	r0, #16
+ 762 0200 FFF7FEFF 		bl	bspLedClear
+ 145:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_2);
+ 763              		.loc 1 145 0
+ 764 0204 2020     		movs	r0, #32
+ 765 0206 FFF7FEFF 		bl	bspLedSet
+ 146:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 766              		.loc 1 146 0
+ 767 020a 4FF6FF73 		movw	r3, #65535
+ 768 020e BB80     		strh	r3, [r7, #4]	@ movhi
+ 769 0210 04E0     		b	.L46
+ 770              	.L47:
+ 771              		.loc 1 146 0 is_stmt 0 discriminator 3
+ 772 0212 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 773 0214 9BB2     		uxth	r3, r3
+ 774 0216 013B     		subs	r3, r3, #1
+ 775 0218 9BB2     		uxth	r3, r3
+ 776 021a BB80     		strh	r3, [r7, #4]	@ movhi
+ 777              	.L46:
+ 778              		.loc 1 146 0 discriminator 1
+ 779 021c BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 780 021e 9BB2     		uxth	r3, r3
+ 781 0220 002B     		cmp	r3, #0
+ 782 0222 F6D1     		bne	.L47
+ 147:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedClear(BSP_LED_2);
+ 783              		.loc 1 147 0 is_stmt 1
+ 784 0224 2020     		movs	r0, #32
+ 785 0226 FFF7FEFF 		bl	bspLedClear
+ 148:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_3);
+ 786              		.loc 1 148 0
+ 787 022a 4020     		movs	r0, #64
+ 788 022c FFF7FEFF 		bl	bspLedSet
+ 149:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 789              		.loc 1 149 0
+ 790 0230 4FF6FF73 		movw	r3, #65535
+ 791 0234 BB80     		strh	r3, [r7, #4]	@ movhi
+ 792 0236 04E0     		b	.L48
+ 793              	.L49:
+ 794              		.loc 1 149 0 is_stmt 0 discriminator 3
+ 795 0238 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 796 023a 9BB2     		uxth	r3, r3
+ 797 023c 013B     		subs	r3, r3, #1
+ 798 023e 9BB2     		uxth	r3, r3
+ 799 0240 BB80     		strh	r3, [r7, #4]	@ movhi
+ 800              	.L48:
+ 801              		.loc 1 149 0 discriminator 1
+ 802 0242 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 803 0244 9BB2     		uxth	r3, r3
+ 804 0246 002B     		cmp	r3, #0
+ 805 0248 F6D1     		bne	.L49
+ 150:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedClear(BSP_LED_3);
+ 806              		.loc 1 150 0 is_stmt 1
+ 807 024a 4020     		movs	r0, #64
+ 808 024c FFF7FEFF 		bl	bspLedClear
+ 151:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_4);
+ 809              		.loc 1 151 0
+ 810 0250 8020     		movs	r0, #128
+ 811 0252 FFF7FEFF 		bl	bspLedSet
+ 152:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 812              		.loc 1 152 0
+ 813 0256 4FF6FF73 		movw	r3, #65535
+ 814 025a BB80     		strh	r3, [r7, #4]	@ movhi
+ 815 025c 04E0     		b	.L50
+ 816              	.L51:
+ 817              		.loc 1 152 0 is_stmt 0 discriminator 3
+ 818 025e BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 819 0260 9BB2     		uxth	r3, r3
+ 820 0262 013B     		subs	r3, r3, #1
+ 821 0264 9BB2     		uxth	r3, r3
+ 822 0266 BB80     		strh	r3, [r7, #4]	@ movhi
+ 823              	.L50:
+ 824              		.loc 1 152 0 discriminator 1
+ 825 0268 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 826 026a 9BB2     		uxth	r3, r3
+ 827 026c 002B     		cmp	r3, #0
+ 828 026e F6D1     		bne	.L51
+ 153:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedClear(BSP_LED_ALL);
+ 829              		.loc 1 153 0 is_stmt 1 discriminator 2
+ 830 0270 F020     		movs	r0, #240
+ 831 0272 FFF7FEFF 		bl	bspLedClear
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 832              		.loc 1 141 0 discriminator 2
+ 833 0276 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 834 0278 0133     		adds	r3, r3, #1
+ 835 027a FB71     		strb	r3, [r7, #7]
+ 836              	.L43:
+ 141:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 837              		.loc 1 141 0 is_stmt 0 discriminator 1
+ 838 027c FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 839 027e 092B     		cmp	r3, #9
+ 840 0280 ADD9     		bls	.L52
+ 154:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****    }
+ 155:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 841              		.loc 1 155 0 is_stmt 1
+ 842 0282 0837     		adds	r7, r7, #8
+ 843              		.cfi_def_cfa_offset 8
+ 844 0284 BD46     		mov	sp, r7
+ 845              		.cfi_def_cfa_register 13
+ 846              		@ sp needed
+ 847 0286 80BD     		pop	{r7, pc}
+ 848              		.cfi_endproc
+ 849              	.LFE21:
+ 851              		.align	2
+ 852              		.global	leds_increment
+ 853              		.thumb
+ 854              		.thumb_func
+ 856              	leds_increment:
+ 857              	.LFB22:
+ 156:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 157:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** void leds_increment(void) {
+ 858              		.loc 1 157 0
+ 859              		.cfi_startproc
+ 860              		@ args = 0, pretend = 0, frame = 8
+ 861              		@ frame_needed = 1, uses_anonymous_args = 0
+ 862 0288 80B5     		push	{r7, lr}
+ 863              		.cfi_def_cfa_offset 8
+ 864              		.cfi_offset 7, -8
+ 865              		.cfi_offset 14, -4
+ 866 028a 82B0     		sub	sp, sp, #8
+ 867              		.cfi_def_cfa_offset 16
+ 868 028c 00AF     		add	r7, sp, #0
+ 869              		.cfi_def_cfa_register 7
+ 158:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint8_t i;
+ 159:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     volatile uint16_t delay;
+ 160:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 161:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // turn all LEDs off
+ 162:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     bspLedClear(BSP_LED_ALL);
+ 870              		.loc 1 162 0
+ 871 028e F020     		movs	r0, #240
+ 872 0290 FFF7FEFF 		bl	bspLedClear
+ 163:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 164:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // incrementally turn LED on
+ 165:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     for (i=0;i<10;i++) {
+ 873              		.loc 1 165 0
+ 874 0294 0023     		movs	r3, #0
+ 875 0296 FB71     		strb	r3, [r7, #7]
+ 876 0298 45E0     		b	.L54
+ 877              	.L63:
+ 166:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 878              		.loc 1 166 0
+ 879 029a 1020     		movs	r0, #16
+ 880 029c FFF7FEFF 		bl	bspLedSet
+ 167:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 881              		.loc 1 167 0
+ 882 02a0 4FF6FF73 		movw	r3, #65535
+ 883 02a4 BB80     		strh	r3, [r7, #4]	@ movhi
+ 884 02a6 04E0     		b	.L55
+ 885              	.L56:
+ 886              		.loc 1 167 0 is_stmt 0 discriminator 3
+ 887 02a8 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 888 02aa 9BB2     		uxth	r3, r3
+ 889 02ac 013B     		subs	r3, r3, #1
+ 890 02ae 9BB2     		uxth	r3, r3
+ 891 02b0 BB80     		strh	r3, [r7, #4]	@ movhi
+ 892              	.L55:
+ 893              		.loc 1 167 0 discriminator 1
+ 894 02b2 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 895 02b4 9BB2     		uxth	r3, r3
+ 896 02b6 002B     		cmp	r3, #0
+ 897 02b8 F6D1     		bne	.L56
+ 168:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_2);
+ 898              		.loc 1 168 0 is_stmt 1
+ 899 02ba 2020     		movs	r0, #32
+ 900 02bc FFF7FEFF 		bl	bspLedSet
+ 169:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 901              		.loc 1 169 0
+ 902 02c0 4FF6FF73 		movw	r3, #65535
+ 903 02c4 BB80     		strh	r3, [r7, #4]	@ movhi
+ 904 02c6 04E0     		b	.L57
+ 905              	.L58:
+ 906              		.loc 1 169 0 is_stmt 0 discriminator 3
+ 907 02c8 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 908 02ca 9BB2     		uxth	r3, r3
+ 909 02cc 013B     		subs	r3, r3, #1
+ 910 02ce 9BB2     		uxth	r3, r3
+ 911 02d0 BB80     		strh	r3, [r7, #4]	@ movhi
+ 912              	.L57:
+ 913              		.loc 1 169 0 discriminator 1
+ 914 02d2 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 915 02d4 9BB2     		uxth	r3, r3
+ 916 02d6 002B     		cmp	r3, #0
+ 917 02d8 F6D1     		bne	.L58
+ 170:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_3);
+ 918              		.loc 1 170 0 is_stmt 1
+ 919 02da 4020     		movs	r0, #64
+ 920 02dc FFF7FEFF 		bl	bspLedSet
+ 171:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 921              		.loc 1 171 0
+ 922 02e0 4FF6FF73 		movw	r3, #65535
+ 923 02e4 BB80     		strh	r3, [r7, #4]	@ movhi
+ 924 02e6 04E0     		b	.L59
+ 925              	.L60:
+ 926              		.loc 1 171 0 is_stmt 0 discriminator 3
+ 927 02e8 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 928 02ea 9BB2     		uxth	r3, r3
+ 929 02ec 013B     		subs	r3, r3, #1
+ 930 02ee 9BB2     		uxth	r3, r3
+ 931 02f0 BB80     		strh	r3, [r7, #4]	@ movhi
+ 932              	.L59:
+ 933              		.loc 1 171 0 discriminator 1
+ 934 02f2 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 935 02f4 9BB2     		uxth	r3, r3
+ 936 02f6 002B     		cmp	r3, #0
+ 937 02f8 F6D1     		bne	.L60
+ 172:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_4);
+ 938              		.loc 1 172 0 is_stmt 1
+ 939 02fa 8020     		movs	r0, #128
+ 940 02fc FFF7FEFF 		bl	bspLedSet
+ 173:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         for (delay=0xffff;delay>0;delay--);
+ 941              		.loc 1 173 0
+ 942 0300 4FF6FF73 		movw	r3, #65535
+ 943 0304 BB80     		strh	r3, [r7, #4]	@ movhi
+ 944 0306 04E0     		b	.L61
+ 945              	.L62:
+ 946              		.loc 1 173 0 is_stmt 0 discriminator 3
+ 947 0308 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 948 030a 9BB2     		uxth	r3, r3
+ 949 030c 013B     		subs	r3, r3, #1
+ 950 030e 9BB2     		uxth	r3, r3
+ 951 0310 BB80     		strh	r3, [r7, #4]	@ movhi
+ 952              	.L61:
+ 953              		.loc 1 173 0 discriminator 1
+ 954 0312 BB88     		ldrh	r3, [r7, #4]	@ movhi
+ 955 0314 9BB2     		uxth	r3, r3
+ 956 0316 002B     		cmp	r3, #0
+ 957 0318 F6D1     		bne	.L62
+ 174:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedClear(BSP_LED_ALL);
+ 958              		.loc 1 174 0 is_stmt 1 discriminator 2
+ 959 031a F020     		movs	r0, #240
+ 960 031c FFF7FEFF 		bl	bspLedClear
+ 165:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 961              		.loc 1 165 0 discriminator 2
+ 962 0320 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 963 0322 0133     		adds	r3, r3, #1
+ 964 0324 FB71     		strb	r3, [r7, #7]
+ 965              	.L54:
+ 165:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****         bspLedSet(BSP_LED_1);
+ 966              		.loc 1 165 0 is_stmt 0 discriminator 1
+ 967 0326 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 968 0328 092B     		cmp	r3, #9
+ 969 032a B6D9     		bls	.L63
+ 175:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     }
+ 176:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 970              		.loc 1 176 0 is_stmt 1
+ 971 032c 0837     		adds	r7, r7, #8
+ 972              		.cfi_def_cfa_offset 8
+ 973 032e BD46     		mov	sp, r7
+ 974              		.cfi_def_cfa_register 13
+ 975              		@ sp needed
+ 976 0330 80BD     		pop	{r7, pc}
+ 977              		.cfi_endproc
+ 978              	.LFE22:
+ 980 0332 00BF     		.align	2
+ 981              		.global	bspLedSet
+ 982              		.thumb
+ 983              		.thumb_func
+ 985              	bspLedSet:
+ 986              	.LFB23:
+ 177:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 178:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** //=========================== private =========================================
+ 179:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 180:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** port_INLINE void bspLedSet(uint8_t ui8Leds){
+ 987              		.loc 1 180 0
+ 988              		.cfi_startproc
+ 989              		@ args = 0, pretend = 0, frame = 8
+ 990              		@ frame_needed = 1, uses_anonymous_args = 0
+ 991 0334 80B5     		push	{r7, lr}
+ 992              		.cfi_def_cfa_offset 8
+ 993              		.cfi_offset 7, -8
+ 994              		.cfi_offset 14, -4
+ 995 0336 82B0     		sub	sp, sp, #8
+ 996              		.cfi_def_cfa_offset 16
+ 997 0338 00AF     		add	r7, sp, #0
+ 998              		.cfi_def_cfa_register 7
+ 999 033a 0346     		mov	r3, r0
+ 1000 033c FB71     		strb	r3, [r7, #7]
+ 181:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 182:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // Turn on specified LEDs
+ 183:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 184:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     GPIOPinWrite(BSP_LED_BASE, ui8Leds, ui8Leds);
+ 1001              		.loc 1 184 0
+ 1002 033e FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1003 0340 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1004 0342 0448     		ldr	r0, .L65
+ 1005 0344 1146     		mov	r1, r2
+ 1006 0346 1A46     		mov	r2, r3
+ 1007 0348 FFF7FEFF 		bl	GPIOPinWrite
+ 185:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 1008              		.loc 1 185 0
+ 1009 034c 0837     		adds	r7, r7, #8
+ 1010              		.cfi_def_cfa_offset 8
+ 1011 034e BD46     		mov	sp, r7
+ 1012              		.cfi_def_cfa_register 13
+ 1013              		@ sp needed
+ 1014 0350 80BD     		pop	{r7, pc}
+ 1015              	.L66:
+ 1016 0352 00BF     		.align	2
+ 1017              	.L65:
+ 1018 0354 00B00D40 		.word	1074638848
+ 1019              		.cfi_endproc
+ 1020              	.LFE23:
+ 1022              		.align	2
+ 1023              		.global	bspLedClear
+ 1024              		.thumb
+ 1025              		.thumb_func
+ 1027              	bspLedClear:
+ 1028              	.LFB24:
+ 186:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 187:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** port_INLINE void bspLedClear(uint8_t ui8Leds){
+ 1029              		.loc 1 187 0
+ 1030              		.cfi_startproc
+ 1031              		@ args = 0, pretend = 0, frame = 8
+ 1032              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1033 0358 80B5     		push	{r7, lr}
+ 1034              		.cfi_def_cfa_offset 8
+ 1035              		.cfi_offset 7, -8
+ 1036              		.cfi_offset 14, -4
+ 1037 035a 82B0     		sub	sp, sp, #8
+ 1038              		.cfi_def_cfa_offset 16
+ 1039 035c 00AF     		add	r7, sp, #0
+ 1040              		.cfi_def_cfa_register 7
+ 1041 035e 0346     		mov	r3, r0
+ 1042 0360 FB71     		strb	r3, [r7, #7]
+ 188:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 189:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // Turn off specified LEDs
+ 190:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 191:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     GPIOPinWrite(BSP_LED_BASE, ui8Leds, 0);
+ 1043              		.loc 1 191 0
+ 1044 0362 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1045 0364 0348     		ldr	r0, .L68
+ 1046 0366 1946     		mov	r1, r3
+ 1047 0368 0022     		movs	r2, #0
+ 1048 036a FFF7FEFF 		bl	GPIOPinWrite
+ 192:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }
+ 1049              		.loc 1 192 0
+ 1050 036e 0837     		adds	r7, r7, #8
+ 1051              		.cfi_def_cfa_offset 8
+ 1052 0370 BD46     		mov	sp, r7
+ 1053              		.cfi_def_cfa_register 13
+ 1054              		@ sp needed
+ 1055 0372 80BD     		pop	{r7, pc}
+ 1056              	.L69:
+ 1057              		.align	2
+ 1058              	.L68:
+ 1059 0374 00B00D40 		.word	1074638848
+ 1060              		.cfi_endproc
+ 1061              	.LFE24:
+ 1063              		.align	2
+ 1064              		.global	bspLedToggle
+ 1065              		.thumb
+ 1066              		.thumb_func
+ 1068              	bspLedToggle:
+ 1069              	.LFB25:
+ 193:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 194:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** port_INLINE void bspLedToggle(uint8_t ui8Leds){
+ 1070              		.loc 1 194 0
+ 1071              		.cfi_startproc
+ 1072              		@ args = 0, pretend = 0, frame = 16
+ 1073              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1074 0378 80B5     		push	{r7, lr}
+ 1075              		.cfi_def_cfa_offset 8
+ 1076              		.cfi_offset 7, -8
+ 1077              		.cfi_offset 14, -4
+ 1078 037a 84B0     		sub	sp, sp, #16
+ 1079              		.cfi_def_cfa_offset 24
+ 1080 037c 00AF     		add	r7, sp, #0
+ 1081              		.cfi_def_cfa_register 7
+ 1082 037e 0346     		mov	r3, r0
+ 1083 0380 FB71     		strb	r3, [r7, #7]
+ 195:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 196:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // Get current pin values of selected bits
+ 197:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 198:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, ui8Leds);
+ 1084              		.loc 1 198 0
+ 1085 0382 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1086 0384 0A48     		ldr	r0, .L71
+ 1087 0386 1946     		mov	r1, r3
+ 1088 0388 FFF7FEFF 		bl	GPIOPinRead
+ 1089 038c F860     		str	r0, [r7, #12]
+ 199:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 200:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 201:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // Invert selected bits
+ 202:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 203:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     ui32Toggle = (~ui32Toggle) & ui8Leds;
+ 1090              		.loc 1 203 0
+ 1091 038e FB68     		ldr	r3, [r7, #12]
+ 1092 0390 DA43     		mvns	r2, r3
+ 1093 0392 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1094 0394 1340     		ands	r3, r3, r2
+ 1095 0396 FB60     		str	r3, [r7, #12]
+ 204:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** 
+ 205:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 206:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     // Set GPIO
+ 207:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     //
+ 208:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c ****     GPIOPinWrite(BSP_LED_BASE, ui8Leds, ui32Toggle);
+ 1096              		.loc 1 208 0
+ 1097 0398 FB68     		ldr	r3, [r7, #12]
+ 1098 039a DBB2     		uxtb	r3, r3
+ 1099 039c FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1100 039e 0448     		ldr	r0, .L71
+ 1101 03a0 1146     		mov	r1, r2
+ 1102 03a2 1A46     		mov	r2, r3
+ 1103 03a4 FFF7FEFF 		bl	GPIOPinWrite
+ 209:build/openmote-cc2538_armgcc/bsp/boards/openmote-cc2538/leds.c **** }...
+ 1104              		.loc 1 209 0
+ 1105 03a8 1037     		adds	r7, r7, #16
+ 1106              		.cfi_def_cfa_offset 8
+ 1107 03aa BD46     		mov	sp, r7
+ 1108              		.cfi_def_cfa_register 13
+ 1109              		@ sp needed
+ 1110 03ac 80BD     		pop	{r7, pc}
+ 1111              	.L72:
+ 1112 03ae 00BF     		.align	2
+ 1113              	.L71:
+ 1114 03b0 00B00D40 		.word	1074638848
+ 1115              		.cfi_endproc
+ 1116              	.LFE25:
+ 1118              	.Letext0:
+ 1119              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1120              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1121              		.file 4 "bsp/boards/openmote-cc2538/board_info.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 leds.c
+     /tmp/cc9QczpX.s:19     .rodata:0000000000000000 $d
+     /tmp/cc9QczpX.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/cc9QczpX.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/cc9QczpX.s:32     .rodata:0000000000000010 infouCName
+     /tmp/cc9QczpX.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/cc9QczpX.s:40     .text:0000000000000000 $t
+     /tmp/cc9QczpX.s:45     .text:0000000000000000 leds_init
+     /tmp/cc9QczpX.s:72     .text:0000000000000018 $d
+     /tmp/cc9QczpX.s:76     .text:000000000000001c $t
+     /tmp/cc9QczpX.s:81     .text:000000000000001c leds_error_on
+     /tmp/cc9QczpX.s:985    .text:0000000000000334 bspLedSet
+     /tmp/cc9QczpX.s:106    .text:0000000000000028 leds_error_off
+     /tmp/cc9QczpX.s:1027   .text:0000000000000358 bspLedClear
+     /tmp/cc9QczpX.s:131    .text:0000000000000034 leds_error_toggle
+     /tmp/cc9QczpX.s:1068   .text:0000000000000378 bspLedToggle
+     /tmp/cc9QczpX.s:156    .text:0000000000000040 leds_error_isOn
+     /tmp/cc9QczpX.s:192    .text:0000000000000064 $d
+     /tmp/cc9QczpX.s:196    .text:0000000000000068 $t
+     /tmp/cc9QczpX.s:201    .text:0000000000000068 leds_sync_on
+     /tmp/cc9QczpX.s:226    .text:0000000000000074 leds_sync_off
+     /tmp/cc9QczpX.s:251    .text:0000000000000080 leds_sync_toggle
+     /tmp/cc9QczpX.s:276    .text:000000000000008c leds_sync_isOn
+     /tmp/cc9QczpX.s:312    .text:00000000000000b0 $d
+     /tmp/cc9QczpX.s:316    .text:00000000000000b4 $t
+     /tmp/cc9QczpX.s:321    .text:00000000000000b4 leds_radio_on
+     /tmp/cc9QczpX.s:346    .text:00000000000000c0 leds_radio_off
+     /tmp/cc9QczpX.s:371    .text:00000000000000cc leds_radio_toggle
+     /tmp/cc9QczpX.s:396    .text:00000000000000d8 leds_radio_isOn
+     /tmp/cc9QczpX.s:431    .text:00000000000000f8 $d
+     /tmp/cc9QczpX.s:435    .text:00000000000000fc $t
+     /tmp/cc9QczpX.s:440    .text:00000000000000fc leds_debug_on
+     /tmp/cc9QczpX.s:465    .text:0000000000000108 leds_debug_off
+     /tmp/cc9QczpX.s:490    .text:0000000000000114 leds_debug_toggle
+     /tmp/cc9QczpX.s:515    .text:0000000000000120 leds_debug_isOn
+     /tmp/cc9QczpX.s:551    .text:0000000000000144 $d
+     /tmp/cc9QczpX.s:555    .text:0000000000000148 $t
+     /tmp/cc9QczpX.s:560    .text:0000000000000148 leds_all_on
+     /tmp/cc9QczpX.s:585    .text:0000000000000154 leds_all_off
+     /tmp/cc9QczpX.s:610    .text:0000000000000160 leds_all_toggle
+     /tmp/cc9QczpX.s:635    .text:000000000000016c leds_error_blink
+     /tmp/cc9QczpX.s:718    .text:00000000000001cc leds_circular_shift
+     /tmp/cc9QczpX.s:856    .text:0000000000000288 leds_increment
+     /tmp/cc9QczpX.s:1018   .text:0000000000000354 $d
+     /tmp/cc9QczpX.s:1022   .text:0000000000000358 $t
+     /tmp/cc9QczpX.s:1059   .text:0000000000000374 $d
+     /tmp/cc9QczpX.s:1063   .text:0000000000000378 $t
+     /tmp/cc9QczpX.s:1114   .text:00000000000003b0 $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.hw_memmap.h.39.19283c377d449c9bca5fdd8ccb62628c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.gpio.h.41.604fa3d9f70fb140a75ada50bffeaeff
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.1de8df52ab2567aa1aa0a288d2325900
+                           .group:0000000000000000 wm4.leds.h.2.746f2c4bd224f28046dfa242de7e3f3d
+
+UNDEFINED SYMBOLS
+GPIOPinTypeGPIOOutput
+GPIOPinWrite
+GPIOPinRead

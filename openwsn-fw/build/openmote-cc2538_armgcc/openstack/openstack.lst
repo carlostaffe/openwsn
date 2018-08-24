@@ -1,0 +1,352 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"openstack.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	linklocalprefix:
+  48 0030 FE       		.byte	-2
+  49 0031 80       		.byte	-128
+  50 0032 00       		.byte	0
+  51 0033 00       		.byte	0
+  52 0034 00       		.byte	0
+  53 0035 00       		.byte	0
+  54 0036 00       		.byte	0
+  55 0037 00       		.byte	0
+  56              		.align	2
+  59              	chTemplate_default:
+  60 0038 05       		.byte	5
+  61 0039 06       		.byte	6
+  62 003a 0C       		.byte	12
+  63 003b 07       		.byte	7
+  64 003c 0F       		.byte	15
+  65 003d 04       		.byte	4
+  66 003e 0E       		.byte	14
+  67 003f 0B       		.byte	11
+  68 0040 08       		.byte	8
+  69 0041 00       		.byte	0
+  70 0042 01       		.byte	1
+  71 0043 02       		.byte	2
+  72 0044 0D       		.byte	13
+  73 0045 03       		.byte	3
+  74 0046 09       		.byte	9
+  75 0047 0A       		.byte	10
+  76              		.align	2
+  79              	ebIEsBytestream:
+  80 0048 1A       		.byte	26
+  81 0049 88       		.byte	-120
+  82 004a 06       		.byte	6
+  83 004b 1A       		.byte	26
+  84 004c 00       		.byte	0
+  85 004d 00       		.byte	0
+  86 004e 00       		.byte	0
+  87 004f 00       		.byte	0
+  88 0050 00       		.byte	0
+  89 0051 00       		.byte	0
+  90 0052 01       		.byte	1
+  91 0053 1C       		.byte	28
+  92 0054 00       		.byte	0
+  93 0055 01       		.byte	1
+  94 0056 C8       		.byte	-56
+  95 0057 00       		.byte	0
+  96 0058 0A       		.byte	10
+  97 0059 1B       		.byte	27
+  98 005a 01       		.byte	1
+  99 005b 00       		.byte	0
+ 100 005c 65       		.byte	101
+ 101 005d 00       		.byte	0
+ 102 005e 01       		.byte	1
+ 103 005f 00       		.byte	0
+ 104 0060 00       		.byte	0
+ 105 0061 00       		.byte	0
+ 106 0062 00       		.byte	0
+ 107 0063 0F       		.byte	15
+ 108              		.align	2
+ 111              	all_routers_multicast:
+ 112 0064 FF       		.byte	-1
+ 113 0065 02       		.byte	2
+ 114 0066 00       		.byte	0
+ 115 0067 00       		.byte	0
+ 116 0068 00       		.byte	0
+ 117 0069 00       		.byte	0
+ 118 006a 00       		.byte	0
+ 119 006b 00       		.byte	0
+ 120 006c 00       		.byte	0
+ 121 006d 00       		.byte	0
+ 122 006e 00       		.byte	0
+ 123 006f 00       		.byte	0
+ 124 0070 00       		.byte	0
+ 125 0071 00       		.byte	0
+ 126 0072 00       		.byte	0
+ 127 0073 1A       		.byte	26
+ 128              		.text
+ 129              		.align	2
+ 130              		.global	openstack_init
+ 131              		.thumb
+ 132              		.thumb_func
+ 134              	openstack_init:
+ 135              	.LFB0:
+ 136              		.file 1 "build/openmote-cc2538_armgcc/openstack/openstack.c"
+   1:build/openmote-cc2538_armgcc/openstack/openstack.c **** /**
+   2:build/openmote-cc2538_armgcc/openstack/openstack.c **** \brief Entry point for accessing the OpenWSN stack.
+   3:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+   4:build/openmote-cc2538_armgcc/openstack/openstack.c **** \author Thomas Watteyne <watteyne@eecs.berkeley.edu>, October 2014.
+   5:build/openmote-cc2538_armgcc/openstack/openstack.c **** */
+   6:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+   7:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "opendefs.h"
+   8:build/openmote-cc2538_armgcc/openstack/openstack.c **** //===== drivers
+   9:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openserial.h"
+  10:build/openmote-cc2538_armgcc/openstack/openstack.c **** //===== stack
+  11:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openstack.h"
+  12:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- cross-layer
+  13:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "idmanager.h"
+  14:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openqueue.h"
+  15:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openrandom.h"
+  16:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "opentimers.h"
+  17:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "opentimers.h"
+  18:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- 02a-TSCH
+  19:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "adaptive_sync.h"
+  20:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "IEEE802154E.h"
+  21:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- 02b-RES
+  22:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "schedule.h"
+  23:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "sixtop.h"
+  24:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "neighbors.h"
+  25:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "msf.h"
+  26:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- 03a-IPHC
+  27:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openbridge.h"
+  28:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "iphc.h"
+  29:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- 03b-IPv6
+  30:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "forwarding.h"
+  31:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "icmpv6.h"
+  32:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "icmpv6echo.h"
+  33:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "icmpv6rpl.h"
+  34:build/openmote-cc2538_armgcc/openstack/openstack.c **** //-- 04-TRAN
+  35:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openudp.h"
+  36:build/openmote-cc2538_armgcc/openstack/openstack.c **** //===== applications
+  37:build/openmote-cc2538_armgcc/openstack/openstack.c **** #include "openapps.h"
+  38:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  39:build/openmote-cc2538_armgcc/openstack/openstack.c **** //=========================== variables =======================================
+  40:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  41:build/openmote-cc2538_armgcc/openstack/openstack.c **** //=========================== prototypes ======================================
+  42:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  43:build/openmote-cc2538_armgcc/openstack/openstack.c **** //=========================== public ==========================================
+  44:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  45:build/openmote-cc2538_armgcc/openstack/openstack.c **** //=========================== private =========================================
+  46:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  47:build/openmote-cc2538_armgcc/openstack/openstack.c **** void openstack_init(void) {
+ 137              		.loc 1 47 0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 1, uses_anonymous_args = 0
+ 141 0000 80B5     		push	{r7, lr}
+ 142              		.cfi_def_cfa_offset 8
+ 143              		.cfi_offset 7, -8
+ 144              		.cfi_offset 14, -4
+ 145 0002 00AF     		add	r7, sp, #0
+ 146              		.cfi_def_cfa_register 7
+  48:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  49:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //===== drivers
+  50:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openserial_init();
+ 147              		.loc 1 50 0
+ 148 0004 FFF7FEFF 		bl	openserial_init
+  51:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  52:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //===== stack
+  53:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- cross-layer
+  54:build/openmote-cc2538_armgcc/openstack/openstack.c ****    idmanager_init();    // call first since initializes EUI64 and isDAGroot
+ 149              		.loc 1 54 0
+ 150 0008 FFF7FEFF 		bl	idmanager_init
+  55:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openqueue_init();
+ 151              		.loc 1 55 0
+ 152 000c FFF7FEFF 		bl	openqueue_init
+  56:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openrandom_init();
+ 153              		.loc 1 56 0
+ 154 0010 FFF7FEFF 		bl	openrandom_init
+  57:build/openmote-cc2538_armgcc/openstack/openstack.c ****    opentimers_init();
+ 155              		.loc 1 57 0
+ 156 0014 FFF7FEFF 		bl	opentimers_init
+  58:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- 02a-TSCH
+  59:build/openmote-cc2538_armgcc/openstack/openstack.c **** //   adaptive_sync_init();
+  60:build/openmote-cc2538_armgcc/openstack/openstack.c ****    ieee154e_init();
+ 157              		.loc 1 60 0
+ 158 0018 FFF7FEFF 		bl	ieee154e_init
+  61:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- 02b-RES
+  62:build/openmote-cc2538_armgcc/openstack/openstack.c ****    schedule_init();
+ 159              		.loc 1 62 0
+ 160 001c FFF7FEFF 		bl	schedule_init
+  63:build/openmote-cc2538_armgcc/openstack/openstack.c ****    sixtop_init();
+ 161              		.loc 1 63 0
+ 162 0020 FFF7FEFF 		bl	sixtop_init
+  64:build/openmote-cc2538_armgcc/openstack/openstack.c ****    neighbors_init();
+ 163              		.loc 1 64 0
+ 164 0024 FFF7FEFF 		bl	neighbors_init
+  65:build/openmote-cc2538_armgcc/openstack/openstack.c ****    msf_init();
+ 165              		.loc 1 65 0
+ 166 0028 FFF7FEFF 		bl	msf_init
+  66:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- 03a-IPHC
+  67:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openbridge_init();
+ 167              		.loc 1 67 0
+ 168 002c FFF7FEFF 		bl	openbridge_init
+  68:build/openmote-cc2538_armgcc/openstack/openstack.c ****    iphc_init();
+ 169              		.loc 1 68 0
+ 170 0030 FFF7FEFF 		bl	iphc_init
+  69:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- 03b-IPv6
+  70:build/openmote-cc2538_armgcc/openstack/openstack.c ****    forwarding_init();
+ 171              		.loc 1 70 0
+ 172 0034 FFF7FEFF 		bl	forwarding_init
+  71:build/openmote-cc2538_armgcc/openstack/openstack.c ****    icmpv6_init();
+ 173              		.loc 1 71 0
+ 174 0038 FFF7FEFF 		bl	icmpv6_init
+  72:build/openmote-cc2538_armgcc/openstack/openstack.c ****    icmpv6echo_init();
+ 175              		.loc 1 72 0
+ 176 003c FFF7FEFF 		bl	icmpv6echo_init
+  73:build/openmote-cc2538_armgcc/openstack/openstack.c ****    icmpv6rpl_init();
+ 177              		.loc 1 73 0
+ 178 0040 FFF7FEFF 		bl	icmpv6rpl_init
+  74:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //-- 04-TRAN
+  75:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openudp_init();
+ 179              		.loc 1 75 0
+ 180 0044 FFF7FEFF 		bl	openudp_init
+  76:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  77:build/openmote-cc2538_armgcc/openstack/openstack.c ****    //===== applications
+  78:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openapps_init();
+ 181              		.loc 1 78 0
+ 182 0048 FFF7FEFF 		bl	openapps_init
+  79:build/openmote-cc2538_armgcc/openstack/openstack.c **** 
+  80:build/openmote-cc2538_armgcc/openstack/openstack.c ****    openserial_printInfo(
+ 183              		.loc 1 80 0
+ 184 004c 0120     		movs	r0, #1
+ 185 004e 3521     		movs	r1, #53
+ 186 0050 0022     		movs	r2, #0
+ 187 0052 0023     		movs	r3, #0
+ 188 0054 FFF7FEFF 		bl	openserial_printInfo
+  81:build/openmote-cc2538_armgcc/openstack/openstack.c ****       COMPONENT_OPENWSN,ERR_BOOTED,
+  82:build/openmote-cc2538_armgcc/openstack/openstack.c ****       (errorparameter_t)0,
+  83:build/openmote-cc2538_armgcc/openstack/openstack.c ****       (errorparameter_t)0
+  84:build/openmote-cc2538_armgcc/openstack/openstack.c ****    );
+  85:build/openmote-cc2538_armgcc/openstack/openstack.c **** }
+ 189              		.loc 1 85 0
+ 190 0058 80BD     		pop	{r7, pc}
+ 191              		.cfi_endproc
+ 192              	.LFE0:
+ 194              	.Letext0:
+ 195              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 196              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 197              		.file 4 "inc/opendefs.h"
+ 198              		.file 5 "bsp/boards/openmote-cc2538/board_info.h"
+ 199              		.file 6 "openstack/cross-layers/idmanager.h"
+ 200              		.file 7 "openstack/02a-MAClow/IEEE802154E.h"
+ 201              		.file 8 "openstack/03b-IPv6/icmpv6rpl.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 openstack.c
+     /tmp/cc3Lyd6X.s:19     .rodata:0000000000000000 $d
+     /tmp/cc3Lyd6X.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/cc3Lyd6X.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/cc3Lyd6X.s:32     .rodata:0000000000000010 infouCName
+     /tmp/cc3Lyd6X.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/cc3Lyd6X.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/cc3Lyd6X.s:47     .rodata:0000000000000030 linklocalprefix
+     /tmp/cc3Lyd6X.s:59     .rodata:0000000000000038 chTemplate_default
+     /tmp/cc3Lyd6X.s:79     .rodata:0000000000000048 ebIEsBytestream
+     /tmp/cc3Lyd6X.s:111    .rodata:0000000000000064 all_routers_multicast
+     /tmp/cc3Lyd6X.s:129    .text:0000000000000000 $t
+     /tmp/cc3Lyd6X.s:134    .text:0000000000000000 openstack_init
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.stdio.h.27.3fc80220048df77954e38daec3bb9670
+                           .group:0000000000000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:0000000000000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:0000000000000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:0000000000000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:0000000000000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:0000000000000000 wm4.stdio.h.68.a99a2db1e55915cfd1b035cc1e9fcff1
+                           .group:0000000000000000 wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949
+                           .group:0000000000000000 wm4.openserial.h.32.c1b1c4db184af4a79a2b8ff62d908d4d
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.schedule.h.2.1e56c0a55af41b0871de1bf3babafbff
+                           .group:0000000000000000 wm4.IEEE802154E.h.31.4df44943e63b807d05253db7aa10079f
+                           .group:0000000000000000 wm4.sixtop.h.2.ee4bd0b70b528bdc38891cf2a16bad67
+                           .group:0000000000000000 wm4.icmpv6rpl.h.2.f31802bcce2a0808bf5db39ce34f4322
+                           .group:0000000000000000 wm4.neighbors.h.15.2a77b1a66a5fa826e9ff514b195b0560
+                           .group:0000000000000000 wm4.msf.h.2.f5f54d094fceca000a0716834465e47f
+                           .group:0000000000000000 wm4.iphc.h.2.9e7d9d56ac728a3c0b3014283a59854e
+                           .group:0000000000000000 wm4.forwarding.h.2.92227c8206462e747e83f1fe703c6cf8
+
+UNDEFINED SYMBOLS
+openserial_init
+idmanager_init
+openqueue_init
+openrandom_init
+opentimers_init
+ieee154e_init
+schedule_init
+sixtop_init
+neighbors_init
+msf_init
+openbridge_init
+iphc_init
+forwarding_init
+icmpv6_init
+icmpv6echo_init
+icmpv6rpl_init
+openudp_init
+openapps_init
+openserial_printInfo

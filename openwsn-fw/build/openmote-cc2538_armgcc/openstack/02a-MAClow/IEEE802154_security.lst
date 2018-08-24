@@ -1,0 +1,1391 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"IEEE802154_security.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	chTemplate_default:
+  48 0030 05       		.byte	5
+  49 0031 06       		.byte	6
+  50 0032 0C       		.byte	12
+  51 0033 07       		.byte	7
+  52 0034 0F       		.byte	15
+  53 0035 04       		.byte	4
+  54 0036 0E       		.byte	14
+  55 0037 0B       		.byte	11
+  56 0038 08       		.byte	8
+  57 0039 00       		.byte	0
+  58 003a 01       		.byte	1
+  59 003b 02       		.byte	2
+  60 003c 0D       		.byte	13
+  61 003d 03       		.byte	3
+  62 003e 09       		.byte	9
+  63 003f 0A       		.byte	10
+  64              		.align	2
+  67              	ebIEsBytestream:
+  68 0040 1A       		.byte	26
+  69 0041 88       		.byte	-120
+  70 0042 06       		.byte	6
+  71 0043 1A       		.byte	26
+  72 0044 00       		.byte	0
+  73 0045 00       		.byte	0
+  74 0046 00       		.byte	0
+  75 0047 00       		.byte	0
+  76 0048 00       		.byte	0
+  77 0049 00       		.byte	0
+  78 004a 01       		.byte	1
+  79 004b 1C       		.byte	28
+  80 004c 00       		.byte	0
+  81 004d 01       		.byte	1
+  82 004e C8       		.byte	-56
+  83 004f 00       		.byte	0
+  84 0050 0A       		.byte	10
+  85 0051 1B       		.byte	27
+  86 0052 01       		.byte	1
+  87 0053 00       		.byte	0
+  88 0054 65       		.byte	101
+  89 0055 00       		.byte	0
+  90 0056 01       		.byte	1
+  91 0057 00       		.byte	0
+  92 0058 00       		.byte	0
+  93 0059 00       		.byte	0
+  94 005a 00       		.byte	0
+  95 005b 0F       		.byte	15
+  96              		.align	2
+  99              	linklocalprefix:
+ 100 005c FE       		.byte	-2
+ 101 005d 80       		.byte	-128
+ 102 005e 00       		.byte	0
+ 103 005f 00       		.byte	0
+ 104 0060 00       		.byte	0
+ 105 0061 00       		.byte	0
+ 106 0062 00       		.byte	0
+ 107 0063 00       		.byte	0
+ 108              		.align	2
+ 111              	all_routers_multicast:
+ 112 0064 FF       		.byte	-1
+ 113 0065 02       		.byte	2
+ 114 0066 00       		.byte	0
+ 115 0067 00       		.byte	0
+ 116 0068 00       		.byte	0
+ 117 0069 00       		.byte	0
+ 118 006a 00       		.byte	0
+ 119 006b 00       		.byte	0
+ 120 006c 00       		.byte	0
+ 121 006d 00       		.byte	0
+ 122 006e 00       		.byte	0
+ 123 006f 00       		.byte	0
+ 124 0070 00       		.byte	0
+ 125 0071 00       		.byte	0
+ 126 0072 00       		.byte	0
+ 127 0073 1A       		.byte	26
+ 128              		.comm	ieee802154_security_vars,36,4
+ 129              		.text
+ 130              		.align	2
+ 131              		.global	IEEE802154_security_init
+ 132              		.thumb
+ 133              		.thumb_func
+ 135              	IEEE802154_security_init:
+ 136              	.LFB0:
+ 137              		.file 1 "build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c"
+   1:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+   2:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Security operations defined by IEEE802.15.4e standard
+   3:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+   4:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \author Savio Sciancalepore <savio.sciancalepore@poliba.it>, June 2015.
+   5:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \author Giuseppe Piro <giuseppe.piro@poliba.it> June 2015.
+   6:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \author Gennaro Boggia <gennaro.boggia@poliba.it> June 2015.
+   7:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \author Luigi Alfredo Grieco <alfredo.grieco@poliba.it>, June 2015.
+   8:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \author Malisa Vucinic <malishav@gmail.com>, June 2015.
+   9:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+  10:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  11:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "packetfunctions.h"
+  12:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "cryptoengine.h"
+  13:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "IEEE802154.h"
+  14:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "IEEE802154E.h"
+  15:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "idmanager.h"
+  16:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "openserial.h"
+  17:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "neighbors.h"
+  18:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #include "IEEE802154_security.h"
+  19:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  20:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** //=============================define==========================================
+  21:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** //=========================== variables =======================================
+  22:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  23:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** ieee802154_security_vars_t ieee802154_security_vars;
+  24:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  25:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** //========= common functions regardless of whether L2SEC is used or not =======
+  26:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** // following 7 functions are also called when L2SEC is not used. This is to facilitate
+  27:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** // automated testing of SECJOIN without L2SEC and to ensure the order in which nodes
+  28:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** // start sending out EBs. With the current implementation, EBs are sent only once the
+  29:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** // node has received a Join Response from the JRC.
+  30:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  31:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_init(void) {
+ 138              		.loc 1 31 0
+ 139              		.cfi_startproc
+ 140              		@ args = 0, pretend = 0, frame = 0
+ 141              		@ frame_needed = 1, uses_anonymous_args = 0
+ 142 0000 80B5     		push	{r7, lr}
+ 143              		.cfi_def_cfa_offset 8
+ 144              		.cfi_offset 7, -8
+ 145              		.cfi_offset 14, -4
+ 146 0002 00AF     		add	r7, sp, #0
+ 147              		.cfi_def_cfa_register 7
+  32:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  33:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // By default, we assume that no dynamic keying (SEC JOIN) is used
+  34:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // if an app is linked with dynamic keying support, it should set
+  35:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // this flag to true by calling IEEE802154_security_setDynamicKeying()
+  36:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    ieee802154_security_vars.dynamicKeying = FALSE;
+ 148              		.loc 1 36 0
+ 149 0004 0B4B     		ldr	r3, .L2
+ 150 0006 0022     		movs	r2, #0
+ 151 0008 1A70     		strb	r2, [r3]
+  37:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  38:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     // TODO joinPermitted flag should be set dynamically upon a button press
+  39:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     // and propagated through the network via EBs
+  40:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     ieee802154_security_vars.joinPermitted = TRUE;
+ 152              		.loc 1 40 0
+ 153 000a 0A4B     		ldr	r3, .L2
+ 154 000c 0122     		movs	r2, #1
+ 155 000e 5A70     		strb	r2, [r3, #1]
+  41:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  42:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // invalidate beacon key (key 1)
+  43:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    ieee802154_security_vars.k1.index = IEEE802154_SECURITY_KEYINDEX_INVALID;
+ 156              		.loc 1 43 0
+ 157 0010 084B     		ldr	r3, .L2
+ 158 0012 0022     		movs	r2, #0
+ 159 0014 9A70     		strb	r2, [r3, #2]
+  44:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    memset(&ieee802154_security_vars.k1.value[0], 0x00, 16);
+ 160              		.loc 1 44 0
+ 161 0016 0848     		ldr	r0, .L2+4
+ 162 0018 0021     		movs	r1, #0
+ 163 001a 1022     		movs	r2, #16
+ 164 001c FFF7FEFF 		bl	memset
+  45:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  46:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // invalidate data key (key 2)
+  47:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    ieee802154_security_vars.k2.index = IEEE802154_SECURITY_KEYINDEX_INVALID;
+ 165              		.loc 1 47 0
+ 166 0020 044B     		ldr	r3, .L2
+ 167 0022 0022     		movs	r2, #0
+ 168 0024 DA74     		strb	r2, [r3, #19]
+  48:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    memset(&ieee802154_security_vars.k2.value[0], 0x00, 16);
+ 169              		.loc 1 48 0
+ 170 0026 0548     		ldr	r0, .L2+8
+ 171 0028 0021     		movs	r1, #0
+ 172 002a 1022     		movs	r2, #16
+ 173 002c FFF7FEFF 		bl	memset
+  49:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 174              		.loc 1 49 0
+ 175 0030 80BD     		pop	{r7, pc}
+ 176              	.L3:
+ 177 0032 00BF     		.align	2
+ 178              	.L2:
+ 179 0034 00000000 		.word	ieee802154_security_vars
+ 180 0038 03000000 		.word	ieee802154_security_vars+3
+ 181 003c 14000000 		.word	ieee802154_security_vars+20
+ 182              		.cfi_endproc
+ 183              	.LFE0:
+ 185              		.align	2
+ 186              		.global	IEEE802154_security_getBeaconKeyIndex
+ 187              		.thumb
+ 188              		.thumb_func
+ 190              	IEEE802154_security_getBeaconKeyIndex:
+ 191              	.LFB1:
+  50:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  51:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_getBeaconKeyIndex(void) {
+ 192              		.loc 1 51 0
+ 193              		.cfi_startproc
+ 194              		@ args = 0, pretend = 0, frame = 0
+ 195              		@ frame_needed = 1, uses_anonymous_args = 0
+ 196              		@ link register save eliminated.
+ 197 0040 80B4     		push	{r7}
+ 198              		.cfi_def_cfa_offset 4
+ 199              		.cfi_offset 7, -4
+ 200 0042 00AF     		add	r7, sp, #0
+ 201              		.cfi_def_cfa_register 7
+  52:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return ieee802154_security_vars.k1.index;
+ 202              		.loc 1 52 0
+ 203 0044 034B     		ldr	r3, .L6
+ 204 0046 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+  53:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 205              		.loc 1 53 0
+ 206 0048 1846     		mov	r0, r3
+ 207 004a BD46     		mov	sp, r7
+ 208              		.cfi_def_cfa_register 13
+ 209              		@ sp needed
+ 210 004c 5DF8047B 		ldr	r7, [sp], #4
+ 211              		.cfi_restore 7
+ 212              		.cfi_def_cfa_offset 0
+ 213 0050 7047     		bx	lr
+ 214              	.L7:
+ 215 0052 00BF     		.align	2
+ 216              	.L6:
+ 217 0054 00000000 		.word	ieee802154_security_vars
+ 218              		.cfi_endproc
+ 219              	.LFE1:
+ 221              		.align	2
+ 222              		.global	IEEE802154_security_getDataKeyIndex
+ 223              		.thumb
+ 224              		.thumb_func
+ 226              	IEEE802154_security_getDataKeyIndex:
+ 227              	.LFB2:
+  54:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_getDataKeyIndex(void) {
+ 228              		.loc 1 54 0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 0
+ 231              		@ frame_needed = 1, uses_anonymous_args = 0
+ 232              		@ link register save eliminated.
+ 233 0058 80B4     		push	{r7}
+ 234              		.cfi_def_cfa_offset 4
+ 235              		.cfi_offset 7, -4
+ 236 005a 00AF     		add	r7, sp, #0
+ 237              		.cfi_def_cfa_register 7
+  55:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return ieee802154_security_vars.k2.index;
+ 238              		.loc 1 55 0
+ 239 005c 034B     		ldr	r3, .L10
+ 240 005e DB7C     		ldrb	r3, [r3, #19]	@ zero_extendqisi2
+  56:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 241              		.loc 1 56 0
+ 242 0060 1846     		mov	r0, r3
+ 243 0062 BD46     		mov	sp, r7
+ 244              		.cfi_def_cfa_register 13
+ 245              		@ sp needed
+ 246 0064 5DF8047B 		ldr	r7, [sp], #4
+ 247              		.cfi_restore 7
+ 248              		.cfi_def_cfa_offset 0
+ 249 0068 7047     		bx	lr
+ 250              	.L11:
+ 251 006a 00BF     		.align	2
+ 252              	.L10:
+ 253 006c 00000000 		.word	ieee802154_security_vars
+ 254              		.cfi_endproc
+ 255              	.LFE2:
+ 257              		.align	2
+ 258              		.global	IEEE802154_security_setBeaconKey
+ 259              		.thumb
+ 260              		.thumb_func
+ 262              	IEEE802154_security_setBeaconKey:
+ 263              	.LFB3:
+  57:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  58:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_setBeaconKey(uint8_t index, uint8_t* value) {
+ 264              		.loc 1 58 0
+ 265              		.cfi_startproc
+ 266              		@ args = 0, pretend = 0, frame = 8
+ 267              		@ frame_needed = 1, uses_anonymous_args = 0
+ 268              		@ link register save eliminated.
+ 269 0070 90B4     		push	{r4, r7}
+ 270              		.cfi_def_cfa_offset 8
+ 271              		.cfi_offset 4, -8
+ 272              		.cfi_offset 7, -4
+ 273 0072 82B0     		sub	sp, sp, #8
+ 274              		.cfi_def_cfa_offset 16
+ 275 0074 00AF     		add	r7, sp, #0
+ 276              		.cfi_def_cfa_register 7
+ 277 0076 0346     		mov	r3, r0
+ 278 0078 3960     		str	r1, [r7]
+ 279 007a FB71     		strb	r3, [r7, #7]
+  59:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     ieee802154_security_vars.k1.index = index;
+ 280              		.loc 1 59 0
+ 281 007c 084A     		ldr	r2, .L13
+ 282 007e FB79     		ldrb	r3, [r7, #7]
+ 283 0080 9370     		strb	r3, [r2, #2]
+  60:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     memcpy(ieee802154_security_vars.k1.value, value, 16);
+ 284              		.loc 1 60 0
+ 285 0082 074B     		ldr	r3, .L13
+ 286 0084 3A68     		ldr	r2, [r7]
+ 287 0086 0333     		adds	r3, r3, #3
+ 288 0088 1468     		ldr	r4, [r2]	@ unaligned
+ 289 008a 5068     		ldr	r0, [r2, #4]	@ unaligned
+ 290 008c 9168     		ldr	r1, [r2, #8]	@ unaligned
+ 291 008e D268     		ldr	r2, [r2, #12]	@ unaligned
+ 292 0090 1C60     		str	r4, [r3]	@ unaligned
+ 293 0092 5860     		str	r0, [r3, #4]	@ unaligned
+ 294 0094 9960     		str	r1, [r3, #8]	@ unaligned
+ 295 0096 DA60     		str	r2, [r3, #12]	@ unaligned
+  61:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 296              		.loc 1 61 0
+ 297 0098 0837     		adds	r7, r7, #8
+ 298              		.cfi_def_cfa_offset 8
+ 299 009a BD46     		mov	sp, r7
+ 300              		.cfi_def_cfa_register 13
+ 301              		@ sp needed
+ 302 009c 90BC     		pop	{r4, r7}
+ 303              		.cfi_restore 7
+ 304              		.cfi_restore 4
+ 305              		.cfi_def_cfa_offset 0
+ 306 009e 7047     		bx	lr
+ 307              	.L14:
+ 308              		.align	2
+ 309              	.L13:
+ 310 00a0 00000000 		.word	ieee802154_security_vars
+ 311              		.cfi_endproc
+ 312              	.LFE3:
+ 314              		.align	2
+ 315              		.global	IEEE802154_security_setDataKey
+ 316              		.thumb
+ 317              		.thumb_func
+ 319              	IEEE802154_security_setDataKey:
+ 320              	.LFB4:
+  62:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  63:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_setDataKey(uint8_t index, uint8_t* value) {
+ 321              		.loc 1 63 0
+ 322              		.cfi_startproc
+ 323              		@ args = 0, pretend = 0, frame = 8
+ 324              		@ frame_needed = 1, uses_anonymous_args = 0
+ 325              		@ link register save eliminated.
+ 326 00a4 90B4     		push	{r4, r7}
+ 327              		.cfi_def_cfa_offset 8
+ 328              		.cfi_offset 4, -8
+ 329              		.cfi_offset 7, -4
+ 330 00a6 82B0     		sub	sp, sp, #8
+ 331              		.cfi_def_cfa_offset 16
+ 332 00a8 00AF     		add	r7, sp, #0
+ 333              		.cfi_def_cfa_register 7
+ 334 00aa 0346     		mov	r3, r0
+ 335 00ac 3960     		str	r1, [r7]
+ 336 00ae FB71     		strb	r3, [r7, #7]
+  64:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     ieee802154_security_vars.k2.index = index;
+ 337              		.loc 1 64 0
+ 338 00b0 084A     		ldr	r2, .L16
+ 339 00b2 FB79     		ldrb	r3, [r7, #7]
+ 340 00b4 D374     		strb	r3, [r2, #19]
+  65:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     memcpy(ieee802154_security_vars.k2.value, value, 16);
+ 341              		.loc 1 65 0
+ 342 00b6 074B     		ldr	r3, .L16
+ 343 00b8 3A68     		ldr	r2, [r7]
+ 344 00ba 1433     		adds	r3, r3, #20
+ 345 00bc 1468     		ldr	r4, [r2]	@ unaligned
+ 346 00be 5068     		ldr	r0, [r2, #4]	@ unaligned
+ 347 00c0 9168     		ldr	r1, [r2, #8]	@ unaligned
+ 348 00c2 D268     		ldr	r2, [r2, #12]	@ unaligned
+ 349 00c4 1C60     		str	r4, [r3]	@ unaligned
+ 350 00c6 5860     		str	r0, [r3, #4]	@ unaligned
+ 351 00c8 9960     		str	r1, [r3, #8]	@ unaligned
+ 352 00ca DA60     		str	r2, [r3, #12]	@ unaligned
+  66:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 353              		.loc 1 66 0
+ 354 00cc 0837     		adds	r7, r7, #8
+ 355              		.cfi_def_cfa_offset 8
+ 356 00ce BD46     		mov	sp, r7
+ 357              		.cfi_def_cfa_register 13
+ 358              		@ sp needed
+ 359 00d0 90BC     		pop	{r4, r7}
+ 360              		.cfi_restore 7
+ 361              		.cfi_restore 4
+ 362              		.cfi_def_cfa_offset 0
+ 363 00d2 7047     		bx	lr
+ 364              	.L17:
+ 365              		.align	2
+ 366              	.L16:
+ 367 00d4 00000000 		.word	ieee802154_security_vars
+ 368              		.cfi_endproc
+ 369              	.LFE4:
+ 371              		.align	2
+ 372              		.global	IEEE802154_security_isConfigured
+ 373              		.thumb
+ 374              		.thumb_func
+ 376              	IEEE802154_security_isConfigured:
+ 377              	.LFB5:
+  67:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  68:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** bool IEEE802154_security_isConfigured(void) {
+ 378              		.loc 1 68 0
+ 379              		.cfi_startproc
+ 380              		@ args = 0, pretend = 0, frame = 0
+ 381              		@ frame_needed = 1, uses_anonymous_args = 0
+ 382              		@ link register save eliminated.
+ 383 00d8 80B4     		push	{r7}
+ 384              		.cfi_def_cfa_offset 4
+ 385              		.cfi_offset 7, -4
+ 386 00da 00AF     		add	r7, sp, #0
+ 387              		.cfi_def_cfa_register 7
+  69:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (ieee802154_security_vars.dynamicKeying == FALSE) {
+ 388              		.loc 1 69 0
+ 389 00dc 0C4B     		ldr	r3, .L22
+ 390 00de 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 391 00e0 83F00103 		eor	r3, r3, #1
+ 392 00e4 DBB2     		uxtb	r3, r3
+ 393 00e6 002B     		cmp	r3, #0
+ 394 00e8 01D0     		beq	.L19
+  70:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 395              		.loc 1 70 0
+ 396 00ea 0123     		movs	r3, #1
+ 397 00ec 0AE0     		b	.L20
+ 398              	.L19:
+  71:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+  72:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  73:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (ieee802154_security_vars.k1.index != IEEE802154_SECURITY_KEYINDEX_INVALID &&
+ 399              		.loc 1 73 0
+ 400 00ee 084B     		ldr	r3, .L22
+ 401 00f0 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 402 00f2 002B     		cmp	r3, #0
+ 403 00f4 05D0     		beq	.L21
+  74:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          ieee802154_security_vars.k2.index != IEEE802154_SECURITY_KEYINDEX_INVALID) {
+ 404              		.loc 1 74 0 discriminator 1
+ 405 00f6 064B     		ldr	r3, .L22
+ 406 00f8 DB7C     		ldrb	r3, [r3, #19]	@ zero_extendqisi2
+  73:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          ieee802154_security_vars.k2.index != IEEE802154_SECURITY_KEYINDEX_INVALID) {
+ 407              		.loc 1 73 0 discriminator 1
+ 408 00fa 002B     		cmp	r3, #0
+ 409 00fc 01D0     		beq	.L21
+  75:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 410              		.loc 1 75 0
+ 411 00fe 0123     		movs	r3, #1
+ 412 0100 00E0     		b	.L20
+ 413              	.L21:
+  76:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+  77:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return FALSE;
+ 414              		.loc 1 77 0
+ 415 0102 0023     		movs	r3, #0
+ 416              	.L20:
+  78:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 417              		.loc 1 78 0
+ 418 0104 1846     		mov	r0, r3
+ 419 0106 BD46     		mov	sp, r7
+ 420              		.cfi_def_cfa_register 13
+ 421              		@ sp needed
+ 422 0108 5DF8047B 		ldr	r7, [sp], #4
+ 423              		.cfi_restore 7
+ 424              		.cfi_def_cfa_offset 0
+ 425 010c 7047     		bx	lr
+ 426              	.L23:
+ 427 010e 00BF     		.align	2
+ 428              	.L22:
+ 429 0110 00000000 		.word	ieee802154_security_vars
+ 430              		.cfi_endproc
+ 431              	.LFE5:
+ 433              		.align	2
+ 434              		.global	IEEE802154_security_setDynamicKeying
+ 435              		.thumb
+ 436              		.thumb_func
+ 438              	IEEE802154_security_setDynamicKeying:
+ 439              	.LFB6:
+  79:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  80:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_setDynamicKeying(void) {
+ 440              		.loc 1 80 0
+ 441              		.cfi_startproc
+ 442              		@ args = 0, pretend = 0, frame = 0
+ 443              		@ frame_needed = 1, uses_anonymous_args = 0
+ 444              		@ link register save eliminated.
+ 445 0114 80B4     		push	{r7}
+ 446              		.cfi_def_cfa_offset 4
+ 447              		.cfi_offset 7, -4
+ 448 0116 00AF     		add	r7, sp, #0
+ 449              		.cfi_def_cfa_register 7
+  81:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     ieee802154_security_vars.dynamicKeying = TRUE;
+ 450              		.loc 1 81 0
+ 451 0118 034B     		ldr	r3, .L25
+ 452 011a 0122     		movs	r2, #1
+ 453 011c 1A70     		strb	r2, [r3]
+  82:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 454              		.loc 1 82 0
+ 455 011e BD46     		mov	sp, r7
+ 456              		.cfi_def_cfa_register 13
+ 457              		@ sp needed
+ 458 0120 5DF8047B 		ldr	r7, [sp], #4
+ 459              		.cfi_restore 7
+ 460              		.cfi_def_cfa_offset 0
+ 461 0124 7047     		bx	lr
+ 462              	.L26:
+ 463 0126 00BF     		.align	2
+ 464              	.L25:
+ 465 0128 00000000 		.word	ieee802154_security_vars
+ 466              		.cfi_endproc
+ 467              	.LFE6:
+ 469              		.align	2
+ 470              		.global	IEEE802154_security_prependAuxiliarySecurityHeader
+ 471              		.thumb
+ 472              		.thumb_func
+ 474              	IEEE802154_security_prependAuxiliarySecurityHeader:
+ 475              	.LFB7:
+  83:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  84:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** //=========================== public ==========================================
+  85:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #ifdef L2_SECURITY_ACTIVE
+  86:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+  87:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Adding of Auxiliary Security Header to the IEEE802.15.4 MAC header
+  88:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+  89:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_prependAuxiliarySecurityHeader(OpenQueueEntry_t* msg){
+  90:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  91:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t frameCounterSuppression;
+  92:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t temp8b;
+  93:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    open_addr_t* temp_keySource;
+  94:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t auxiliaryLength;
+  95:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  96:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    frameCounterSuppression = IEEE154_ASH_FRAMECOUNTER_SUPPRESSED; //the frame counter is carried in
+  97:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+  98:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //max length of MAC frames
+  99:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // length of authentication Tag
+ 100:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    msg->l2_authenticationLength = IEEE802154_security_authLengthChecking(msg->l2_securityLevel);
+ 101:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 102:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //length of auxiliary security header
+ 103:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    auxiliaryLength = IEEE802154_security_auxLengthChecking(msg->l2_keyIdMode,
+ 104:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                                            frameCounterSuppression, // frame counte
+ 105:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                                            0); //length of Key ID field
+ 106:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 107:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 108:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if ((msg->length+auxiliaryLength+msg->l2_authenticationLength+2) >= 128 ){ //2 bytes of CRC, 127
+ 109:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       return;
+ 110:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 111:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 112:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //start setting the Auxiliary Security Header
+ 113:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (msg->l2_keyIdMode != IEEE154_ASH_KEYIDMODE_IMPLICIT){//if the KeyIdMode is zero, keyIndex an
+ 114:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       temp8b = msg->l2_keyIndex; //key index field
+ 115:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       packetfunctions_reserveHeaderSize(msg, sizeof(uint8_t));
+ 116:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       *((uint8_t*)(msg->payload)) = temp8b;
+ 117:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 118:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 119:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //insert the keyIdMode field
+ 120:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (msg->l2_keyIdMode){
+ 121:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_IMPLICIT: //no KeyIDMode field - implicit
+ 122:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_DEFAULTKEYSOURCE:// macDefaultKeySource
+ 123:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 124:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_16: //keySource with 16b address
+ 125:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          temp_keySource = &msg->l2_keySource;
+ 126:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          packetfunctions_reserveHeaderSize(msg, sizeof(uint8_t));
+ 127:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          *((uint8_t*)(msg->payload)) = temp_keySource->addr_64b[6];
+ 128:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          packetfunctions_reserveHeaderSize(msg, sizeof(uint8_t));
+ 129:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          *((uint8_t*)(msg->payload)) = temp_keySource->addr_64b[7];
+ 130:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 131:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_64: //keySource with 64b address
+ 132:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          temp_keySource = &msg->l2_keySource;
+ 133:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          packetfunctions_writeAddress(msg,temp_keySource,OW_LITTLE_ENDIAN);
+ 134:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 135:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       default://error
+ 136:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 137:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)msg->l2_frameType,
+ 138:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)0);
+ 139:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return;
+ 140:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 141:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 142:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //security control field
+ 143:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    packetfunctions_reserveHeaderSize(msg, sizeof(uint8_t));
+ 144:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****  
+ 145:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b = 0;
+ 146:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b |= msg->l2_securityLevel << IEEE154_ASH_SCF_SECURITY_LEVEL;//3b
+ 147:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b |= msg->l2_keyIdMode << IEEE154_ASH_SCF_KEY_IDENTIFIER_MODE;//2b
+ 148:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b |= frameCounterSuppression << IEEE154_ASH_SCF_FRAME_CNT_MODE; //1b
+ 149:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 150:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b |= 1 << IEEE154_ASH_SCF_FRAME_CNT_SIZE; //1b
+ 151:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 152:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b |= 0 << 1;//1b reserved
+ 153:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    *((uint8_t*)(msg->payload)) = temp8b;
+ 154:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 155:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 156:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+ 157:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Key searching and encryption/authentication operations.
+ 158:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+ 159:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** owerror_t IEEE802154_security_outgoingFrameSecurity(OpenQueueEntry_t*   msg){
+ 160:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t nonce[13];
+ 161:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t *key;
+ 162:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    owerror_t outStatus;
+ 163:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t* a;
+ 164:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t len_a;
+ 165:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t* m;
+ 166:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t len_m;
+ 167:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 168:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    key = msg->l2_frameType == IEEE154_TYPE_BEACON ? ieee802154_security_vars.k1.value : ieee802154_
+ 169:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 170:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // First 8 bytes of the nonce are always the source address of the frame
+ 171:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    memcpy(&nonce[0],idmanager_getMyID(ADDR_64B)->addr_64b,8);
+ 172:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 173:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // Fill last 5 bytes with the ASN part of the nonce
+ 174:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    ieee154e_getAsn(&nonce[8]);
+ 175:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    packetfunctions_reverseArrayByteOrder(&nonce[8], 5);  // reverse ASN bytes to big endian 
+ 176:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 177:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //identify data to be authenticated and data to be encrypted
+ 178:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (msg->l2_securityLevel) {
+ 179:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_32:  // authentication only cases
+ 180:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_64:
+ 181:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_128: 
+ 182:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          a = msg->payload;             // first byte of the frame
+ 183:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_a = msg->length;          // whole frame
+ 184:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          m = &msg->payload[len_a];     // concatenate MIC at the end of the frame
+ 185:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_m = 0;                    // length of the encrypted part
+ 186:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 187:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_32:  // authentication + encryption cases
+ 188:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_64:
+ 189:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_128:
+ 190:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          a = msg->payload;             // first byte of the frame
+ 191:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          m = msg->l2_payload;          // first byte where we should start encrypting (see 15.4 std
+ 192:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_a = m - a;                // part that is only authenticated is the difference of two 
+ 193:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_m = msg->length - len_a;  // part that is encrypted+authenticated is the rest of the f
+ 194:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 195:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     case IEEE154_ASH_SLF_TYPE_ENC:    // encryption only
+ 196:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          // unsecure, should not support it
+ 197:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return E_FAIL;
+ 198:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     default:
+ 199:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          // reject anything else
+ 200:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return E_FAIL;
+ 201:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 202:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 203:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // assert
+ 204:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (len_a + len_m > 125) {
+ 205:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 206:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)msg->l2_frameType,
+ 207:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)2);
+ 208:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       return E_FAIL;
+ 209:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 210:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 211:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (msg->l2_authenticationLength != 0) {
+ 212:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       //update the length of the packet
+ 213:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       packetfunctions_reserveFooterSize(msg,msg->l2_authenticationLength);
+ 214:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 215:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 216:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //Encryption and/or authentication
+ 217:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // cryptoengine overwrites m[] with ciphertext and appends the MIC
+ 218:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    outStatus = cryptoengine_aes_ccms_enc(a,
+ 219:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     len_a,
+ 220:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     m,
+ 221:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     &len_m,
+ 222:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     nonce,
+ 223:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     2, // L=2 in 15.4 std
+ 224:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     key,
+ 225:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     msg->l2_authenticationLength);
+ 226:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 227:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //verify that no errors occurred
+ 228:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (outStatus != E_SUCCESS) {
+ 229:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 230:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       (errorparameter_t)msg->l2_frameType,
+ 231:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       (errorparameter_t)3);
+ 232:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 233:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    
+ 234:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    return outStatus;
+ 235:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 236:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 237:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+ 238:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Parsing of IEEE802.15.4 Auxiliary Security Header.
+ 239:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+ 240:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_retrieveAuxiliarySecurityHeader(OpenQueueEntry_t*      msg, 
+ 241:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                                         ieee802154_header_iht* tempheader){
+ 242:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 243:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t frameCnt_Suppression;
+ 244:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t frameCnt_Size;
+ 245:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t temp8b;
+ 246:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t i;
+ 247:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t receivedASN[5];
+ 248:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    macFrameCounter_t l2_frameCounter;
+ 249:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 250:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //Retrieve the Security Control field
+ 251:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //1byte, Security Control Field
+ 252:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    temp8b = *((uint8_t*)(msg->payload)+tempheader->headerLength);
+ 253:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    msg->l2_securityLevel = (temp8b >> IEEE154_ASH_SCF_SECURITY_LEVEL)& 0x07;//3b
+ 254:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 255:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //identify the length of the MIC looking the security level
+ 256:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    msg->l2_authenticationLength = IEEE802154_security_authLengthChecking(msg->l2_securityLevel);
+ 257:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 258:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //retrieve the KeyIdMode field
+ 259:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    msg->l2_keyIdMode = (temp8b >> IEEE154_ASH_SCF_KEY_IDENTIFIER_MODE)& 0x03;//2b
+ 260:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 261:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //retrieve information on the Frame Counter Mode
+ 262:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    frameCnt_Suppression = (temp8b >> IEEE154_ASH_SCF_FRAME_CNT_MODE)& 0x01;//1b
+ 263:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    frameCnt_Size = (temp8b >> IEEE154_ASH_SCF_FRAME_CNT_SIZE)& 0x01;//1b
+ 264:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 265:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //if the frame counter is zero, it is 4-bytes long, 5 otherwise
+ 266:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (frameCnt_Size == IEEE154_ASH_FRAMECOUNTER_COUNTER) {
+ 267:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       frameCnt_Size = 4;
+ 268:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    } else {
+ 269:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       frameCnt_Size = 5;
+ 270:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 271:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 272:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    tempheader->headerLength++;
+ 273:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 274:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //Frame Counter field
+ 275:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (frameCnt_Suppression == IEEE154_ASH_FRAMECOUNTER_PRESENT) { //the frame counter is here
+ 276:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       //the frame counter size can be 4 or 5 bytes
+ 277:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       for (i=0;i<frameCnt_Size;i++){
+ 278:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****           receivedASN[i] = *((uint8_t*)(msg->payload)+tempheader->headerLength);
+ 279:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****           tempheader->headerLength++;
+ 280:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 281:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 282:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       l2_frameCounter.bytes0and1 = receivedASN[0]+256*receivedASN[1];
+ 283:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       l2_frameCounter.bytes2and3 = receivedASN[2]+256*receivedASN[3];
+ 284:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       if (frameCnt_Size == 5){ //we have the ASN as the frame counter
+ 285:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          l2_frameCounter.byte4 = receivedASN[4];
+ 286:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 287:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 288:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       if (l2_frameCounter.byte4 == 0xff){ //frame counter overflow
+ 289:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 290:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)msg->l2_frameType,
+ 291:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)4);
+ 292:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return;
+ 293:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 294:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 295:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 296:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 297:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //retrieve the Key Identifier field
+ 298:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (msg->l2_keyIdMode){
+ 299:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_IMPLICIT:
+ 300:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_DEFAULTKEYSOURCE:
+ 301:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          //key is derived implicitly
+ 302:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          memcpy(&(msg->l2_keySource), &tempheader->src, sizeof(open_addr_t));
+ 303:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 304:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_16:
+ 305:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          packetfunctions_readAddress(((uint8_t*)(msg->payload)+tempheader->headerLength),
+ 306:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      ADDR_16B,
+ 307:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      &msg->l2_keySource,
+ 308:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      OW_LITTLE_ENDIAN);
+ 309:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          tempheader->headerLength+=2;
+ 310:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 311:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_64:
+ 312:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          packetfunctions_readAddress(((uint8_t*)(msg->payload)+tempheader->headerLength),
+ 313:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      ADDR_64B,
+ 314:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      &msg->l2_keySource,
+ 315:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                      OW_LITTLE_ENDIAN);
+ 316:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          tempheader->headerLength+=8;
+ 317:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 318:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       default: //error
+ 319:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 320:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)msg->l2_frameType,
+ 321:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                               (errorparameter_t)5);
+ 322:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return;
+ 323:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 324:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 325:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //retrieve the KeyIndex
+ 326:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (msg->l2_keyIdMode != IEEE154_ASH_KEYIDMODE_IMPLICIT){
+ 327:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       temp8b = *((uint8_t*)(msg->payload)+tempheader->headerLength);
+ 328:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       msg->l2_keyIndex = (temp8b);
+ 329:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       tempheader->headerLength++;
+ 330:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    } else {
+ 331:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       //key is derived implicitly
+ 332:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       msg->l2_keyIndex = 1;
+ 333:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 334:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 335:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 336:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+ 337:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Identification of the key used to protect the frame and unsecuring operations.
+ 338:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+ 339:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** owerror_t IEEE802154_security_incomingFrame(OpenQueueEntry_t* msg){
+ 340:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t nonce[13];
+ 341:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    owerror_t outStatus;
+ 342:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t* a;
+ 343:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t len_a;
+ 344:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t* c;
+ 345:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t len_c;
+ 346:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t *key;
+ 347:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    
+ 348:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    key = msg->l2_frameType == IEEE154_TYPE_BEACON ? ieee802154_security_vars.k1.value : ieee802154_
+ 349:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 350:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // First 8 bytes of the nonce are always the source address of the frame
+ 351:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    memcpy(&nonce[0],msg->l2_nextORpreviousHop.addr_64b, 8);
+ 352:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // Fill last 5 bytes with ASN part of the nonce
+ 353:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    ieee154e_getAsn(&nonce[8]);
+ 354:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    packetfunctions_reverseArrayByteOrder(&nonce[8], 5);  // reverse ASN bytes to big endian 
+ 355:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 356:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //identify data to be authenticated and data to be decrypted
+ 357:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (msg->l2_securityLevel) {
+ 358:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_32:  // authentication only cases
+ 359:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_64:
+ 360:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_128: 
+ 361:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          a = msg->payload;                                           // first byte of the frame
+ 362:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_a = msg->length-msg->l2_authenticationLength;           // whole frame
+ 363:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          c = &msg->payload[len_a];                                   // MIC is at the end of the fr
+ 364:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_c = msg->l2_authenticationLength;                       // length of the encrypted par
+ 365:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 366:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_32:  // authentication + encryption cases
+ 367:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_64:
+ 368:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_128:
+ 369:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          a = msg->payload;             // first byte of the frame
+ 370:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          c = msg->l2_payload;          // first byte where we should start decrypting 
+ 371:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_a = c - a;                // part that is only authenticated is the difference of two 
+ 372:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          len_c = msg->length - len_a;  // part that is decrypted+authenticated is the rest of the f
+ 373:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 374:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC:    // encryption only
+ 375:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          // unsecure, should not support it
+ 376:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return E_FAIL;
+ 377:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       default:
+ 378:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          // reject anything else
+ 379:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          return E_FAIL;
+ 380:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 381:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 382:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    // assert
+ 383:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (len_a + len_c > 125) {
+ 384:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 385:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)msg->l2_frameType,
+ 386:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)11);
+ 387:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       return E_FAIL;
+ 388:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 389:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 390:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //decrypt and/or verify authenticity of the frame
+ 391:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    outStatus = cryptoengine_aes_ccms_dec(a,
+ 392:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     len_a,
+ 393:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     c,
+ 394:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     &len_c,
+ 395:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     nonce,
+ 396:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     2,
+ 397:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     key,
+ 398:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                     msg->l2_authenticationLength);
+ 399:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 400:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    //verify if any error occurs
+ 401:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (outStatus != E_SUCCESS){
+ 402:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       openserial_printError(COMPONENT_SECURITY,ERR_SECURITY,
+ 403:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)msg->l2_frameType,
+ 404:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                            (errorparameter_t)12);
+ 405:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 406:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 407:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    packetfunctions_tossFooter(msg,msg->l2_authenticationLength);
+ 408:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    
+ 409:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    return outStatus;
+ 410:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 411:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 412:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+ 413:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Identification of the length of the MIC based on the security Level in the frame
+ 414:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+ 415:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_authLengthChecking(uint8_t securityLevel){
+ 416:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 417:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t authlen;
+ 418:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (securityLevel) {
+ 419:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_NOSEC:
+ 420:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC:
+ 421:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          authlen = 0;
+ 422:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 423:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_32:
+ 424:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_32:
+ 425:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          authlen = 4;
+ 426:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 427:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_64:
+ 428:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_64:
+ 429:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          authlen = 8;
+ 430:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 431:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_MIC_128:
+ 432:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_SLF_TYPE_ENC_MIC_128:
+ 433:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          authlen = 16;
+ 434:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 435:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 436:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 437:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    return authlen;
+ 438:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 439:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 440:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** /**
+ 441:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** \brief Identification of the length of the IEEE802.15.4 Auxiliary Security Header.
+ 442:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** */
+ 443:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_auxLengthChecking(uint8_t KeyIdMode, 
+ 444:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                              uint8_t frameCounterSuppression, 
+ 445:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****                                              uint8_t frameCounterSize){
+ 446:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t auxilary_len;
+ 447:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    uint8_t frameCntLength;
+ 448:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 449:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    auxilary_len = 0;
+ 450:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 451:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    if (frameCounterSuppression == IEEE154_ASH_FRAMECOUNTER_PRESENT){
+ 452:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       if (frameCounterSize == 4){
+ 453:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          frameCntLength = 4;
+ 454:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       } else {
+ 455:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          frameCntLength = 5;
+ 456:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       }
+ 457:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    } else {
+ 458:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       frameCntLength = 0;
+ 459:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 460:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 461:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    switch (KeyIdMode){
+ 462:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_IMPLICIT:
+ 463:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          auxilary_len = frameCntLength + 1; //only SecLev and FrameCnt
+ 464:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 465:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_DEFAULTKEYSOURCE:
+ 466:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          auxilary_len = frameCntLength + 1 + 1; //SecLev, FrameCnt, KeyIndex
+ 467:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 468:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_16:
+ 469:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          auxilary_len = frameCntLength + 1 + 3; //SecLev, FrameCnt, KeyIdMode (2 bytes) and KeyInde
+ 470:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 471:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       case IEEE154_ASH_KEYIDMODE_EXPLICIT_64:
+ 472:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          auxilary_len = frameCntLength + 1 + 9; //SecLev, FrameCnt, KeyIdMode (8 bytes) and KeyInde
+ 473:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 474:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****       default:
+ 475:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          break;
+ 476:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    }
+ 477:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 478:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****    return auxilary_len;
+ 479:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 480:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 481:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_getSecurityLevel(OpenQueueEntry_t *msg) {
+ 482:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured() == FALSE) {
+ 483:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return IEEE154_ASH_SLF_TYPE_NOSEC;
+ 484:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 485:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     
+ 486:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (packetfunctions_isBroadcastMulticast(&msg->l2_nextORpreviousHop)) {
+ 487:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return IEEE802154_SECURITY_LEVEL;
+ 488:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 489:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 490:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if(neighbors_isInsecureNeighbor(&msg->l2_nextORpreviousHop) &&
+ 491:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****        ieee802154_security_vars.joinPermitted == TRUE) {
+ 492:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return IEEE154_ASH_SLF_TYPE_NOSEC;
+ 493:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 494:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     
+ 495:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return IEEE802154_SECURITY_LEVEL;
+ 496:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 497:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 498:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** bool IEEE802154_security_acceptableLevel(OpenQueueEntry_t* msg, ieee802154_header_iht* parsedHeader
+ 499:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured() == FALSE     &&
+ 500:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_NOSEC) {
+ 501:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 502:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 503:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 504:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured() == FALSE             &&
+ 505:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         msg->l2_frameType == IEEE154_TYPE_BEACON                &&
+ 506:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         (msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_32   ||
+ 507:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_64   ||
+ 508:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_128)) {
+ 509:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 510:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 511:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     
+ 512:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured()               == TRUE &&
+ 513:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_NOSEC      &&
+ 514:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         ieee802154_security_vars.joinPermitted           == TRUE &&
+ 515:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         neighbors_isInsecureNeighbor(&parsedHeader->src) == TRUE) {
+ 516:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 517:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 518:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 519:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured() == TRUE              &&
+ 520:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         msg->l2_frameType == IEEE154_TYPE_BEACON                &&
+ 521:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         (msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_32   ||
+ 522:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_64   ||
+ 523:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_MIC_128)) {
+ 524:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 525:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 526:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****  
+ 527:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     if (IEEE802154_security_isConfigured() == TRUE                  &&
+ 528:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         (msg->l2_frameType == IEEE154_TYPE_DATA                     ||
+ 529:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_frameType == IEEE154_TYPE_ACK                      ||
+ 530:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_frameType == IEEE154_TYPE_CMD)                     &&
+ 531:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         (msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_ENC_MIC_32   ||
+ 532:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_ENC_MIC_64   ||
+ 533:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****          msg->l2_securityLevel == IEEE154_ASH_SLF_TYPE_ENC_MIC_128)) {
+ 534:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****         return TRUE;
+ 535:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     }
+ 536:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return FALSE;
+ 537:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 538:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 539:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** #else /* L2_SECURITY_ACTIVE */
+ 540:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 541:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_prependAuxiliarySecurityHeader(OpenQueueEntry_t* msg){
+ 476              		.loc 1 541 0
+ 477              		.cfi_startproc
+ 478              		@ args = 0, pretend = 0, frame = 8
+ 479              		@ frame_needed = 1, uses_anonymous_args = 0
+ 480              		@ link register save eliminated.
+ 481 012c 80B4     		push	{r7}
+ 482              		.cfi_def_cfa_offset 4
+ 483              		.cfi_offset 7, -4
+ 484 012e 83B0     		sub	sp, sp, #12
+ 485              		.cfi_def_cfa_offset 16
+ 486 0130 00AF     		add	r7, sp, #0
+ 487              		.cfi_def_cfa_register 7
+ 488 0132 7860     		str	r0, [r7, #4]
+ 542:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return;
+ 489              		.loc 1 542 0
+ 490 0134 00BF     		nop
+ 543:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 491              		.loc 1 543 0
+ 492 0136 0C37     		adds	r7, r7, #12
+ 493              		.cfi_def_cfa_offset 4
+ 494 0138 BD46     		mov	sp, r7
+ 495              		.cfi_def_cfa_register 13
+ 496              		@ sp needed
+ 497 013a 5DF8047B 		ldr	r7, [sp], #4
+ 498              		.cfi_restore 7
+ 499              		.cfi_def_cfa_offset 0
+ 500 013e 7047     		bx	lr
+ 501              		.cfi_endproc
+ 502              	.LFE7:
+ 504              		.align	2
+ 505              		.global	IEEE802154_security_retrieveAuxiliarySecurityHeader
+ 506              		.thumb
+ 507              		.thumb_func
+ 509              	IEEE802154_security_retrieveAuxiliarySecurityHeader:
+ 510              	.LFB8:
+ 544:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 545:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** void IEEE802154_security_retrieveAuxiliarySecurityHeader(OpenQueueEntry_t* msg, ieee802154_header_i
+ 511              		.loc 1 545 0
+ 512              		.cfi_startproc
+ 513              		@ args = 0, pretend = 0, frame = 8
+ 514              		@ frame_needed = 1, uses_anonymous_args = 0
+ 515              		@ link register save eliminated.
+ 516 0140 80B4     		push	{r7}
+ 517              		.cfi_def_cfa_offset 4
+ 518              		.cfi_offset 7, -4
+ 519 0142 83B0     		sub	sp, sp, #12
+ 520              		.cfi_def_cfa_offset 16
+ 521 0144 00AF     		add	r7, sp, #0
+ 522              		.cfi_def_cfa_register 7
+ 523 0146 7860     		str	r0, [r7, #4]
+ 524 0148 3960     		str	r1, [r7]
+ 546:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return;
+ 525              		.loc 1 546 0
+ 526 014a 00BF     		nop
+ 547:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 527              		.loc 1 547 0
+ 528 014c 0C37     		adds	r7, r7, #12
+ 529              		.cfi_def_cfa_offset 4
+ 530 014e BD46     		mov	sp, r7
+ 531              		.cfi_def_cfa_register 13
+ 532              		@ sp needed
+ 533 0150 5DF8047B 		ldr	r7, [sp], #4
+ 534              		.cfi_restore 7
+ 535              		.cfi_def_cfa_offset 0
+ 536 0154 7047     		bx	lr
+ 537              		.cfi_endproc
+ 538              	.LFE8:
+ 540 0156 00BF     		.align	2
+ 541              		.global	IEEE802154_security_outgoingFrameSecurity
+ 542              		.thumb
+ 543              		.thumb_func
+ 545              	IEEE802154_security_outgoingFrameSecurity:
+ 546              	.LFB9:
+ 548:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 549:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** owerror_t IEEE802154_security_outgoingFrameSecurity(OpenQueueEntry_t* msg) {
+ 547              		.loc 1 549 0
+ 548              		.cfi_startproc
+ 549              		@ args = 0, pretend = 0, frame = 8
+ 550              		@ frame_needed = 1, uses_anonymous_args = 0
+ 551              		@ link register save eliminated.
+ 552 0158 80B4     		push	{r7}
+ 553              		.cfi_def_cfa_offset 4
+ 554              		.cfi_offset 7, -4
+ 555 015a 83B0     		sub	sp, sp, #12
+ 556              		.cfi_def_cfa_offset 16
+ 557 015c 00AF     		add	r7, sp, #0
+ 558              		.cfi_def_cfa_register 7
+ 559 015e 7860     		str	r0, [r7, #4]
+ 550:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return E_SUCCESS;
+ 560              		.loc 1 550 0
+ 561 0160 0023     		movs	r3, #0
+ 551:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 562              		.loc 1 551 0
+ 563 0162 1846     		mov	r0, r3
+ 564 0164 0C37     		adds	r7, r7, #12
+ 565              		.cfi_def_cfa_offset 4
+ 566 0166 BD46     		mov	sp, r7
+ 567              		.cfi_def_cfa_register 13
+ 568              		@ sp needed
+ 569 0168 5DF8047B 		ldr	r7, [sp], #4
+ 570              		.cfi_restore 7
+ 571              		.cfi_def_cfa_offset 0
+ 572 016c 7047     		bx	lr
+ 573              		.cfi_endproc
+ 574              	.LFE9:
+ 576 016e 00BF     		.align	2
+ 577              		.global	IEEE802154_security_incomingFrame
+ 578              		.thumb
+ 579              		.thumb_func
+ 581              	IEEE802154_security_incomingFrame:
+ 582              	.LFB10:
+ 552:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 553:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** owerror_t IEEE802154_security_incomingFrame(OpenQueueEntry_t* msg) {
+ 583              		.loc 1 553 0
+ 584              		.cfi_startproc
+ 585              		@ args = 0, pretend = 0, frame = 8
+ 586              		@ frame_needed = 1, uses_anonymous_args = 0
+ 587              		@ link register save eliminated.
+ 588 0170 80B4     		push	{r7}
+ 589              		.cfi_def_cfa_offset 4
+ 590              		.cfi_offset 7, -4
+ 591 0172 83B0     		sub	sp, sp, #12
+ 592              		.cfi_def_cfa_offset 16
+ 593 0174 00AF     		add	r7, sp, #0
+ 594              		.cfi_def_cfa_register 7
+ 595 0176 7860     		str	r0, [r7, #4]
+ 554:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return E_SUCCESS;
+ 596              		.loc 1 554 0
+ 597 0178 0023     		movs	r3, #0
+ 555:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 598              		.loc 1 555 0
+ 599 017a 1846     		mov	r0, r3
+ 600 017c 0C37     		adds	r7, r7, #12
+ 601              		.cfi_def_cfa_offset 4
+ 602 017e BD46     		mov	sp, r7
+ 603              		.cfi_def_cfa_register 13
+ 604              		@ sp needed
+ 605 0180 5DF8047B 		ldr	r7, [sp], #4
+ 606              		.cfi_restore 7
+ 607              		.cfi_def_cfa_offset 0
+ 608 0184 7047     		bx	lr
+ 609              		.cfi_endproc
+ 610              	.LFE10:
+ 612 0186 00BF     		.align	2
+ 613              		.global	IEEE802154_security_authLengthChecking
+ 614              		.thumb
+ 615              		.thumb_func
+ 617              	IEEE802154_security_authLengthChecking:
+ 618              	.LFB11:
+ 556:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 557:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_authLengthChecking(uint8_t sec_level) {
+ 619              		.loc 1 557 0
+ 620              		.cfi_startproc
+ 621              		@ args = 0, pretend = 0, frame = 8
+ 622              		@ frame_needed = 1, uses_anonymous_args = 0
+ 623              		@ link register save eliminated.
+ 624 0188 80B4     		push	{r7}
+ 625              		.cfi_def_cfa_offset 4
+ 626              		.cfi_offset 7, -4
+ 627 018a 83B0     		sub	sp, sp, #12
+ 628              		.cfi_def_cfa_offset 16
+ 629 018c 00AF     		add	r7, sp, #0
+ 630              		.cfi_def_cfa_register 7
+ 631 018e 0346     		mov	r3, r0
+ 632 0190 FB71     		strb	r3, [r7, #7]
+ 558:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return (uint8_t) 0;
+ 633              		.loc 1 558 0
+ 634 0192 0023     		movs	r3, #0
+ 559:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 635              		.loc 1 559 0
+ 636 0194 1846     		mov	r0, r3
+ 637 0196 0C37     		adds	r7, r7, #12
+ 638              		.cfi_def_cfa_offset 4
+ 639 0198 BD46     		mov	sp, r7
+ 640              		.cfi_def_cfa_register 13
+ 641              		@ sp needed
+ 642 019a 5DF8047B 		ldr	r7, [sp], #4
+ 643              		.cfi_restore 7
+ 644              		.cfi_def_cfa_offset 0
+ 645 019e 7047     		bx	lr
+ 646              		.cfi_endproc
+ 647              	.LFE11:
+ 649              		.align	2
+ 650              		.global	IEEE802154_security_auxLengthChecking
+ 651              		.thumb
+ 652              		.thumb_func
+ 654              	IEEE802154_security_auxLengthChecking:
+ 655              	.LFB12:
+ 560:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 561:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_auxLengthChecking(uint8_t kid, uint8_t sup, uint8_t size) {
+ 656              		.loc 1 561 0
+ 657              		.cfi_startproc
+ 658              		@ args = 0, pretend = 0, frame = 8
+ 659              		@ frame_needed = 1, uses_anonymous_args = 0
+ 660              		@ link register save eliminated.
+ 661 01a0 80B4     		push	{r7}
+ 662              		.cfi_def_cfa_offset 4
+ 663              		.cfi_offset 7, -4
+ 664 01a2 83B0     		sub	sp, sp, #12
+ 665              		.cfi_def_cfa_offset 16
+ 666 01a4 00AF     		add	r7, sp, #0
+ 667              		.cfi_def_cfa_register 7
+ 668 01a6 0346     		mov	r3, r0
+ 669 01a8 FB71     		strb	r3, [r7, #7]
+ 670 01aa 0B46     		mov	r3, r1
+ 671 01ac BB71     		strb	r3, [r7, #6]
+ 672 01ae 1346     		mov	r3, r2
+ 673 01b0 7B71     		strb	r3, [r7, #5]
+ 562:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return (uint8_t) 0;
+ 674              		.loc 1 562 0
+ 675 01b2 0023     		movs	r3, #0
+ 563:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 676              		.loc 1 563 0
+ 677 01b4 1846     		mov	r0, r3
+ 678 01b6 0C37     		adds	r7, r7, #12
+ 679              		.cfi_def_cfa_offset 4
+ 680 01b8 BD46     		mov	sp, r7
+ 681              		.cfi_def_cfa_register 13
+ 682              		@ sp needed
+ 683 01ba 5DF8047B 		ldr	r7, [sp], #4
+ 684              		.cfi_restore 7
+ 685              		.cfi_def_cfa_offset 0
+ 686 01be 7047     		bx	lr
+ 687              		.cfi_endproc
+ 688              	.LFE12:
+ 690              		.align	2
+ 691              		.global	IEEE802154_security_getSecurityLevel
+ 692              		.thumb
+ 693              		.thumb_func
+ 695              	IEEE802154_security_getSecurityLevel:
+ 696              	.LFB13:
+ 564:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 565:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** uint8_t IEEE802154_security_getSecurityLevel(OpenQueueEntry_t *msg) {
+ 697              		.loc 1 565 0
+ 698              		.cfi_startproc
+ 699              		@ args = 0, pretend = 0, frame = 8
+ 700              		@ frame_needed = 1, uses_anonymous_args = 0
+ 701              		@ link register save eliminated.
+ 702 01c0 80B4     		push	{r7}
+ 703              		.cfi_def_cfa_offset 4
+ 704              		.cfi_offset 7, -4
+ 705 01c2 83B0     		sub	sp, sp, #12
+ 706              		.cfi_def_cfa_offset 16
+ 707 01c4 00AF     		add	r7, sp, #0
+ 708              		.cfi_def_cfa_register 7
+ 709 01c6 7860     		str	r0, [r7, #4]
+ 566:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return IEEE154_ASH_SLF_TYPE_NOSEC;
+ 710              		.loc 1 566 0
+ 711 01c8 0023     		movs	r3, #0
+ 567:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 712              		.loc 1 567 0
+ 713 01ca 1846     		mov	r0, r3
+ 714 01cc 0C37     		adds	r7, r7, #12
+ 715              		.cfi_def_cfa_offset 4
+ 716 01ce BD46     		mov	sp, r7
+ 717              		.cfi_def_cfa_register 13
+ 718              		@ sp needed
+ 719 01d0 5DF8047B 		ldr	r7, [sp], #4
+ 720              		.cfi_restore 7
+ 721              		.cfi_def_cfa_offset 0
+ 722 01d4 7047     		bx	lr
+ 723              		.cfi_endproc
+ 724              	.LFE13:
+ 726 01d6 00BF     		.align	2
+ 727              		.global	IEEE802154_security_acceptableLevel
+ 728              		.thumb
+ 729              		.thumb_func
+ 731              	IEEE802154_security_acceptableLevel:
+ 732              	.LFB14:
+ 568:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** 
+ 569:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** bool IEEE802154_security_acceptableLevel(OpenQueueEntry_t* msg, ieee802154_header_iht* parsedheader
+ 733              		.loc 1 569 0
+ 734              		.cfi_startproc
+ 735              		@ args = 0, pretend = 0, frame = 8
+ 736              		@ frame_needed = 1, uses_anonymous_args = 0
+ 737              		@ link register save eliminated.
+ 738 01d8 80B4     		push	{r7}
+ 739              		.cfi_def_cfa_offset 4
+ 740              		.cfi_offset 7, -4
+ 741 01da 83B0     		sub	sp, sp, #12
+ 742              		.cfi_def_cfa_offset 16
+ 743 01dc 00AF     		add	r7, sp, #0
+ 744              		.cfi_def_cfa_register 7
+ 745 01de 7860     		str	r0, [r7, #4]
+ 746 01e0 3960     		str	r1, [r7]
+ 570:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c ****     return TRUE;
+ 747              		.loc 1 570 0
+ 748 01e2 0123     		movs	r3, #1
+ 571:build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.c **** }
+ 749              		.loc 1 571 0
+ 750 01e4 1846     		mov	r0, r3
+ 751 01e6 0C37     		adds	r7, r7, #12
+ 752              		.cfi_def_cfa_offset 4
+ 753 01e8 BD46     		mov	sp, r7
+ 754              		.cfi_def_cfa_register 13
+ 755              		@ sp needed
+ 756 01ea 5DF8047B 		ldr	r7, [sp], #4
+ 757              		.cfi_restore 7
+ 758              		.cfi_def_cfa_offset 0
+ 759 01ee 7047     		bx	lr
+ 760              		.cfi_endproc
+ 761              	.LFE14:
+ 763              	.Letext0:
+ 764              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 765              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 766              		.file 4 "inc/opendefs.h"
+ 767              		.file 5 "build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154.h"
+ 768              		.file 6 "build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154_security.h"
+ 769              		.file 7 "bsp/boards/openmote-cc2538/board_info.h"
+ 770              		.file 8 "build/openmote-cc2538_armgcc/openstack/02a-MAClow/IEEE802154E.h"
+ 771              		.file 9 "openstack/cross-layers/idmanager.h"
+ 772              		.file 10 "openstack/03b-IPv6/icmpv6rpl.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 IEEE802154_security.c
+     /tmp/cc0UWoMl.s:19     .rodata:0000000000000000 $d
+     /tmp/cc0UWoMl.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/cc0UWoMl.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/cc0UWoMl.s:32     .rodata:0000000000000010 infouCName
+     /tmp/cc0UWoMl.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/cc0UWoMl.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/cc0UWoMl.s:47     .rodata:0000000000000030 chTemplate_default
+     /tmp/cc0UWoMl.s:67     .rodata:0000000000000040 ebIEsBytestream
+     /tmp/cc0UWoMl.s:99     .rodata:000000000000005c linklocalprefix
+     /tmp/cc0UWoMl.s:111    .rodata:0000000000000064 all_routers_multicast
+                            *COM*:0000000000000024 ieee802154_security_vars
+     /tmp/cc0UWoMl.s:130    .text:0000000000000000 $t
+     /tmp/cc0UWoMl.s:135    .text:0000000000000000 IEEE802154_security_init
+     /tmp/cc0UWoMl.s:179    .text:0000000000000034 $d
+     /tmp/cc0UWoMl.s:185    .text:0000000000000040 $t
+     /tmp/cc0UWoMl.s:190    .text:0000000000000040 IEEE802154_security_getBeaconKeyIndex
+     /tmp/cc0UWoMl.s:217    .text:0000000000000054 $d
+     /tmp/cc0UWoMl.s:221    .text:0000000000000058 $t
+     /tmp/cc0UWoMl.s:226    .text:0000000000000058 IEEE802154_security_getDataKeyIndex
+     /tmp/cc0UWoMl.s:253    .text:000000000000006c $d
+     /tmp/cc0UWoMl.s:257    .text:0000000000000070 $t
+     /tmp/cc0UWoMl.s:262    .text:0000000000000070 IEEE802154_security_setBeaconKey
+     /tmp/cc0UWoMl.s:310    .text:00000000000000a0 $d
+     /tmp/cc0UWoMl.s:314    .text:00000000000000a4 $t
+     /tmp/cc0UWoMl.s:319    .text:00000000000000a4 IEEE802154_security_setDataKey
+     /tmp/cc0UWoMl.s:367    .text:00000000000000d4 $d
+     /tmp/cc0UWoMl.s:371    .text:00000000000000d8 $t
+     /tmp/cc0UWoMl.s:376    .text:00000000000000d8 IEEE802154_security_isConfigured
+     /tmp/cc0UWoMl.s:429    .text:0000000000000110 $d
+     /tmp/cc0UWoMl.s:433    .text:0000000000000114 $t
+     /tmp/cc0UWoMl.s:438    .text:0000000000000114 IEEE802154_security_setDynamicKeying
+     /tmp/cc0UWoMl.s:465    .text:0000000000000128 $d
+     /tmp/cc0UWoMl.s:469    .text:000000000000012c $t
+     /tmp/cc0UWoMl.s:474    .text:000000000000012c IEEE802154_security_prependAuxiliarySecurityHeader
+     /tmp/cc0UWoMl.s:509    .text:0000000000000140 IEEE802154_security_retrieveAuxiliarySecurityHeader
+     /tmp/cc0UWoMl.s:545    .text:0000000000000158 IEEE802154_security_outgoingFrameSecurity
+     /tmp/cc0UWoMl.s:581    .text:0000000000000170 IEEE802154_security_incomingFrame
+     /tmp/cc0UWoMl.s:617    .text:0000000000000188 IEEE802154_security_authLengthChecking
+     /tmp/cc0UWoMl.s:654    .text:00000000000001a0 IEEE802154_security_auxLengthChecking
+     /tmp/cc0UWoMl.s:695    .text:00000000000001c0 IEEE802154_security_getSecurityLevel
+     /tmp/cc0UWoMl.s:731    .text:00000000000001d8 IEEE802154_security_acceptableLevel
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.cryptoengine.h.8.da068b9149b7576990bbc3b5f1e9b415
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.schedule.h.2.1e56c0a55af41b0871de1bf3babafbff
+                           .group:0000000000000000 wm4.IEEE802154E.h.31.4df44943e63b807d05253db7aa10079f
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+                           .group:0000000000000000 wm4.stdio.h.27.3fc80220048df77954e38daec3bb9670
+                           .group:0000000000000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:0000000000000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:0000000000000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:0000000000000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:0000000000000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:0000000000000000 wm4.stdio.h.68.a99a2db1e55915cfd1b035cc1e9fcff1
+                           .group:0000000000000000 wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949
+                           .group:0000000000000000 wm4.openserial.h.32.c1b1c4db184af4a79a2b8ff62d908d4d
+                           .group:0000000000000000 wm4.icmpv6rpl.h.2.f31802bcce2a0808bf5db39ce34f4322
+                           .group:0000000000000000 wm4.neighbors.h.15.2a77b1a66a5fa826e9ff514b195b0560
+                           .group:0000000000000000 wm4.IEEE802154_security.h.12.01376db633007f86cc7c78f3ee4cf764
+
+UNDEFINED SYMBOLS
+memset

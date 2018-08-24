@@ -1,0 +1,980 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"hmac.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	hmac
+  20              		.thumb
+  21              		.thumb_func
+  23              	hmac:
+  24              	.LFB0:
+  25              		.file 1 "build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c"
+   1:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /**************************** hmac.c ***************************/
+   2:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /***************** See RFC 6234 for details. *******************/
+   3:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /* Copyright (c) 2011 IETF Trust and the persons identified as */
+   4:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /* authors of the code.  All rights reserved.                  */
+   5:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /* See sha.h for terms of use and redistribution.              */
+   6:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+   7:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+   8:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Description:
+   9:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      This file implements the HMAC algorithm (Keyed-Hashing for
+  10:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      Message Authentication, [RFC 2104]), expressed in terms of
+  11:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      the various SHA algorithms.
+  12:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+  13:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  14:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** #include "sha.h"
+  15:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  16:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+  17:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  hmac
+  18:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  19:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Description:
+  20:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      This function will compute an HMAC message digest.
+  21:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  22:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Parameters:
+  23:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      whichSha: [in]
+  24:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          One of SHA1, SHA224, SHA256, SHA384, SHA512
+  25:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      message_array[ ]: [in]
+  26:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          An array of octets representing the message.
+  27:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          Note: in RFC 2104, this parameter is known
+  28:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          as 'text'.
+  29:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      length: [in]
+  30:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The length of the message in message_array.
+  31:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      key[ ]: [in]
+  32:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The secret shared key.
+  33:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      key_len: [in]
+  34:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The length of the secret shared key.
+  35:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      digest[ ]: [out]
+  36:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          Where the digest is to be returned.
+  37:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          NOTE: The length of the digest is determined by
+  38:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *              the value of whichSha.
+  39:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  40:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Returns:
+  41:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      sha Error Code.
+  42:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  43:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+  44:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  45:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** int hmac(SHAversion whichSha,
+  46:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     const unsigned char *message_array, int length,
+  47:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     const unsigned char *key, int key_len,
+  48:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     uint8_t digest[USHAMaxHashSize])
+  49:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** {
+  26              		.loc 1 49 0
+  27              		.cfi_startproc
+  28              		@ args = 8, pretend = 0, frame = 400
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30 0000 90B5     		push	{r4, r7, lr}
+  31              		.cfi_def_cfa_offset 12
+  32              		.cfi_offset 4, -12
+  33              		.cfi_offset 7, -8
+  34              		.cfi_offset 14, -4
+  35 0002 E5B0     		sub	sp, sp, #404
+  36              		.cfi_def_cfa_offset 416
+  37 0004 00AF     		add	r7, sp, #0
+  38              		.cfi_def_cfa_register 7
+  39 0006 0446     		mov	r4, r0
+  40 0008 07F10800 		add	r0, r7, #8
+  41 000c 0160     		str	r1, [r0]
+  42 000e 391D     		adds	r1, r7, #4
+  43 0010 0A60     		str	r2, [r1]
+  44 0012 3A46     		mov	r2, r7
+  45 0014 1360     		str	r3, [r2]
+  46 0016 07F10F03 		add	r3, r7, #15
+  47 001a 2246     		mov	r2, r4
+  48 001c 1A70     		strb	r2, [r3]
+  50:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   HMACContext context;
+  51:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   return hmacReset(&context, whichSha, key, key_len) ||
+  49              		.loc 1 51 0
+  50 001e 07F11001 		add	r1, r7, #16
+  51 0022 07F10F03 		add	r3, r7, #15
+  52 0026 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  53 0028 3B46     		mov	r3, r7
+  54 002a 0846     		mov	r0, r1
+  55 002c 1146     		mov	r1, r2
+  56 002e 1A68     		ldr	r2, [r3]
+  57 0030 D7F8A031 		ldr	r3, [r7, #416]
+  58 0034 FFF7FEFF 		bl	hmacReset
+  59 0038 0346     		mov	r3, r0
+  52:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacInput(&context, message_array, length) ||
+  60              		.loc 1 52 0
+  61 003a 002B     		cmp	r3, #0
+  62 003c 16D1     		bne	.L2
+  63              		.loc 1 52 0 is_stmt 0 discriminator 2
+  64 003e 07F11001 		add	r1, r7, #16
+  65 0042 07F10802 		add	r2, r7, #8
+  66 0046 3B1D     		adds	r3, r7, #4
+  67 0048 0846     		mov	r0, r1
+  68 004a 1168     		ldr	r1, [r2]
+  69 004c 1A68     		ldr	r2, [r3]
+  70 004e FFF7FEFF 		bl	hmacInput
+  71 0052 0346     		mov	r3, r0
+  51:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacInput(&context, message_array, length) ||
+  72              		.loc 1 51 0 is_stmt 1 discriminator 2
+  73 0054 002B     		cmp	r3, #0
+  74 0056 09D1     		bne	.L2
+  53:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacResult(&context, digest);
+  75              		.loc 1 53 0 discriminator 3
+  76 0058 07F11003 		add	r3, r7, #16
+  77 005c 1846     		mov	r0, r3
+  78 005e D7F8A411 		ldr	r1, [r7, #420]
+  79 0062 FFF7FEFF 		bl	hmacResult
+  80 0066 0346     		mov	r3, r0
+  52:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacInput(&context, message_array, length) ||
+  81              		.loc 1 52 0 discriminator 3
+  82 0068 002B     		cmp	r3, #0
+  83 006a 01D0     		beq	.L3
+  84              	.L2:
+  52:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacInput(&context, message_array, length) ||
+  85              		.loc 1 52 0 is_stmt 0 discriminator 1
+  86 006c 0123     		movs	r3, #1
+  87 006e 00E0     		b	.L5
+  88              	.L3:
+  52:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          hmacInput(&context, message_array, length) ||
+  89              		.loc 1 52 0 discriminator 4
+  90 0070 0023     		movs	r3, #0
+  91              	.L5:
+  54:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** }
+  92              		.loc 1 54 0 is_stmt 1
+  93 0072 1846     		mov	r0, r3
+  94 0074 07F5CA77 		add	r7, r7, #404
+  95              		.cfi_def_cfa_offset 12
+  96 0078 BD46     		mov	sp, r7
+  97              		.cfi_def_cfa_register 13
+  98              		@ sp needed
+  99 007a 90BD     		pop	{r4, r7, pc}
+ 100              		.cfi_endproc
+ 101              	.LFE0:
+ 103              		.align	2
+ 104              		.global	hmacReset
+ 105              		.thumb
+ 106              		.thumb_func
+ 108              	hmacReset:
+ 109              	.LFB1:
+  55:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  56:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+  57:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  hmacReset
+  58:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  59:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Description:
+  60:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      This function will initialize the hmacContext in preparation
+  61:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      for computing a new HMAC message digest.
+  62:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  63:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Parameters:
+  64:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      context: [in/out]
+  65:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The context to reset.
+  66:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      whichSha: [in]
+  67:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          One of SHA1, SHA224, SHA256, SHA384, SHA512
+  68:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      key[ ]: [in]
+  69:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The secret shared key.
+  70:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      key_len: [in]
+  71:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The length of the secret shared key.
+  72:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  73:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Returns:
+  74:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      sha Error Code.
+  75:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+  76:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+  77:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** int hmacReset(HMACContext *context, enum SHAversion whichSha,
+  78:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     const unsigned char *key, int key_len)
+  79:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** {
+ 110              		.loc 1 79 0
+ 111              		.cfi_startproc
+ 112              		@ args = 0, pretend = 0, frame = 464
+ 113              		@ frame_needed = 1, uses_anonymous_args = 0
+ 114 007c 90B5     		push	{r4, r7, lr}
+ 115              		.cfi_def_cfa_offset 12
+ 116              		.cfi_offset 4, -12
+ 117              		.cfi_offset 7, -8
+ 118              		.cfi_offset 14, -4
+ 119 007e F5B0     		sub	sp, sp, #468
+ 120              		.cfi_def_cfa_offset 480
+ 121 0080 00AF     		add	r7, sp, #0
+ 122              		.cfi_def_cfa_register 7
+ 123 0082 07F10C04 		add	r4, r7, #12
+ 124 0086 2060     		str	r0, [r4]
+ 125 0088 0846     		mov	r0, r1
+ 126 008a 391D     		adds	r1, r7, #4
+ 127 008c 0A60     		str	r2, [r1]
+ 128 008e 3A46     		mov	r2, r7
+ 129 0090 1360     		str	r3, [r2]
+ 130 0092 07F10B03 		add	r3, r7, #11
+ 131 0096 0246     		mov	r2, r0
+ 132 0098 1A70     		strb	r2, [r3]
+  80:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   int i, blocksize, hashsize, ret;
+  81:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  82:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* inner padding - key XORd with ipad */
+  83:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   unsigned char k_ipad[USHA_Max_Message_Block_Size];
+  84:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  85:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* temporary buffer when keylen > blocksize */
+  86:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   unsigned char tempkey[USHAMaxHashSize];
+  87:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  88:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (!context) return shaNull;
+ 133              		.loc 1 88 0
+ 134 009a 07F10C03 		add	r3, r7, #12
+ 135 009e 1B68     		ldr	r3, [r3]
+ 136 00a0 002B     		cmp	r3, #0
+ 137 00a2 01D1     		bne	.L7
+ 138              		.loc 1 88 0 is_stmt 0 discriminator 1
+ 139 00a4 0123     		movs	r3, #1
+ 140 00a6 EFE0     		b	.L21
+ 141              	.L7:
+  89:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   context->Computed = 0;
+ 142              		.loc 1 89 0 is_stmt 1
+ 143 00a8 07F10C03 		add	r3, r7, #12
+ 144 00ac 1B68     		ldr	r3, [r3]
+ 145 00ae 0022     		movs	r2, #0
+ 146 00b0 C3F87821 		str	r2, [r3, #376]
+  90:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   context->Corrupted = shaSuccess;
+ 147              		.loc 1 90 0
+ 148 00b4 07F10C03 		add	r3, r7, #12
+ 149 00b8 1B68     		ldr	r3, [r3]
+ 150 00ba 0022     		movs	r2, #0
+ 151 00bc C3F87C21 		str	r2, [r3, #380]
+  91:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  92:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   blocksize = context->blockSize = USHABlockSize(whichSha);
+ 152              		.loc 1 92 0
+ 153 00c0 07F10B03 		add	r3, r7, #11
+ 154 00c4 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 155 00c6 1846     		mov	r0, r3
+ 156 00c8 FFF7FEFF 		bl	USHABlockSize
+ 157 00cc 0246     		mov	r2, r0
+ 158 00ce 07F10C03 		add	r3, r7, #12
+ 159 00d2 1B68     		ldr	r3, [r3]
+ 160 00d4 9A60     		str	r2, [r3, #8]
+ 161 00d6 07F10C03 		add	r3, r7, #12
+ 162 00da 1B68     		ldr	r3, [r3]
+ 163 00dc 9B68     		ldr	r3, [r3, #8]
+ 164 00de C7F8C831 		str	r3, [r7, #456]
+  93:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   hashsize = context->hashSize = USHAHashSize(whichSha);
+ 165              		.loc 1 93 0
+ 166 00e2 07F10B03 		add	r3, r7, #11
+ 167 00e6 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 168 00e8 1846     		mov	r0, r3
+ 169 00ea FFF7FEFF 		bl	USHAHashSize
+ 170 00ee 0246     		mov	r2, r0
+ 171 00f0 07F10C03 		add	r3, r7, #12
+ 172 00f4 1B68     		ldr	r3, [r3]
+ 173 00f6 5A60     		str	r2, [r3, #4]
+ 174 00f8 07F10C03 		add	r3, r7, #12
+ 175 00fc 1B68     		ldr	r3, [r3]
+ 176 00fe 5B68     		ldr	r3, [r3, #4]
+ 177 0100 C7F8C431 		str	r3, [r7, #452]
+  94:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   context->whichSha = whichSha;
+ 178              		.loc 1 94 0
+ 179 0104 07F10B03 		add	r3, r7, #11
+ 180 0108 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+ 181 010a 07F10C03 		add	r3, r7, #12
+ 182 010e 1B68     		ldr	r3, [r3]
+ 183 0110 1A60     		str	r2, [r3]
+  95:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+  96:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /*
+  97:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * If key is longer than the hash blocksize,
+  98:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * reset it to key = HASH(key).
+  99:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    */
+ 100:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (key_len > blocksize) {
+ 184              		.loc 1 100 0
+ 185 0112 3B46     		mov	r3, r7
+ 186 0114 1A68     		ldr	r2, [r3]
+ 187 0116 D7F8C831 		ldr	r3, [r7, #456]
+ 188 011a 9A42     		cmp	r2, r3
+ 189 011c 36DD     		ble	.L9
+ 190              	.LBB2:
+ 101:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAContext tcontext;
+ 102:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     int err = USHAReset(&tcontext, whichSha) ||
+ 191              		.loc 1 102 0
+ 192 011e 07F11002 		add	r2, r7, #16
+ 193 0122 07F10B03 		add	r3, r7, #11
+ 194 0126 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 195 0128 1046     		mov	r0, r2
+ 196 012a 1946     		mov	r1, r3
+ 197 012c FFF7FEFF 		bl	USHAReset
+ 198 0130 0346     		mov	r3, r0
+ 103:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 199              		.loc 1 103 0
+ 200 0132 002B     		cmp	r3, #0
+ 201 0134 16D1     		bne	.L10
+ 202              		.loc 1 103 0 is_stmt 0 discriminator 2
+ 203 0136 3B46     		mov	r3, r7
+ 204 0138 1A68     		ldr	r2, [r3]
+ 205 013a 07F11001 		add	r1, r7, #16
+ 206 013e 3B1D     		adds	r3, r7, #4
+ 207 0140 0846     		mov	r0, r1
+ 208 0142 1968     		ldr	r1, [r3]
+ 209 0144 FFF7FEFF 		bl	USHAInput
+ 210 0148 0346     		mov	r3, r0
+ 102:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 211              		.loc 1 102 0 is_stmt 1 discriminator 2
+ 212 014a 002B     		cmp	r3, #0
+ 213 014c 0AD1     		bne	.L10
+ 104:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAResult(&tcontext, tempkey);
+ 214              		.loc 1 104 0 discriminator 3
+ 215 014e 07F11002 		add	r2, r7, #16
+ 216 0152 07F1FC03 		add	r3, r7, #252
+ 217 0156 1046     		mov	r0, r2
+ 218 0158 1946     		mov	r1, r3
+ 219 015a FFF7FEFF 		bl	USHAResult
+ 220 015e 0346     		mov	r3, r0
+ 103:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 221              		.loc 1 103 0 discriminator 3
+ 222 0160 002B     		cmp	r3, #0
+ 223 0162 01D0     		beq	.L11
+ 224              	.L10:
+ 103:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 225              		.loc 1 103 0 is_stmt 0 discriminator 1
+ 226 0164 0123     		movs	r3, #1
+ 227 0166 00E0     		b	.L12
+ 228              	.L11:
+ 103:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 229              		.loc 1 103 0 discriminator 4
+ 230 0168 0023     		movs	r3, #0
+ 231              	.L12:
+ 102:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****               USHAInput(&tcontext, key, key_len) ||
+ 232              		.loc 1 102 0 is_stmt 1
+ 233 016a C7F8C031 		str	r3, [r7, #448]
+ 105:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     if (err != shaSuccess) return err;
+ 234              		.loc 1 105 0
+ 235 016e D7F8C031 		ldr	r3, [r7, #448]
+ 236 0172 002B     		cmp	r3, #0
+ 237 0174 02D0     		beq	.L13
+ 238              		.loc 1 105 0 is_stmt 0 discriminator 1
+ 239 0176 D7F8C031 		ldr	r3, [r7, #448]
+ 240 017a 85E0     		b	.L21
+ 241              	.L13:
+ 106:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 107:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     key = tempkey;
+ 242              		.loc 1 107 0 is_stmt 1
+ 243 017c 3B1D     		adds	r3, r7, #4
+ 244 017e 07F1FC02 		add	r2, r7, #252
+ 245 0182 1A60     		str	r2, [r3]
+ 108:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     key_len = hashsize;
+ 246              		.loc 1 108 0
+ 247 0184 3B46     		mov	r3, r7
+ 248 0186 D7F8C421 		ldr	r2, [r7, #452]
+ 249 018a 1A60     		str	r2, [r3]
+ 250              	.L9:
+ 251              	.LBE2:
+ 109:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   }
+ 110:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 111:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /*
+ 112:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * The HMAC transform looks like:
+ 113:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    *
+ 114:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * SHA(K XOR opad, SHA(K XOR ipad, text))
+ 115:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    *
+ 116:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * where K is an n byte key, 0-padded to a total of blocksize bytes,
+ 117:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * ipad is the byte 0x36 repeated blocksize times,
+ 118:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * opad is the byte 0x5c repeated blocksize times,
+ 119:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    * and text is the data being protected.
+ 120:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****    */
+ 121:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 122:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* store key into the pads, XOR'd with ipad and opad values */
+ 123:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   for (i = 0; i < key_len; i++) {
+ 252              		.loc 1 123 0
+ 253 018c 0023     		movs	r3, #0
+ 254 018e C7F8CC31 		str	r3, [r7, #460]
+ 255 0192 26E0     		b	.L14
+ 256              	.L15:
+ 124:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = key[i] ^ 0x36;
+ 257              		.loc 1 124 0 discriminator 3
+ 258 0194 D7F8CC31 		ldr	r3, [r7, #460]
+ 259 0198 3A1D     		adds	r2, r7, #4
+ 260 019a 1268     		ldr	r2, [r2]
+ 261 019c 1344     		add	r3, r3, r2
+ 262 019e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 263 01a0 83F03603 		eor	r3, r3, #54
+ 264 01a4 D9B2     		uxtb	r1, r3
+ 265 01a6 07F59E72 		add	r2, r7, #316
+ 266 01aa D7F8CC31 		ldr	r3, [r7, #460]
+ 267 01ae 1344     		add	r3, r3, r2
+ 268 01b0 0A46     		mov	r2, r1
+ 269 01b2 1A70     		strb	r2, [r3]
+ 125:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     context->k_opad[i] = key[i] ^ 0x5c;
+ 270              		.loc 1 125 0 discriminator 3
+ 271 01b4 D7F8CC31 		ldr	r3, [r7, #460]
+ 272 01b8 3A1D     		adds	r2, r7, #4
+ 273 01ba 1268     		ldr	r2, [r2]
+ 274 01bc 1344     		add	r3, r3, r2
+ 275 01be 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 276 01c0 83F05C03 		eor	r3, r3, #92
+ 277 01c4 D9B2     		uxtb	r1, r3
+ 278 01c6 07F10C03 		add	r3, r7, #12
+ 279 01ca 1A68     		ldr	r2, [r3]
+ 280 01cc D7F8CC31 		ldr	r3, [r7, #460]
+ 281 01d0 1344     		add	r3, r3, r2
+ 282 01d2 F833     		adds	r3, r3, #248
+ 283 01d4 0A46     		mov	r2, r1
+ 284 01d6 1A70     		strb	r2, [r3]
+ 123:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = key[i] ^ 0x36;
+ 285              		.loc 1 123 0 discriminator 3
+ 286 01d8 D7F8CC31 		ldr	r3, [r7, #460]
+ 287 01dc 0133     		adds	r3, r3, #1
+ 288 01de C7F8CC31 		str	r3, [r7, #460]
+ 289              	.L14:
+ 123:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = key[i] ^ 0x36;
+ 290              		.loc 1 123 0 is_stmt 0 discriminator 1
+ 291 01e2 3B46     		mov	r3, r7
+ 292 01e4 D7F8CC21 		ldr	r2, [r7, #460]
+ 293 01e8 1B68     		ldr	r3, [r3]
+ 294 01ea 9A42     		cmp	r2, r3
+ 295 01ec D2DB     		blt	.L15
+ 126:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   }
+ 127:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* remaining pad bytes are '\0' XOR'd with ipad and opad values */
+ 128:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   for ( ; i < blocksize; i++) {
+ 296              		.loc 1 128 0 is_stmt 1
+ 297 01ee 14E0     		b	.L16
+ 298              	.L17:
+ 129:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = 0x36;
+ 299              		.loc 1 129 0 discriminator 2
+ 300 01f0 07F59E72 		add	r2, r7, #316
+ 301 01f4 D7F8CC31 		ldr	r3, [r7, #460]
+ 302 01f8 1344     		add	r3, r3, r2
+ 303 01fa 3622     		movs	r2, #54
+ 304 01fc 1A70     		strb	r2, [r3]
+ 130:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     context->k_opad[i] = 0x5c;
+ 305              		.loc 1 130 0 discriminator 2
+ 306 01fe 07F10C03 		add	r3, r7, #12
+ 307 0202 1A68     		ldr	r2, [r3]
+ 308 0204 D7F8CC31 		ldr	r3, [r7, #460]
+ 309 0208 1344     		add	r3, r3, r2
+ 310 020a F833     		adds	r3, r3, #248
+ 311 020c 5C22     		movs	r2, #92
+ 312 020e 1A70     		strb	r2, [r3]
+ 128:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = 0x36;
+ 313              		.loc 1 128 0 discriminator 2
+ 314 0210 D7F8CC31 		ldr	r3, [r7, #460]
+ 315 0214 0133     		adds	r3, r3, #1
+ 316 0216 C7F8CC31 		str	r3, [r7, #460]
+ 317              	.L16:
+ 128:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     k_ipad[i] = 0x36;
+ 318              		.loc 1 128 0 is_stmt 0 discriminator 1
+ 319 021a D7F8CC21 		ldr	r2, [r7, #460]
+ 320 021e D7F8C831 		ldr	r3, [r7, #456]
+ 321 0222 9A42     		cmp	r2, r3
+ 322 0224 E4DB     		blt	.L17
+ 131:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   }
+ 132:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 133:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* perform inner hash */
+ 134:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* init context for 1st pass */
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   ret = USHAReset(&context->shaContext, whichSha) ||
+ 323              		.loc 1 135 0 is_stmt 1
+ 324 0226 07F10C03 		add	r3, r7, #12
+ 325 022a 1B68     		ldr	r3, [r3]
+ 326 022c 03F11002 		add	r2, r3, #16
+ 327 0230 07F10B03 		add	r3, r7, #11
+ 328 0234 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 329 0236 1046     		mov	r0, r2
+ 330 0238 1946     		mov	r1, r3
+ 331 023a FFF7FEFF 		bl	USHAReset
+ 332 023e 0346     		mov	r3, r0
+ 333 0240 002B     		cmp	r3, #0
+ 334 0242 10D1     		bne	.L18
+ 136:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         /* and start with inner pad */
+ 137:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         USHAInput(&context->shaContext, k_ipad, blocksize);
+ 335              		.loc 1 137 0 discriminator 2
+ 336 0244 07F10C03 		add	r3, r7, #12
+ 337 0248 1B68     		ldr	r3, [r3]
+ 338 024a 03F11001 		add	r1, r3, #16
+ 339 024e D7F8C831 		ldr	r3, [r7, #456]
+ 340 0252 07F59E72 		add	r2, r7, #316
+ 341 0256 0846     		mov	r0, r1
+ 342 0258 1146     		mov	r1, r2
+ 343 025a 1A46     		mov	r2, r3
+ 344 025c FFF7FEFF 		bl	USHAInput
+ 345 0260 0346     		mov	r3, r0
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         /* and start with inner pad */
+ 346              		.loc 1 135 0 discriminator 2
+ 347 0262 002B     		cmp	r3, #0
+ 348 0264 01D0     		beq	.L19
+ 349              	.L18:
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         /* and start with inner pad */
+ 350              		.loc 1 135 0 is_stmt 0 discriminator 3
+ 351 0266 0123     		movs	r3, #1
+ 352 0268 00E0     		b	.L20
+ 353              	.L19:
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         /* and start with inner pad */
+ 354              		.loc 1 135 0 discriminator 4
+ 355 026a 0023     		movs	r3, #0
+ 356              	.L20:
+ 135:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****         /* and start with inner pad */
+ 357              		.loc 1 135 0 discriminator 6
+ 358 026c C7F8BC31 		str	r3, [r7, #444]
+ 138:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   return context->Corrupted = ret;
+ 359              		.loc 1 138 0 is_stmt 1 discriminator 6
+ 360 0270 07F10C03 		add	r3, r7, #12
+ 361 0274 1B68     		ldr	r3, [r3]
+ 362 0276 D7F8BC21 		ldr	r2, [r7, #444]
+ 363 027a C3F87C21 		str	r2, [r3, #380]
+ 364 027e 07F10C03 		add	r3, r7, #12
+ 365 0282 1B68     		ldr	r3, [r3]
+ 366 0284 D3F87C31 		ldr	r3, [r3, #380]
+ 367              	.L21:
+ 139:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** }
+ 368              		.loc 1 139 0 discriminator 1
+ 369 0288 1846     		mov	r0, r3
+ 370 028a 07F5EA77 		add	r7, r7, #468
+ 371              		.cfi_def_cfa_offset 12
+ 372 028e BD46     		mov	sp, r7
+ 373              		.cfi_def_cfa_register 13
+ 374              		@ sp needed
+ 375 0290 90BD     		pop	{r4, r7, pc}
+ 376              		.cfi_endproc
+ 377              	.LFE1:
+ 379 0292 00BF     		.align	2
+ 380              		.global	hmacInput
+ 381              		.thumb
+ 382              		.thumb_func
+ 384              	hmacInput:
+ 385              	.LFB2:
+ 140:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 141:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+ 142:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  hmacInput
+ 143:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 144:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Description:
+ 145:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      This function accepts an array of octets as the next portion
+ 146:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      of the message.  It may be called multiple times.
+ 147:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 148:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Parameters:
+ 149:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      context: [in/out]
+ 150:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The HMAC context to update.
+ 151:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      text[ ]: [in]
+ 152:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          An array of octets representing the next portion of
+ 153:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          the message.
+ 154:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      text_len: [in]
+ 155:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *          The length of the message in text.
+ 156:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 157:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *  Returns:
+ 158:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      sha Error Code.
+ 159:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 160:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+ 161:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** int hmacInput(HMACContext *context, const unsigned char *text,
+ 162:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     int text_len)
+ 163:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** {
+ 386              		.loc 1 163 0
+ 387              		.cfi_startproc
+ 388              		@ args = 0, pretend = 0, frame = 16
+ 389              		@ frame_needed = 1, uses_anonymous_args = 0
+ 390 0294 80B5     		push	{r7, lr}
+ 391              		.cfi_def_cfa_offset 8
+ 392              		.cfi_offset 7, -8
+ 393              		.cfi_offset 14, -4
+ 394 0296 84B0     		sub	sp, sp, #16
+ 395              		.cfi_def_cfa_offset 24
+ 396 0298 00AF     		add	r7, sp, #0
+ 397              		.cfi_def_cfa_register 7
+ 398 029a F860     		str	r0, [r7, #12]
+ 399 029c B960     		str	r1, [r7, #8]
+ 400 029e 7A60     		str	r2, [r7, #4]
+ 164:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (!context) return shaNull;
+ 401              		.loc 1 164 0
+ 402 02a0 FB68     		ldr	r3, [r7, #12]
+ 403 02a2 002B     		cmp	r3, #0
+ 404 02a4 01D1     		bne	.L23
+ 405              		.loc 1 164 0 is_stmt 0 discriminator 1
+ 406 02a6 0123     		movs	r3, #1
+ 407 02a8 25E0     		b	.L24
+ 408              	.L23:
+ 165:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Corrupted) return context->Corrupted;
+ 409              		.loc 1 165 0 is_stmt 1
+ 410 02aa FB68     		ldr	r3, [r7, #12]
+ 411 02ac D3F87C31 		ldr	r3, [r3, #380]
+ 412 02b0 002B     		cmp	r3, #0
+ 413 02b2 03D0     		beq	.L25
+ 414              		.loc 1 165 0 is_stmt 0 discriminator 1
+ 415 02b4 FB68     		ldr	r3, [r7, #12]
+ 416 02b6 D3F87C31 		ldr	r3, [r3, #380]
+ 417 02ba 1CE0     		b	.L24
+ 418              	.L25:
+ 166:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Computed) return context->Corrupted = shaStateError;
+ 419              		.loc 1 166 0 is_stmt 1
+ 420 02bc FB68     		ldr	r3, [r7, #12]
+ 421 02be D3F87831 		ldr	r3, [r3, #376]
+ 422 02c2 002B     		cmp	r3, #0
+ 423 02c4 07D0     		beq	.L26
+ 424              		.loc 1 166 0 is_stmt 0 discriminator 1
+ 425 02c6 FB68     		ldr	r3, [r7, #12]
+ 426 02c8 0322     		movs	r2, #3
+ 427 02ca C3F87C21 		str	r2, [r3, #380]
+ 428 02ce FB68     		ldr	r3, [r7, #12]
+ 429 02d0 D3F87C31 		ldr	r3, [r3, #380]
+ 430 02d4 0FE0     		b	.L24
+ 431              	.L26:
+ 167:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* then text of datagram */
+ 168:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   return context->Corrupted =
+ 169:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAInput(&context->shaContext, text, text_len);
+ 432              		.loc 1 169 0 is_stmt 1
+ 433 02d6 FB68     		ldr	r3, [r7, #12]
+ 434 02d8 03F11002 		add	r2, r3, #16
+ 435 02dc 7B68     		ldr	r3, [r7, #4]
+ 436 02de 1046     		mov	r0, r2
+ 437 02e0 B968     		ldr	r1, [r7, #8]
+ 438 02e2 1A46     		mov	r2, r3
+ 439 02e4 FFF7FEFF 		bl	USHAInput
+ 440 02e8 0246     		mov	r2, r0
+ 168:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAInput(&context->shaContext, text, text_len);
+ 441              		.loc 1 168 0
+ 442 02ea FB68     		ldr	r3, [r7, #12]
+ 443 02ec C3F87C21 		str	r2, [r3, #380]
+ 444 02f0 FB68     		ldr	r3, [r7, #12]
+ 445 02f2 D3F87C31 		ldr	r3, [r3, #380]
+ 446              	.L24:
+ 170:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** }
+ 447              		.loc 1 170 0
+ 448 02f6 1846     		mov	r0, r3
+ 449 02f8 1037     		adds	r7, r7, #16
+ 450              		.cfi_def_cfa_offset 8
+ 451 02fa BD46     		mov	sp, r7
+ 452              		.cfi_def_cfa_register 13
+ 453              		@ sp needed
+ 454 02fc 80BD     		pop	{r7, pc}
+ 455              		.cfi_endproc
+ 456              	.LFE2:
+ 458 02fe 00BF     		.align	2
+ 459              		.global	hmacFinalBits
+ 460              		.thumb
+ 461              		.thumb_func
+ 463              	hmacFinalBits:
+ 464              	.LFB3:
+ 171:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 172:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+ 173:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * hmacFinalBits
+ 174:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 175:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Description:
+ 176:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   This function will add in any final bits of the message.
+ 177:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 178:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Parameters:
+ 179:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   context: [in/out]
+ 180:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     The HMAC context to update.
+ 181:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   message_bits: [in]
+ 182:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     The final bits of the message, in the upper portion of the
+ 183:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     byte.  (Use 0b###00000 instead of 0b00000### to input the
+ 184:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     three bits ###.)
+ 185:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   length: [in]
+ 186:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     The number of bits in message_bits, between 1 and 7.
+ 187:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 188:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Returns:
+ 189:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   sha Error Code.
+ 190:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+ 191:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** int hmacFinalBits(HMACContext *context,
+ 192:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     uint8_t bits, unsigned int bit_count)
+ 193:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** {
+ 465              		.loc 1 193 0
+ 466              		.cfi_startproc
+ 467              		@ args = 0, pretend = 0, frame = 16
+ 468              		@ frame_needed = 1, uses_anonymous_args = 0
+ 469 0300 80B5     		push	{r7, lr}
+ 470              		.cfi_def_cfa_offset 8
+ 471              		.cfi_offset 7, -8
+ 472              		.cfi_offset 14, -4
+ 473 0302 84B0     		sub	sp, sp, #16
+ 474              		.cfi_def_cfa_offset 24
+ 475 0304 00AF     		add	r7, sp, #0
+ 476              		.cfi_def_cfa_register 7
+ 477 0306 F860     		str	r0, [r7, #12]
+ 478 0308 0B46     		mov	r3, r1
+ 479 030a 7A60     		str	r2, [r7, #4]
+ 480 030c FB72     		strb	r3, [r7, #11]
+ 194:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (!context) return shaNull;
+ 481              		.loc 1 194 0
+ 482 030e FB68     		ldr	r3, [r7, #12]
+ 483 0310 002B     		cmp	r3, #0
+ 484 0312 01D1     		bne	.L28
+ 485              		.loc 1 194 0 is_stmt 0 discriminator 1
+ 486 0314 0123     		movs	r3, #1
+ 487 0316 25E0     		b	.L29
+ 488              	.L28:
+ 195:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Corrupted) return context->Corrupted;
+ 489              		.loc 1 195 0 is_stmt 1
+ 490 0318 FB68     		ldr	r3, [r7, #12]
+ 491 031a D3F87C31 		ldr	r3, [r3, #380]
+ 492 031e 002B     		cmp	r3, #0
+ 493 0320 03D0     		beq	.L30
+ 494              		.loc 1 195 0 is_stmt 0 discriminator 1
+ 495 0322 FB68     		ldr	r3, [r7, #12]
+ 496 0324 D3F87C31 		ldr	r3, [r3, #380]
+ 497 0328 1CE0     		b	.L29
+ 498              	.L30:
+ 196:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Computed) return context->Corrupted = shaStateError;
+ 499              		.loc 1 196 0 is_stmt 1
+ 500 032a FB68     		ldr	r3, [r7, #12]
+ 501 032c D3F87831 		ldr	r3, [r3, #376]
+ 502 0330 002B     		cmp	r3, #0
+ 503 0332 07D0     		beq	.L31
+ 504              		.loc 1 196 0 is_stmt 0 discriminator 1
+ 505 0334 FB68     		ldr	r3, [r7, #12]
+ 506 0336 0322     		movs	r2, #3
+ 507 0338 C3F87C21 		str	r2, [r3, #380]
+ 508 033c FB68     		ldr	r3, [r7, #12]
+ 509 033e D3F87C31 		ldr	r3, [r3, #380]
+ 510 0342 0FE0     		b	.L29
+ 511              	.L31:
+ 197:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* then final bits of datagram */
+ 198:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   return context->Corrupted =
+ 199:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAFinalBits(&context->shaContext, bits, bit_count);
+ 512              		.loc 1 199 0 is_stmt 1
+ 513 0344 FB68     		ldr	r3, [r7, #12]
+ 514 0346 03F11002 		add	r2, r3, #16
+ 515 034a FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 516 034c 1046     		mov	r0, r2
+ 517 034e 1946     		mov	r1, r3
+ 518 0350 7A68     		ldr	r2, [r7, #4]
+ 519 0352 FFF7FEFF 		bl	USHAFinalBits
+ 520 0356 0246     		mov	r2, r0
+ 198:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAFinalBits(&context->shaContext, bits, bit_count);
+ 521              		.loc 1 198 0
+ 522 0358 FB68     		ldr	r3, [r7, #12]
+ 523 035a C3F87C21 		str	r2, [r3, #380]
+ 524 035e FB68     		ldr	r3, [r7, #12]
+ 525 0360 D3F87C31 		ldr	r3, [r3, #380]
+ 526              	.L29:
+ 200:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** }
+ 527              		.loc 1 200 0
+ 528 0364 1846     		mov	r0, r3
+ 529 0366 1037     		adds	r7, r7, #16
+ 530              		.cfi_def_cfa_offset 8
+ 531 0368 BD46     		mov	sp, r7
+ 532              		.cfi_def_cfa_register 13
+ 533              		@ sp needed
+ 534 036a 80BD     		pop	{r7, pc}
+ 535              		.cfi_endproc
+ 536              	.LFE3:
+ 538              		.align	2
+ 539              		.global	hmacResult
+ 540              		.thumb
+ 541              		.thumb_func
+ 543              	hmacResult:
+ 544              	.LFB4:
+ 201:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 202:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** /*
+ 203:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * hmacResult
+ 204:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 205:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Description:
+ 206:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   This function will return the N-byte message digest into the
+ 207:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   Message_Digest array provided by the caller.
+ 208:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 209:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Parameters:
+ 210:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   context: [in/out]
+ 211:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     The context to use to calculate the HMAC hash.
+ 212:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   digest[ ]: [out]
+ 213:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     Where the digest is returned.
+ 214:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *     NOTE 2: The length of the hash is determined by the value of
+ 215:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *      whichSha that was passed to hmacReset().
+ 216:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 217:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  * Returns:
+ 218:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *   sha Error Code.
+ 219:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  *
+ 220:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****  */
+ 221:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** int hmacResult(HMACContext *context, uint8_t *digest)
+ 222:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** {
+ 545              		.loc 1 222 0
+ 546              		.cfi_startproc
+ 547              		@ args = 0, pretend = 0, frame = 16
+ 548              		@ frame_needed = 1, uses_anonymous_args = 0
+ 549 036c 80B5     		push	{r7, lr}
+ 550              		.cfi_def_cfa_offset 8
+ 551              		.cfi_offset 7, -8
+ 552              		.cfi_offset 14, -4
+ 553 036e 84B0     		sub	sp, sp, #16
+ 554              		.cfi_def_cfa_offset 24
+ 555 0370 00AF     		add	r7, sp, #0
+ 556              		.cfi_def_cfa_register 7
+ 557 0372 7860     		str	r0, [r7, #4]
+ 558 0374 3960     		str	r1, [r7]
+ 223:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   int ret;
+ 224:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (!context) return shaNull;
+ 559              		.loc 1 224 0
+ 560 0376 7B68     		ldr	r3, [r7, #4]
+ 561 0378 002B     		cmp	r3, #0
+ 562 037a 01D1     		bne	.L33
+ 563              		.loc 1 224 0 is_stmt 0 discriminator 1
+ 564 037c 0123     		movs	r3, #1
+ 565 037e 60E0     		b	.L34
+ 566              	.L33:
+ 225:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Corrupted) return context->Corrupted;
+ 567              		.loc 1 225 0 is_stmt 1
+ 568 0380 7B68     		ldr	r3, [r7, #4]
+ 569 0382 D3F87C31 		ldr	r3, [r3, #380]
+ 570 0386 002B     		cmp	r3, #0
+ 571 0388 03D0     		beq	.L35
+ 572              		.loc 1 225 0 is_stmt 0 discriminator 1
+ 573 038a 7B68     		ldr	r3, [r7, #4]
+ 574 038c D3F87C31 		ldr	r3, [r3, #380]
+ 575 0390 57E0     		b	.L34
+ 576              	.L35:
+ 226:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   if (context->Computed) return context->Corrupted = shaStateError;
+ 577              		.loc 1 226 0 is_stmt 1
+ 578 0392 7B68     		ldr	r3, [r7, #4]
+ 579 0394 D3F87831 		ldr	r3, [r3, #376]
+ 580 0398 002B     		cmp	r3, #0
+ 581 039a 07D0     		beq	.L36
+ 582              		.loc 1 226 0 is_stmt 0 discriminator 1
+ 583 039c 7B68     		ldr	r3, [r7, #4]
+ 584 039e 0322     		movs	r2, #3
+ 585 03a0 C3F87C21 		str	r2, [r3, #380]
+ 586 03a4 7B68     		ldr	r3, [r7, #4]
+ 587 03a6 D3F87C31 		ldr	r3, [r3, #380]
+ 588 03aa 4AE0     		b	.L34
+ 589              	.L36:
+ 227:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 228:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* finish up 1st pass */
+ 229:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   /* (Use digest here as a temporary buffer.) */
+ 230:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   ret =
+ 231:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAResult(&context->shaContext, digest) ||
+ 590              		.loc 1 231 0 is_stmt 1
+ 591 03ac 7B68     		ldr	r3, [r7, #4]
+ 592 03ae 1033     		adds	r3, r3, #16
+ 593 03b0 1846     		mov	r0, r3
+ 594 03b2 3968     		ldr	r1, [r7]
+ 595 03b4 FFF7FEFF 		bl	USHAResult
+ 596 03b8 0346     		mov	r3, r0
+ 232:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 233:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* perform outer SHA */
+ 234:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* init context for 2nd pass */
+ 235:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          USHAReset(&context->shaContext, context->whichSha) ||
+ 236:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 237:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* start with outer pad */
+ 238:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          USHAInput(&context->shaContext, context->k_opad,
+ 239:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****                    context->blockSize) ||
+ 240:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 241:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* then results of 1st hash */
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          USHAInput(&context->shaContext, digest, context->hashSize) ||
+ 597              		.loc 1 242 0
+ 598 03ba 002B     		cmp	r3, #0
+ 599 03bc 32D1     		bne	.L37
+ 235:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 600              		.loc 1 235 0
+ 601 03be 7B68     		ldr	r3, [r7, #4]
+ 602 03c0 03F11002 		add	r2, r3, #16
+ 603 03c4 7B68     		ldr	r3, [r7, #4]
+ 604 03c6 1B68     		ldr	r3, [r3]
+ 605 03c8 DBB2     		uxtb	r3, r3
+ 606 03ca 1046     		mov	r0, r2
+ 607 03cc 1946     		mov	r1, r3
+ 608 03ce FFF7FEFF 		bl	USHAReset
+ 609 03d2 0346     		mov	r3, r0
+ 231:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 610              		.loc 1 231 0
+ 611 03d4 002B     		cmp	r3, #0
+ 612 03d6 25D1     		bne	.L37
+ 238:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****                    context->blockSize) ||
+ 613              		.loc 1 238 0
+ 614 03d8 7B68     		ldr	r3, [r7, #4]
+ 615 03da 03F11001 		add	r1, r3, #16
+ 616 03de 7B68     		ldr	r3, [r7, #4]
+ 617 03e0 03F1F802 		add	r2, r3, #248
+ 239:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 618              		.loc 1 239 0
+ 619 03e4 7B68     		ldr	r3, [r7, #4]
+ 620 03e6 9B68     		ldr	r3, [r3, #8]
+ 238:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****                    context->blockSize) ||
+ 621              		.loc 1 238 0
+ 622 03e8 0846     		mov	r0, r1
+ 623 03ea 1146     		mov	r1, r2
+ 624 03ec 1A46     		mov	r2, r3
+ 625 03ee FFF7FEFF 		bl	USHAInput
+ 626 03f2 0346     		mov	r3, r0
+ 235:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 627              		.loc 1 235 0
+ 628 03f4 002B     		cmp	r3, #0
+ 629 03f6 15D1     		bne	.L37
+ 630              		.loc 1 242 0
+ 631 03f8 7B68     		ldr	r3, [r7, #4]
+ 632 03fa 03F11002 		add	r2, r3, #16
+ 633 03fe 7B68     		ldr	r3, [r7, #4]
+ 634 0400 5B68     		ldr	r3, [r3, #4]
+ 635 0402 1046     		mov	r0, r2
+ 636 0404 3968     		ldr	r1, [r7]
+ 637 0406 1A46     		mov	r2, r3
+ 638 0408 FFF7FEFF 		bl	USHAInput
+ 639 040c 0346     		mov	r3, r0
+ 239:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 640              		.loc 1 239 0
+ 641 040e 002B     		cmp	r3, #0
+ 642 0410 08D1     		bne	.L37
+ 243:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* finish up 2nd pass */
+ 244:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          USHAResult(&context->shaContext, digest);
+ 643              		.loc 1 244 0 discriminator 2
+ 644 0412 7B68     		ldr	r3, [r7, #4]
+ 645 0414 1033     		adds	r3, r3, #16
+ 646 0416 1846     		mov	r0, r3
+ 647 0418 3968     		ldr	r1, [r7]
+ 648 041a FFF7FEFF 		bl	USHAResult
+ 649 041e 0346     		mov	r3, r0
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* finish up 2nd pass */
+ 650              		.loc 1 242 0 discriminator 2
+ 651 0420 002B     		cmp	r3, #0
+ 652 0422 01D0     		beq	.L38
+ 653              	.L37:
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* finish up 2nd pass */
+ 654              		.loc 1 242 0 is_stmt 0 discriminator 1
+ 655 0424 0123     		movs	r3, #1
+ 656 0426 00E0     		b	.L39
+ 657              	.L38:
+ 242:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****          /* finish up 2nd pass */
+ 658              		.loc 1 242 0 discriminator 3
+ 659 0428 0023     		movs	r3, #0
+ 660              	.L39:
+ 230:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****     USHAResult(&context->shaContext, digest) ||
+ 661              		.loc 1 230 0 is_stmt 1
+ 662 042a FB60     		str	r3, [r7, #12]
+ 245:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** 
+ 246:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   context->Computed = 1;
+ 663              		.loc 1 246 0
+ 664 042c 7B68     		ldr	r3, [r7, #4]
+ 665 042e 0122     		movs	r2, #1
+ 666 0430 C3F87821 		str	r2, [r3, #376]
+ 247:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c ****   return context->Corrupted = ret;
+ 667              		.loc 1 247 0
+ 668 0434 7B68     		ldr	r3, [r7, #4]
+ 669 0436 FA68     		ldr	r2, [r7, #12]
+ 670 0438 C3F87C21 		str	r2, [r3, #380]
+ 671 043c 7B68     		ldr	r3, [r7, #4]
+ 672 043e D3F87C31 		ldr	r3, [r3, #380]
+ 673              	.L34:
+ 248:build/openmote-cc2538_armgcc/openapps/opencoap/hmac.c **** }
+ 674              		.loc 1 248 0
+ 675 0442 1846     		mov	r0, r3
+ 676 0444 1037     		adds	r7, r7, #16
+ 677              		.cfi_def_cfa_offset 8
+ 678 0446 BD46     		mov	sp, r7
+ 679              		.cfi_def_cfa_register 13
+ 680              		@ sp needed
+ 681 0448 80BD     		pop	{r7, pc}
+ 682              		.cfi_endproc
+ 683              	.LFE4:
+ 685              	.Letext0:
+ 686              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 687              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 688              		.file 4 "/usr/include/newlib/stdint.h"
+ 689              		.file 5 "build/openmote-cc2538_armgcc/openapps/opencoap/sha.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 hmac.c
+     /tmp/ccuQheTq.s:18     .text:0000000000000000 $t
+     /tmp/ccuQheTq.s:23     .text:0000000000000000 hmac
+     /tmp/ccuQheTq.s:108    .text:000000000000007c hmacReset
+     /tmp/ccuQheTq.s:384    .text:0000000000000294 hmacInput
+     /tmp/ccuQheTq.s:543    .text:000000000000036c hmacResult
+     /tmp/ccuQheTq.s:463    .text:0000000000000300 hmacFinalBits
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+
+UNDEFINED SYMBOLS
+USHABlockSize
+USHAHashSize
+USHAReset
+USHAInput
+USHAResult
+USHAFinalBits

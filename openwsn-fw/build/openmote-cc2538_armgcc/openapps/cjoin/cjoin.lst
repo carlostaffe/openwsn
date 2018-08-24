@@ -1,0 +1,1610 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"cjoin.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.rodata
+  19              		.align	2
+  22              	rreg_uriquery:
+  23 0000 683D7563 		.ascii	"h=ucb\000"
+  23      6200
+  24 0006 0000     		.align	2
+  27              	infoBoardname:
+  28 0008 43433235 		.ascii	"CC2538\000"
+  28      333800
+  29 000f 00       		.align	2
+  32              	infouCName:
+  33 0010 43433235 		.ascii	"CC2538\000"
+  33      333800
+  34 0017 00       		.align	2
+  37              	infoRadioName:
+  38 0018 43433235 		.ascii	"CC2538 SoC\000"
+  38      33382053 
+  38      6F4300
+  39 0023 00       		.align	2
+  42              	infoStackName:
+  43 0024 4F70656E 		.ascii	"OpenWSN \000"
+  43      57534E20 
+  43      00
+  44 002d 000000   		.align	2
+  47              	ipAddr_ipsoRD:
+  48 0030 26       		.byte	38
+  49 0031 07       		.byte	7
+  50 0032 F7       		.byte	-9
+  51 0033 40       		.byte	64
+  52 0034 00       		.byte	0
+  53 0035 00       		.byte	0
+  54 0036 00       		.byte	0
+  55 0037 3F       		.byte	63
+  56 0038 00       		.byte	0
+  57 0039 00       		.byte	0
+  58 003a 00       		.byte	0
+  59 003b 00       		.byte	0
+  60 003c 00       		.byte	0
+  61 003d 00       		.byte	0
+  62 003e 0E       		.byte	14
+  63 003f 29       		.byte	41
+  64              		.align	2
+  67              	ipAddr_motesEecs:
+  68 0040 20       		.byte	32
+  69 0041 01       		.byte	1
+  70 0042 04       		.byte	4
+  71 0043 70       		.byte	112
+  72 0044 00       		.byte	0
+  73 0045 66       		.byte	102
+  74 0046 00       		.byte	0
+  75 0047 19       		.byte	25
+  76 0048 00       		.byte	0
+  77 0049 00       		.byte	0
+  78 004a 00       		.byte	0
+  79 004b 00       		.byte	0
+  80 004c 00       		.byte	0
+  81 004d 00       		.byte	0
+  82 004e 00       		.byte	0
+  83 004f 02       		.byte	2
+  84              		.align	2
+  87              	ipAddr_local:
+  88 0050 26       		.byte	38
+  89 0051 07       		.byte	7
+  90 0052 F1       		.byte	-15
+  91 0053 40       		.byte	64
+  92 0054 04       		.byte	4
+  93 0055 00       		.byte	0
+  94 0056 10       		.byte	16
+  95 0057 36       		.byte	54
+  96 0058 4D       		.byte	77
+  97 0059 CD       		.byte	-51
+  98 005a AB       		.byte	-85
+  99 005b 54       		.byte	84
+ 100 005c 81       		.byte	-127
+ 101 005d 99       		.byte	-103
+ 102 005e C1       		.byte	-63
+ 103 005f F7       		.byte	-9
+ 104              		.align	2
+ 107              	ipAddr_motedata:
+ 108 0060 20       		.byte	32
+ 109 0061 01       		.byte	1
+ 110 0062 04       		.byte	4
+ 111 0063 70       		.byte	112
+ 112 0064 00       		.byte	0
+ 113 0065 66       		.byte	102
+ 114 0066 00       		.byte	0
+ 115 0067 17       		.byte	23
+ 116 0068 00       		.byte	0
+ 117 0069 00       		.byte	0
+ 118 006a 00       		.byte	0
+ 119 006b 00       		.byte	0
+ 120 006c 00       		.byte	0
+ 121 006d 00       		.byte	0
+ 122 006e 00       		.byte	0
+ 123 006f 02       		.byte	2
+ 124              		.align	2
+ 127              	ipAddr_ringmaster:
+ 128 0070 BB       		.byte	-69
+ 129 0071 BB       		.byte	-69
+ 130 0072 00       		.byte	0
+ 131 0073 00       		.byte	0
+ 132 0074 00       		.byte	0
+ 133 0075 00       		.byte	0
+ 134 0076 00       		.byte	0
+ 135 0077 00       		.byte	0
+ 136 0078 00       		.byte	0
+ 137 0079 00       		.byte	0
+ 138 007a 00       		.byte	0
+ 139 007b 00       		.byte	0
+ 140 007c 00       		.byte	0
+ 141 007d 00       		.byte	0
+ 142 007e 00       		.byte	0
+ 143 007f 01       		.byte	1
+ 144              		.align	2
+ 147              	linklocalprefix:
+ 148 0080 FE       		.byte	-2
+ 149 0081 80       		.byte	-128
+ 150 0082 00       		.byte	0
+ 151 0083 00       		.byte	0
+ 152 0084 00       		.byte	0
+ 153 0085 00       		.byte	0
+ 154 0086 00       		.byte	0
+ 155 0087 00       		.byte	0
+ 156              		.align	2
+ 159              	chTemplate_default:
+ 160 0088 05       		.byte	5
+ 161 0089 06       		.byte	6
+ 162 008a 0C       		.byte	12
+ 163 008b 07       		.byte	7
+ 164 008c 0F       		.byte	15
+ 165 008d 04       		.byte	4
+ 166 008e 0E       		.byte	14
+ 167 008f 0B       		.byte	11
+ 168 0090 08       		.byte	8
+ 169 0091 00       		.byte	0
+ 170 0092 01       		.byte	1
+ 171 0093 02       		.byte	2
+ 172 0094 0D       		.byte	13
+ 173 0095 03       		.byte	3
+ 174 0096 09       		.byte	9
+ 175 0097 0A       		.byte	10
+ 176              		.align	2
+ 179              	ebIEsBytestream:
+ 180 0098 1A       		.byte	26
+ 181 0099 88       		.byte	-120
+ 182 009a 06       		.byte	6
+ 183 009b 1A       		.byte	26
+ 184 009c 00       		.byte	0
+ 185 009d 00       		.byte	0
+ 186 009e 00       		.byte	0
+ 187 009f 00       		.byte	0
+ 188 00a0 00       		.byte	0
+ 189 00a1 00       		.byte	0
+ 190 00a2 01       		.byte	1
+ 191 00a3 1C       		.byte	28
+ 192 00a4 00       		.byte	0
+ 193 00a5 01       		.byte	1
+ 194 00a6 C8       		.byte	-56
+ 195 00a7 00       		.byte	0
+ 196 00a8 0A       		.byte	10
+ 197 00a9 1B       		.byte	27
+ 198 00aa 01       		.byte	1
+ 199 00ab 00       		.byte	0
+ 200 00ac 65       		.byte	101
+ 201 00ad 00       		.byte	0
+ 202 00ae 01       		.byte	1
+ 203 00af 00       		.byte	0
+ 204 00b0 00       		.byte	0
+ 205 00b1 00       		.byte	0
+ 206 00b2 00       		.byte	0
+ 207 00b3 0F       		.byte	15
+ 208              		.align	2
+ 211              	all_routers_multicast:
+ 212 00b4 FF       		.byte	-1
+ 213 00b5 02       		.byte	2
+ 214 00b6 00       		.byte	0
+ 215 00b7 00       		.byte	0
+ 216 00b8 00       		.byte	0
+ 217 00b9 00       		.byte	0
+ 218 00ba 00       		.byte	0
+ 219 00bb 00       		.byte	0
+ 220 00bc 00       		.byte	0
+ 221 00bd 00       		.byte	0
+ 222 00be 00       		.byte	0
+ 223 00bf 00       		.byte	0
+ 224 00c0 00       		.byte	0
+ 225 00c1 00       		.byte	0
+ 226 00c2 00       		.byte	0
+ 227 00c3 1A       		.byte	26
+ 228              		.global	cjoin_path0
+ 229              		.align	2
+ 232              	cjoin_path0:
+ 233 00c4 6A00     		.ascii	"j\000"
+ 234 00c6 0000     		.align	2
+ 237              	masterSecret:
+ 238 00c8 DE       		.byte	-34
+ 239 00c9 AD       		.byte	-83
+ 240 00ca BE       		.byte	-66
+ 241 00cb EF       		.byte	-17
+ 242 00cc CA       		.byte	-54
+ 243 00cd FE       		.byte	-2
+ 244 00ce DE       		.byte	-34
+ 245 00cf AD       		.byte	-83
+ 246 00d0 BE       		.byte	-66
+ 247 00d1 EF       		.byte	-17
+ 248 00d2 CA       		.byte	-54
+ 249 00d3 FE       		.byte	-2
+ 250 00d4 DE       		.byte	-34
+ 251 00d5 AD       		.byte	-83
+ 252 00d6 BE       		.byte	-66
+ 253 00d7 EF       		.byte	-17
+ 254              		.align	2
+ 257              	jrcHostName:
+ 258 00d8 36746973 		.ascii	"6tisch.arpa\000"
+ 258      63682E61 
+ 258      72706100 
+ 259              		.align	2
+ 262              	proxyScheme:
+ 263 00e4 636F6170 		.ascii	"coap\000"
+ 263      00
+ 264              		.comm	cjoin_vars,156,4
+ 265              		.text
+ 266              		.align	2
+ 267              		.global	cjoin_init
+ 268              		.thumb
+ 269              		.thumb_func
+ 271              	cjoin_init:
+ 272              	.LFB0:
+ 273              		.file 1 "build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c"
+   1:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** /**
+   2:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** \brief Implementation of Constrained Join Protocol (CoJP) from minimal-security-06 draft.
+   3:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** */
+   4:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+   5:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "opendefs.h"
+   6:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "cjoin.h"
+   7:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "opencoap.h"
+   8:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "opentimers.h"
+   9:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "openqueue.h"
+  10:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "packetfunctions.h"
+  11:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "openserial.h"
+  12:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "openrandom.h"
+  13:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "scheduler.h"
+  14:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "idmanager.h"
+  15:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "IEEE802154E.h"
+  16:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "IEEE802154_security.h"
+  17:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "cojp_cbor.h"
+  18:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "eui64.h"
+  19:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #include "neighbors.h"
+  20:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  21:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //=========================== defines =========================================
+  22:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  23:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** /// inter-packet period (in ms)
+  24:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** #define TIMEOUT                 60000
+  25:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  26:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** const uint8_t cjoin_path0[] = "j";
+  27:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  28:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** static const uint8_t masterSecret[] = {0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0xde, 0xad, \
+  29:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                      0xbe, 0xef, 0xca, 0xfe, 0xde, 0xad, 0xbe, 0xef};
+  30:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  31:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** static const uint8_t jrcHostName[] = "6tisch.arpa";
+  32:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  33:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** static const uint8_t proxyScheme[] = "coap";
+  34:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  35:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //=========================== variables =======================================
+  36:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  37:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** cjoin_vars_t cjoin_vars;
+  38:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  39:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //=========================== prototypes ======================================
+  40:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_init_security_context(void);
+  41:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  42:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** owerror_t   cjoin_receive(OpenQueueEntry_t* msg,
+  43:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                           coap_header_iht*  coap_header,
+  44:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                           coap_option_iht*  coap_incomingOptions,
+  45:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                           coap_option_iht*  coap_outgoingOptions,
+  46:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                           uint8_t*          coap_outgoingOptionsLen);
+  47:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_timer_cb(opentimers_id_t id);
+  48:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_task_cb(void);
+  49:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_sendDone(OpenQueueEntry_t* msg,
+  50:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                        owerror_t error);
+  51:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** owerror_t   cjoin_sendJoinRequest(open_addr_t *joinProxy);
+  52:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_retransmission_cb(opentimers_id_t id);
+  53:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_retransmission_task_cb(void);
+  54:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** bool        cjoin_getIsJoined(void);
+  55:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void        cjoin_setIsJoined(bool newValue);
+  56:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //=========================== public ==========================================
+  57:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  58:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_init(void) {
+ 274              		.loc 1 58 0
+ 275              		.cfi_startproc
+ 276              		@ args = 0, pretend = 0, frame = 0
+ 277              		@ frame_needed = 1, uses_anonymous_args = 0
+ 278 0000 80B5     		push	{r7, lr}
+ 279              		.cfi_def_cfa_offset 8
+ 280              		.cfi_offset 7, -8
+ 281              		.cfi_offset 14, -4
+ 282 0002 00AF     		add	r7, sp, #0
+ 283              		.cfi_def_cfa_register 7
+  59:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // declare the usage of dynamic keying to L2 security module
+  60:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    IEEE802154_security_setDynamicKeying();
+ 284              		.loc 1 60 0
+ 285 0004 FFF7FEFF 		bl	IEEE802154_security_setDynamicKeying
+  61:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  62:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // prepare the resource descriptor for the /j path
+  63:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.path0len                        = sizeof(cjoin_path0)-1;
+ 286              		.loc 1 63 0
+ 287 0008 174B     		ldr	r3, .L2
+ 288 000a 0122     		movs	r2, #1
+ 289 000c 1A70     		strb	r2, [r3]
+  64:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.path0val                        = (uint8_t*)(&cjoin_path0);
+ 290              		.loc 1 64 0
+ 291 000e 164B     		ldr	r3, .L2
+ 292 0010 164A     		ldr	r2, .L2+4
+ 293 0012 5A60     		str	r2, [r3, #4]
+  65:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.path1len                        = 0;
+ 294              		.loc 1 65 0
+ 295 0014 144B     		ldr	r3, .L2
+ 296 0016 0022     		movs	r2, #0
+ 297 0018 1A72     		strb	r2, [r3, #8]
+  66:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.path1val                        = NULL;
+ 298              		.loc 1 66 0
+ 299 001a 134B     		ldr	r3, .L2
+ 300 001c 0022     		movs	r2, #0
+ 301 001e DA60     		str	r2, [r3, #12]
+  67:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.componentID                     = COMPONENT_CJOIN;
+ 302              		.loc 1 67 0
+ 303 0020 114B     		ldr	r3, .L2
+ 304 0022 2722     		movs	r2, #39
+ 305 0024 1A74     		strb	r2, [r3, #16]
+  68:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //   cjoin_vars.desc.securityContext                 = &cjoin_vars.context;
+  69:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.securityContext                 = NULL;
+ 306              		.loc 1 69 0
+ 307 0026 104B     		ldr	r3, .L2
+ 308 0028 0022     		movs	r2, #0
+ 309 002a 5A61     		str	r2, [r3, #20]
+  70:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.discoverable                    = TRUE;
+ 310              		.loc 1 70 0
+ 311 002c 0E4B     		ldr	r3, .L2
+ 312 002e 0122     		movs	r2, #1
+ 313 0030 1A76     		strb	r2, [r3, #24]
+  71:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.callbackRx                      = &cjoin_receive;
+ 314              		.loc 1 71 0
+ 315 0032 0D4B     		ldr	r3, .L2
+ 316 0034 0E4A     		ldr	r2, .L2+8
+ 317 0036 DA61     		str	r2, [r3, #28]
+  72:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.desc.callbackSendDone                = &cjoin_sendDone;
+ 318              		.loc 1 72 0
+ 319 0038 0B4B     		ldr	r3, .L2
+ 320 003a 0E4A     		ldr	r2, .L2+12
+ 321 003c 1A62     		str	r2, [r3, #32]
+  73:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  74:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.isJoined                             = FALSE;
+ 322              		.loc 1 74 0
+ 323 003e 0A4B     		ldr	r3, .L2
+ 324 0040 0022     		movs	r2, #0
+ 325 0042 83F83920 		strb	r2, [r3, #57]
+  75:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  76:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    opencoap_register(&cjoin_vars.desc);
+ 326              		.loc 1 76 0
+ 327 0046 0848     		ldr	r0, .L2
+ 328 0048 FFF7FEFF 		bl	opencoap_register
+  77:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  78:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.timerId = opentimers_create();
+ 329              		.loc 1 78 0
+ 330 004c FFF7FEFF 		bl	opentimers_create
+ 331 0050 0346     		mov	r3, r0
+ 332 0052 1A46     		mov	r2, r3
+ 333 0054 044B     		ldr	r3, .L2
+ 334 0056 83F83820 		strb	r2, [r3, #56]
+  79:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  80:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    idmanager_setJoinKey((uint8_t *) masterSecret);
+ 335              		.loc 1 80 0
+ 336 005a 0748     		ldr	r0, .L2+16
+ 337 005c FFF7FEFF 		bl	idmanager_setJoinKey
+  81:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  82:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_schedule();
+ 338              		.loc 1 82 0
+ 339 0060 FFF7FEFF 		bl	cjoin_schedule
+  83:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 340              		.loc 1 83 0
+ 341 0064 80BD     		pop	{r7, pc}
+ 342              	.L3:
+ 343 0066 00BF     		.align	2
+ 344              	.L2:
+ 345 0068 00000000 		.word	cjoin_vars
+ 346 006c 00000000 		.word	cjoin_path0
+ 347 0070 00000000 		.word	cjoin_receive
+ 348 0074 00000000 		.word	cjoin_sendDone
+ 349 0078 C8000000 		.word	masterSecret
+ 350              		.cfi_endproc
+ 351              	.LFE0:
+ 353              		.align	2
+ 354              		.global	cjoin_init_security_context
+ 355              		.thumb
+ 356              		.thumb_func
+ 358              	cjoin_init_security_context:
+ 359              	.LFB1:
+  84:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  85:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_init_security_context(void) {
+ 360              		.loc 1 85 0
+ 361              		.cfi_startproc
+ 362              		@ args = 0, pretend = 0, frame = 24
+ 363              		@ frame_needed = 1, uses_anonymous_args = 0
+ 364 007c 90B5     		push	{r4, r7, lr}
+ 365              		.cfi_def_cfa_offset 12
+ 366              		.cfi_offset 4, -12
+ 367              		.cfi_offset 7, -8
+ 368              		.cfi_offset 14, -4
+ 369 007e 8DB0     		sub	sp, sp, #52
+ 370              		.cfi_def_cfa_offset 64
+ 371 0080 06AF     		add	r7, sp, #24
+ 372              		.cfi_def_cfa 7, 40
+  86:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t senderID[1];     // 1 dummy byte
+  87:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t recipientID[3];  // 3 byte fixed value
+  88:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t id_context[8];
+  89:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t* joinKey;
+  90:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  91:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    eui64_get(id_context);
+ 373              		.loc 1 91 0
+ 374 0082 07F10803 		add	r3, r7, #8
+ 375 0086 1846     		mov	r0, r3
+ 376 0088 FFF7FEFF 		bl	eui64_get
+  92:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    senderID[0] = 0x00;      // construct sender ID according to the minimal-security-06 draft
+ 377              		.loc 1 92 0
+ 378 008c 0023     		movs	r3, #0
+ 379 008e 3B75     		strb	r3, [r7, #20]
+  93:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // construct recipient ID according to the minimal-security-06 draft
+  94:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    recipientID[0] = 0x4a; // "J"
+ 380              		.loc 1 94 0
+ 381 0090 4A23     		movs	r3, #74
+ 382 0092 3B74     		strb	r3, [r7, #16]
+  95:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    recipientID[1] = 0x52; // "R"
+ 383              		.loc 1 95 0
+ 384 0094 5223     		movs	r3, #82
+ 385 0096 7B74     		strb	r3, [r7, #17]
+  96:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    recipientID[2] = 0x43; // "C"
+ 386              		.loc 1 96 0
+ 387 0098 4323     		movs	r3, #67
+ 388 009a BB74     		strb	r3, [r7, #18]
+  97:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+  98:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    idmanager_getJoinKey(&joinKey);
+ 389              		.loc 1 98 0
+ 390 009c 3B1D     		adds	r3, r7, #4
+ 391 009e 1846     		mov	r0, r3
+ 392 00a0 FFF7FEFF 		bl	idmanager_getJoinKey
+  99:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 100:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // TODO Pass id_context to the routine
+ 101:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    openoscoap_init_security_context(&cjoin_vars.context,
+ 393              		.loc 1 101 0
+ 394 00a4 7B68     		ldr	r3, [r7, #4]
+ 395 00a6 07F11401 		add	r1, r7, #20
+ 396 00aa 07F11004 		add	r4, r7, #16
+ 397 00ae 0322     		movs	r2, #3
+ 398 00b0 0092     		str	r2, [sp]
+ 399 00b2 0193     		str	r3, [sp, #4]
+ 400 00b4 1023     		movs	r3, #16
+ 401 00b6 0293     		str	r3, [sp, #8]
+ 402 00b8 0023     		movs	r3, #0
+ 403 00ba 0393     		str	r3, [sp, #12]
+ 404 00bc 0023     		movs	r3, #0
+ 405 00be 0493     		str	r3, [sp, #16]
+ 406 00c0 0348     		ldr	r0, .L5
+ 407 00c2 0122     		movs	r2, #1
+ 408 00c4 2346     		mov	r3, r4
+ 409 00c6 FFF7FEFF 		bl	openoscoap_init_security_context
+ 102:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 senderID,
+ 103:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 sizeof(senderID),
+ 104:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 recipientID,
+ 105:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 sizeof(recipientID),
+ 106:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 joinKey,
+ 107:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 16,
+ 108:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 NULL,
+ 109:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                                 0);
+ 110:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 410              		.loc 1 110 0
+ 411 00ca 1C37     		adds	r7, r7, #28
+ 412              		.cfi_def_cfa_offset 12
+ 413 00cc BD46     		mov	sp, r7
+ 414              		.cfi_def_cfa_register 13
+ 415              		@ sp needed
+ 416 00ce 90BD     		pop	{r4, r7, pc}
+ 417              	.L6:
+ 418              		.align	2
+ 419              	.L5:
+ 420 00d0 3C000000 		.word	cjoin_vars+60
+ 421              		.cfi_endproc
+ 422              	.LFE1:
+ 424              		.align	2
+ 425              		.global	cjoin_schedule
+ 426              		.thumb
+ 427              		.thumb_func
+ 429              	cjoin_schedule:
+ 430              	.LFB2:
+ 111:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 112:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_schedule(void) {
+ 431              		.loc 1 112 0
+ 432              		.cfi_startproc
+ 433              		@ args = 0, pretend = 0, frame = 8
+ 434              		@ frame_needed = 1, uses_anonymous_args = 0
+ 435 00d4 80B5     		push	{r7, lr}
+ 436              		.cfi_def_cfa_offset 8
+ 437              		.cfi_offset 7, -8
+ 438              		.cfi_offset 14, -4
+ 439 00d6 84B0     		sub	sp, sp, #16
+ 440              		.cfi_def_cfa_offset 24
+ 441 00d8 02AF     		add	r7, sp, #8
+ 442              		.cfi_def_cfa 7, 16
+ 113:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     uint16_t delay;
+ 114:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 115:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (cjoin_getIsJoined() == FALSE) {
+ 443              		.loc 1 115 0
+ 444 00da FFF7FEFF 		bl	cjoin_getIsJoined
+ 445 00de 0346     		mov	r3, r0
+ 446 00e0 83F00103 		eor	r3, r3, #1
+ 447 00e4 DBB2     		uxtb	r3, r3
+ 448 00e6 002B     		cmp	r3, #0
+ 449 00e8 0FD0     		beq	.L7
+ 116:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         delay = openrandom_get16b();
+ 450              		.loc 1 116 0
+ 451 00ea FFF7FEFF 		bl	openrandom_get16b
+ 452 00ee 0346     		mov	r3, r0
+ 453 00f0 FB80     		strh	r3, [r7, #6]	@ movhi
+ 117:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 118:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         opentimers_scheduleIn(cjoin_vars.timerId,
+ 454              		.loc 1 118 0
+ 455 00f2 074B     		ldr	r3, .L9
+ 456 00f4 93F83810 		ldrb	r1, [r3, #56]	@ zero_extendqisi2
+ 457 00f8 FA88     		ldrh	r2, [r7, #6]
+ 458 00fa 064B     		ldr	r3, .L9+4
+ 459 00fc 0093     		str	r3, [sp]
+ 460 00fe 0846     		mov	r0, r1
+ 461 0100 1146     		mov	r1, r2
+ 462 0102 0022     		movs	r2, #0
+ 463 0104 0023     		movs	r3, #0
+ 464 0106 FFF7FEFF 		bl	opentimers_scheduleIn
+ 465              	.L7:
+ 119:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                 (uint32_t) delay, // random wait from 0 to 65535ms
+ 120:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                 TIME_MS,
+ 121:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                 TIMER_PERIODIC,
+ 122:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                 cjoin_timer_cb
+ 123:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         );
+ 124:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 125:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 126:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 466              		.loc 1 126 0
+ 467 010a 0837     		adds	r7, r7, #8
+ 468              		.cfi_def_cfa_offset 8
+ 469 010c BD46     		mov	sp, r7
+ 470              		.cfi_def_cfa_register 13
+ 471              		@ sp needed
+ 472 010e 80BD     		pop	{r7, pc}
+ 473              	.L10:
+ 474              		.align	2
+ 475              	.L9:
+ 476 0110 00000000 		.word	cjoin_vars
+ 477 0114 00000000 		.word	cjoin_timer_cb
+ 478              		.cfi_endproc
+ 479              	.LFE2:
+ 481              		.align	2
+ 482              		.global	cjoin_receive
+ 483              		.thumb
+ 484              		.thumb_func
+ 486              	cjoin_receive:
+ 487              	.LFB3:
+ 127:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 128:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //=========================== private =========================================
+ 129:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** owerror_t cjoin_receive(OpenQueueEntry_t* msg,
+ 130:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         coap_header_iht*  coap_header,
+ 131:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         coap_option_iht*  coap_incomingOptions,
+ 132:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         coap_option_iht*  coap_outgoingOptions,
+ 133:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         uint8_t*          coap_outgoingOptionsLen) {
+ 488              		.loc 1 133 0
+ 489              		.cfi_startproc
+ 490              		@ args = 4, pretend = 0, frame = 88
+ 491              		@ frame_needed = 1, uses_anonymous_args = 0
+ 492 0118 80B5     		push	{r7, lr}
+ 493              		.cfi_def_cfa_offset 8
+ 494              		.cfi_offset 7, -8
+ 495              		.cfi_offset 14, -4
+ 496 011a 96B0     		sub	sp, sp, #88
+ 497              		.cfi_def_cfa_offset 96
+ 498 011c 00AF     		add	r7, sp, #0
+ 499              		.cfi_def_cfa_register 7
+ 500 011e F860     		str	r0, [r7, #12]
+ 501 0120 B960     		str	r1, [r7, #8]
+ 502 0122 7A60     		str	r2, [r7, #4]
+ 503 0124 3B60     		str	r3, [r7]
+ 134:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 135:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 136:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     cojp_configuration_object_t configuration;
+ 137:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     owerror_t ret;
+ 138:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 139:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     opentimers_cancel(cjoin_vars.timerId); // cancel the retransmission timer
+ 504              		.loc 1 139 0
+ 505 0126 204B     		ldr	r3, .L17
+ 506 0128 93F83830 		ldrb	r3, [r3, #56]	@ zero_extendqisi2
+ 507 012c 1846     		mov	r0, r3
+ 508 012e FFF7FEFF 		bl	opentimers_cancel
+ 140:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 141:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (coap_header->Code != COAP_CODE_RESP_CHANGED) {
+ 509              		.loc 1 141 0
+ 510 0132 BB68     		ldr	r3, [r7, #8]
+ 511 0134 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 512 0136 442B     		cmp	r3, #68
+ 513 0138 01D0     		beq	.L12
+ 142:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         return E_FAIL;
+ 514              		.loc 1 142 0
+ 515 013a 0123     		movs	r3, #1
+ 516 013c 2FE0     		b	.L16
+ 517              	.L12:
+ 143:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 144:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 145:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     ret = cojp_cbor_decode_configuration_object(msg->payload, msg->length, &configuration);
+ 518              		.loc 1 145 0
+ 519 013e FB68     		ldr	r3, [r7, #12]
+ 520 0140 5968     		ldr	r1, [r3, #4]
+ 521 0142 FB68     		ldr	r3, [r7, #12]
+ 522 0144 1A7A     		ldrb	r2, [r3, #8]	@ zero_extendqisi2
+ 523 0146 07F11003 		add	r3, r7, #16
+ 524 014a 0846     		mov	r0, r1
+ 525 014c 1146     		mov	r1, r2
+ 526 014e 1A46     		mov	r2, r3
+ 527 0150 FFF7FEFF 		bl	cojp_cbor_decode_configuration_object
+ 528 0154 0346     		mov	r3, r0
+ 529 0156 87F85730 		strb	r3, [r7, #87]
+ 146:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (ret == E_FAIL) { return E_FAIL; }
+ 530              		.loc 1 146 0
+ 531 015a 97F85730 		ldrb	r3, [r7, #87]	@ zero_extendqisi2
+ 532 015e 012B     		cmp	r3, #1
+ 533 0160 01D1     		bne	.L14
+ 534              		.loc 1 146 0 is_stmt 0 discriminator 1
+ 535 0162 0123     		movs	r3, #1
+ 536 0164 1BE0     		b	.L16
+ 537              	.L14:
+ 147:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 148:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (configuration.keyset.num_keys == 1 &&
+ 538              		.loc 1 148 0 is_stmt 1
+ 539 0166 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 540 0168 012B     		cmp	r3, #1
+ 541 016a 17D1     		bne	.L15
+ 149:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         configuration.keyset.key[0].key_usage == COJP_KEY_USAGE_6TiSCH_K1K2_ENC_MIC32) {
+ 542              		.loc 1 149 0 discriminator 1
+ 543 016c BB7C     		ldrb	r3, [r7, #18]	@ zero_extendqisi2
+ 148:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         configuration.keyset.key[0].key_usage == COJP_KEY_USAGE_6TiSCH_K1K2_ENC_MIC32) {
+ 544              		.loc 1 148 0 discriminator 1
+ 545 016e 002B     		cmp	r3, #0
+ 546 0170 14D1     		bne	.L15
+ 150:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             // set the L2 keys as per the parsed value
+ 151:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             IEEE802154_security_setBeaconKey(configuration.keyset.key[0].key_index, configuration.k
+ 547              		.loc 1 151 0
+ 548 0172 7A7C     		ldrb	r2, [r7, #17]	@ zero_extendqisi2
+ 549 0174 07F11003 		add	r3, r7, #16
+ 550 0178 0333     		adds	r3, r3, #3
+ 551 017a 1046     		mov	r0, r2
+ 552 017c 1946     		mov	r1, r3
+ 553 017e FFF7FEFF 		bl	IEEE802154_security_setBeaconKey
+ 152:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             IEEE802154_security_setDataKey(configuration.keyset.key[0].key_index, configuration.key
+ 554              		.loc 1 152 0
+ 555 0182 7A7C     		ldrb	r2, [r7, #17]	@ zero_extendqisi2
+ 556 0184 07F11003 		add	r3, r7, #16
+ 557 0188 0333     		adds	r3, r3, #3
+ 558 018a 1046     		mov	r0, r2
+ 559 018c 1946     		mov	r1, r3
+ 560 018e FFF7FEFF 		bl	IEEE802154_security_setDataKey
+ 153:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             cjoin_setIsJoined(TRUE); // declare join is over
+ 561              		.loc 1 153 0
+ 562 0192 0120     		movs	r0, #1
+ 563 0194 FFF7FEFF 		bl	cjoin_setIsJoined
+ 154:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             return E_SUCCESS;
+ 564              		.loc 1 154 0
+ 565 0198 0023     		movs	r3, #0
+ 566 019a 00E0     		b	.L16
+ 567              	.L15:
+ 155:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     } else {
+ 156:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         // TODO not supported for now
+ 157:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 158:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 159:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 160:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     return E_FAIL;
+ 568              		.loc 1 160 0
+ 569 019c 0123     		movs	r3, #1
+ 570              	.L16:
+ 161:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 571              		.loc 1 161 0 discriminator 1
+ 572 019e 1846     		mov	r0, r3
+ 573 01a0 5837     		adds	r7, r7, #88
+ 574              		.cfi_def_cfa_offset 8
+ 575 01a2 BD46     		mov	sp, r7
+ 576              		.cfi_def_cfa_register 13
+ 577              		@ sp needed
+ 578 01a4 80BD     		pop	{r7, pc}
+ 579              	.L18:
+ 580 01a6 00BF     		.align	2
+ 581              	.L17:
+ 582 01a8 00000000 		.word	cjoin_vars
+ 583              		.cfi_endproc
+ 584              	.LFE3:
+ 586              		.align	2
+ 587              		.global	cjoin_timer_cb
+ 588              		.thumb
+ 589              		.thumb_func
+ 591              	cjoin_timer_cb:
+ 592              	.LFB4:
+ 162:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 163:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //timer fired, but we don't want to execute task in ISR mode
+ 164:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //instead, push task to scheduler with COAP priority, and let scheduler take care of it
+ 165:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_timer_cb(opentimers_id_t id){
+ 593              		.loc 1 165 0
+ 594              		.cfi_startproc
+ 595              		@ args = 0, pretend = 0, frame = 8
+ 596              		@ frame_needed = 1, uses_anonymous_args = 0
+ 597 01ac 80B5     		push	{r7, lr}
+ 598              		.cfi_def_cfa_offset 8
+ 599              		.cfi_offset 7, -8
+ 600              		.cfi_offset 14, -4
+ 601 01ae 82B0     		sub	sp, sp, #8
+ 602              		.cfi_def_cfa_offset 16
+ 603 01b0 00AF     		add	r7, sp, #0
+ 604              		.cfi_def_cfa_register 7
+ 605 01b2 0346     		mov	r3, r0
+ 606 01b4 FB71     		strb	r3, [r7, #7]
+ 166:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    scheduler_push_task(cjoin_task_cb,TASKPRIO_COAP);
+ 607              		.loc 1 166 0
+ 608 01b6 0348     		ldr	r0, .L20
+ 609 01b8 0621     		movs	r1, #6
+ 610 01ba FFF7FEFF 		bl	scheduler_push_task
+ 167:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 611              		.loc 1 167 0
+ 612 01be 0837     		adds	r7, r7, #8
+ 613              		.cfi_def_cfa_offset 8
+ 614 01c0 BD46     		mov	sp, r7
+ 615              		.cfi_def_cfa_register 13
+ 616              		@ sp needed
+ 617 01c2 80BD     		pop	{r7, pc}
+ 618              	.L21:
+ 619              		.align	2
+ 620              	.L20:
+ 621 01c4 00000000 		.word	cjoin_task_cb
+ 622              		.cfi_endproc
+ 623              	.LFE4:
+ 625              		.align	2
+ 626              		.global	cjoin_retransmission_cb
+ 627              		.thumb
+ 628              		.thumb_func
+ 630              	cjoin_retransmission_cb:
+ 631              	.LFB5:
+ 168:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 169:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_retransmission_cb(opentimers_id_t id) {
+ 632              		.loc 1 169 0
+ 633              		.cfi_startproc
+ 634              		@ args = 0, pretend = 0, frame = 8
+ 635              		@ frame_needed = 1, uses_anonymous_args = 0
+ 636 01c8 80B5     		push	{r7, lr}
+ 637              		.cfi_def_cfa_offset 8
+ 638              		.cfi_offset 7, -8
+ 639              		.cfi_offset 14, -4
+ 640 01ca 82B0     		sub	sp, sp, #8
+ 641              		.cfi_def_cfa_offset 16
+ 642 01cc 00AF     		add	r7, sp, #0
+ 643              		.cfi_def_cfa_register 7
+ 644 01ce 0346     		mov	r3, r0
+ 645 01d0 FB71     		strb	r3, [r7, #7]
+ 170:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     scheduler_push_task(cjoin_retransmission_task_cb, TASKPRIO_COAP);
+ 646              		.loc 1 170 0
+ 647 01d2 0348     		ldr	r0, .L23
+ 648 01d4 0621     		movs	r1, #6
+ 649 01d6 FFF7FEFF 		bl	scheduler_push_task
+ 171:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 650              		.loc 1 171 0
+ 651 01da 0837     		adds	r7, r7, #8
+ 652              		.cfi_def_cfa_offset 8
+ 653 01dc BD46     		mov	sp, r7
+ 654              		.cfi_def_cfa_register 13
+ 655              		@ sp needed
+ 656 01de 80BD     		pop	{r7, pc}
+ 657              	.L24:
+ 658              		.align	2
+ 659              	.L23:
+ 660 01e0 00000000 		.word	cjoin_retransmission_task_cb
+ 661              		.cfi_endproc
+ 662              	.LFE5:
+ 664              		.align	2
+ 665              		.global	cjoin_retransmission_task_cb
+ 666              		.thumb
+ 667              		.thumb_func
+ 669              	cjoin_retransmission_task_cb:
+ 670              	.LFB6:
+ 172:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 173:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_retransmission_task_cb(void) {
+ 671              		.loc 1 173 0
+ 672              		.cfi_startproc
+ 673              		@ args = 0, pretend = 0, frame = 8
+ 674              		@ frame_needed = 1, uses_anonymous_args = 0
+ 675 01e4 80B5     		push	{r7, lr}
+ 676              		.cfi_def_cfa_offset 8
+ 677              		.cfi_offset 7, -8
+ 678              		.cfi_offset 14, -4
+ 679 01e6 82B0     		sub	sp, sp, #8
+ 680              		.cfi_def_cfa_offset 16
+ 681 01e8 00AF     		add	r7, sp, #0
+ 682              		.cfi_def_cfa_register 7
+ 174:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     open_addr_t* joinProxy;
+ 175:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 176:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     joinProxy = neighbors_getJoinProxy();
+ 683              		.loc 1 176 0
+ 684 01ea FFF7FEFF 		bl	neighbors_getJoinProxy
+ 685 01ee 7860     		str	r0, [r7, #4]
+ 177:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if(joinProxy == NULL) {
+ 686              		.loc 1 177 0
+ 687 01f0 7B68     		ldr	r3, [r7, #4]
+ 688 01f2 002B     		cmp	r3, #0
+ 689 01f4 06D1     		bne	.L26
+ 178:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       openserial_printError(
+ 690              		.loc 1 178 0
+ 691 01f6 2720     		movs	r0, #39
+ 692 01f8 4921     		movs	r1, #73
+ 693 01fa 0022     		movs	r2, #0
+ 694 01fc 0023     		movs	r3, #0
+ 695 01fe FFF7FEFF 		bl	openserial_printError
+ 179:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          COMPONENT_CJOIN,
+ 180:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          ERR_ABORT_JOIN_PROCESS,
+ 181:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          (errorparameter_t)0,
+ 182:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          (errorparameter_t)0
+ 183:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       );
+ 184:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         return;
+ 696              		.loc 1 184 0
+ 697 0202 02E0     		b	.L25
+ 698              	.L26:
+ 185:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 186:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 187:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     cjoin_sendJoinRequest(joinProxy);
+ 699              		.loc 1 187 0
+ 700 0204 7868     		ldr	r0, [r7, #4]
+ 701 0206 FFF7FEFF 		bl	cjoin_sendJoinRequest
+ 702              	.L25:
+ 188:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 703              		.loc 1 188 0
+ 704 020a 0837     		adds	r7, r7, #8
+ 705              		.cfi_def_cfa_offset 8
+ 706 020c BD46     		mov	sp, r7
+ 707              		.cfi_def_cfa_register 13
+ 708              		@ sp needed
+ 709 020e 80BD     		pop	{r7, pc}
+ 710              		.cfi_endproc
+ 711              	.LFE6:
+ 713              		.align	2
+ 714              		.global	cjoin_task_cb
+ 715              		.thumb
+ 716              		.thumb_func
+ 718              	cjoin_task_cb:
+ 719              	.LFB7:
+ 189:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 190:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_task_cb(void) {
+ 720              		.loc 1 190 0
+ 721              		.cfi_startproc
+ 722              		@ args = 0, pretend = 0, frame = 8
+ 723              		@ frame_needed = 1, uses_anonymous_args = 0
+ 724 0210 80B5     		push	{r7, lr}
+ 725              		.cfi_def_cfa_offset 8
+ 726              		.cfi_offset 7, -8
+ 727              		.cfi_offset 14, -4
+ 728 0212 82B0     		sub	sp, sp, #8
+ 729              		.cfi_def_cfa_offset 16
+ 730 0214 00AF     		add	r7, sp, #0
+ 731              		.cfi_def_cfa_register 7
+ 191:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     open_addr_t *joinProxy;
+ 192:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 193:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // don't run if not synch
+ 194:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (ieee154e_isSynch() == FALSE) return;
+ 732              		.loc 1 194 0
+ 733 0216 FFF7FEFF 		bl	ieee154e_isSynch
+ 734 021a 0346     		mov	r3, r0
+ 735 021c 83F00103 		eor	r3, r3, #1
+ 736 0220 DBB2     		uxtb	r3, r3
+ 737 0222 002B     		cmp	r3, #0
+ 738 0224 00D0     		beq	.L29
+ 739 0226 1CE0     		b	.L28
+ 740              	.L29:
+ 195:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 196:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // don't run if DAG root
+ 197:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (idmanager_getIsDAGroot() == TRUE) {
+ 741              		.loc 1 197 0
+ 742 0228 FFF7FEFF 		bl	idmanager_getIsDAGroot
+ 743 022c 0346     		mov	r3, r0
+ 744 022e 002B     		cmp	r3, #0
+ 745 0230 06D0     		beq	.L31
+ 198:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         opentimers_destroy(cjoin_vars.timerId);
+ 746              		.loc 1 198 0
+ 747 0232 0D4B     		ldr	r3, .L33
+ 748 0234 93F83830 		ldrb	r3, [r3, #56]	@ zero_extendqisi2
+ 749 0238 1846     		mov	r0, r3
+ 750 023a FFF7FEFF 		bl	opentimers_destroy
+ 199:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         return;
+ 751              		.loc 1 199 0
+ 752 023e 10E0     		b	.L28
+ 753              	.L31:
+ 200:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 201:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 202:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     joinProxy = neighbors_getJoinProxy();
+ 754              		.loc 1 202 0
+ 755 0240 FFF7FEFF 		bl	neighbors_getJoinProxy
+ 756 0244 7860     		str	r0, [r7, #4]
+ 203:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if(joinProxy == NULL) {
+ 757              		.loc 1 203 0
+ 758 0246 7B68     		ldr	r3, [r7, #4]
+ 759 0248 002B     		cmp	r3, #0
+ 760 024a 00D1     		bne	.L32
+ 204:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         return;
+ 761              		.loc 1 204 0 discriminator 2
+ 762 024c 09E0     		b	.L28
+ 763              	.L32:
+ 205:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 206:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 207:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // cancel the startup timer but do not destroy it as we reuse it for retransmissions
+ 208:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     opentimers_cancel(cjoin_vars.timerId);
+ 764              		.loc 1 208 0
+ 765 024e 064B     		ldr	r3, .L33
+ 766 0250 93F83830 		ldrb	r3, [r3, #56]	@ zero_extendqisi2
+ 767 0254 1846     		mov	r0, r3
+ 768 0256 FFF7FEFF 		bl	opentimers_cancel
+ 209:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 210:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // init the security context only here in order to use the latest joinKey
+ 211:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // that may be set over the serial
+ 212:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //    cjoin_init_security_context();
+ 213:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 214:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     cjoin_sendJoinRequest(joinProxy);
+ 769              		.loc 1 214 0
+ 770 025a 7868     		ldr	r0, [r7, #4]
+ 771 025c FFF7FEFF 		bl	cjoin_sendJoinRequest
+ 215:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 216:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     return;
+ 772              		.loc 1 216 0
+ 773 0260 00BF     		nop
+ 774              	.L28:
+ 217:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 775              		.loc 1 217 0
+ 776 0262 0837     		adds	r7, r7, #8
+ 777              		.cfi_def_cfa_offset 8
+ 778 0264 BD46     		mov	sp, r7
+ 779              		.cfi_def_cfa_register 13
+ 780              		@ sp needed
+ 781 0266 80BD     		pop	{r7, pc}
+ 782              	.L34:
+ 783              		.align	2
+ 784              	.L33:
+ 785 0268 00000000 		.word	cjoin_vars
+ 786              		.cfi_endproc
+ 787              	.LFE7:
+ 789              		.align	2
+ 790              		.global	cjoin_sendDone
+ 791              		.thumb
+ 792              		.thumb_func
+ 794              	cjoin_sendDone:
+ 795              	.LFB8:
+ 218:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 219:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
+ 796              		.loc 1 219 0
+ 797              		.cfi_startproc
+ 798              		@ args = 0, pretend = 0, frame = 8
+ 799              		@ frame_needed = 1, uses_anonymous_args = 0
+ 800 026c 80B5     		push	{r7, lr}
+ 801              		.cfi_def_cfa_offset 8
+ 802              		.cfi_offset 7, -8
+ 803              		.cfi_offset 14, -4
+ 804 026e 82B0     		sub	sp, sp, #8
+ 805              		.cfi_def_cfa_offset 16
+ 806 0270 00AF     		add	r7, sp, #0
+ 807              		.cfi_def_cfa_register 7
+ 808 0272 7860     		str	r0, [r7, #4]
+ 809 0274 0B46     		mov	r3, r1
+ 810 0276 FB70     		strb	r3, [r7, #3]
+ 220:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    openqueue_freePacketBuffer(msg);
+ 811              		.loc 1 220 0
+ 812 0278 7868     		ldr	r0, [r7, #4]
+ 813 027a FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 221:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 814              		.loc 1 221 0
+ 815 027e 0837     		adds	r7, r7, #8
+ 816              		.cfi_def_cfa_offset 8
+ 817 0280 BD46     		mov	sp, r7
+ 818              		.cfi_def_cfa_register 13
+ 819              		@ sp needed
+ 820 0282 80BD     		pop	{r7, pc}
+ 821              		.cfi_endproc
+ 822              	.LFE8:
+ 824              		.align	2
+ 825              		.global	cjoin_sendJoinRequest
+ 826              		.thumb
+ 827              		.thumb_func
+ 829              	cjoin_sendJoinRequest:
+ 830              	.LFB9:
+ 222:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 223:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** owerror_t cjoin_sendJoinRequest(open_addr_t* joinProxy) {
+ 831              		.loc 1 223 0
+ 832              		.cfi_startproc
+ 833              		@ args = 0, pretend = 0, frame = 80
+ 834              		@ frame_needed = 1, uses_anonymous_args = 0
+ 835 0284 80B5     		push	{r7, lr}
+ 836              		.cfi_def_cfa_offset 8
+ 837              		.cfi_offset 7, -8
+ 838              		.cfi_offset 14, -4
+ 839 0286 98B0     		sub	sp, sp, #96
+ 840              		.cfi_def_cfa_offset 104
+ 841 0288 04AF     		add	r7, sp, #16
+ 842              		.cfi_def_cfa 7, 88
+ 843 028a 7860     		str	r0, [r7, #4]
+ 224:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    OpenQueueEntry_t*            pkt;
+ 225:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    owerror_t                    outcome;
+ 226:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    coap_option_iht              options[5];
+ 227:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t                      tmp[10];
+ 228:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    uint8_t                      payload_len;
+ 229:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cojp_join_request_object_t   join_request;
+ 230:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 231:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    payload_len = 0;
+ 844              		.loc 1 231 0
+ 845 028c 0023     		movs	r3, #0
+ 846 028e 87F84F30 		strb	r3, [r7, #79]
+ 232:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 233:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // immediately arm the retransmission timer
+ 234:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     opentimers_scheduleIn(cjoin_vars.timerId,
+ 847              		.loc 1 234 0
+ 848 0292 514B     		ldr	r3, .L41
+ 849 0294 93F83820 		ldrb	r2, [r3, #56]	@ zero_extendqisi2
+ 850 0298 504B     		ldr	r3, .L41+4
+ 851 029a 0093     		str	r3, [sp]
+ 852 029c 1046     		mov	r0, r2
+ 853 029e 4EF66021 		movw	r1, #60000
+ 854 02a2 0022     		movs	r2, #0
+ 855 02a4 0123     		movs	r3, #1
+ 856 02a6 FFF7FEFF 		bl	opentimers_scheduleIn
+ 235:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             (uint32_t) TIMEOUT,
+ 236:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             TIME_MS,
+ 237:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             TIMER_ONESHOT,
+ 238:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****             cjoin_retransmission_cb
+ 239:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     );
+ 240:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 241:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // create a CoAP RD packet
+ 242:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt = openqueue_getFreePacketBuffer(COMPONENT_CJOIN);
+ 857              		.loc 1 242 0
+ 858 02aa 2720     		movs	r0, #39
+ 859 02ac FFF7FEFF 		bl	openqueue_getFreePacketBuffer
+ 860 02b0 B864     		str	r0, [r7, #72]
+ 243:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    if (pkt==NULL) {
+ 861              		.loc 1 243 0
+ 862 02b2 BB6C     		ldr	r3, [r7, #72]
+ 863 02b4 002B     		cmp	r3, #0
+ 864 02b6 07D1     		bne	.L37
+ 244:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       openserial_printError(
+ 865              		.loc 1 244 0
+ 866 02b8 2720     		movs	r0, #39
+ 867 02ba 2C21     		movs	r1, #44
+ 868 02bc 0022     		movs	r2, #0
+ 869 02be 0023     		movs	r3, #0
+ 870 02c0 FFF7FEFF 		bl	openserial_printError
+ 245:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          COMPONENT_CJOIN,
+ 246:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          ERR_NO_FREE_PACKET_BUFFER,
+ 247:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          (errorparameter_t)0,
+ 248:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****          (errorparameter_t)0
+ 249:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       );
+ 250:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       return E_FAIL;
+ 871              		.loc 1 250 0
+ 872 02c4 0123     		movs	r3, #1
+ 873 02c6 82E0     		b	.L40
+ 874              	.L37:
+ 251:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    }
+ 252:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // take ownership over that packet
+ 253:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->creator                   = COMPONENT_CJOIN;
+ 875              		.loc 1 253 0
+ 876 02c8 BB6C     		ldr	r3, [r7, #72]
+ 877 02ca 2722     		movs	r2, #39
+ 878 02cc 1A70     		strb	r2, [r3]
+ 254:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->owner                     = COMPONENT_CJOIN;
+ 879              		.loc 1 254 0
+ 880 02ce BB6C     		ldr	r3, [r7, #72]
+ 881 02d0 2722     		movs	r2, #39
+ 882 02d2 5A70     		strb	r2, [r3, #1]
+ 255:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 256:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // uri-host set to 6tisch.arpa
+ 257:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[0].type = COAP_OPTION_NUM_URIHOST;
+ 883              		.loc 1 257 0
+ 884 02d4 0323     		movs	r3, #3
+ 885 02d6 3B77     		strb	r3, [r7, #28]
+ 258:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[0].length = sizeof(jrcHostName)-1;
+ 886              		.loc 1 258 0
+ 887 02d8 0B23     		movs	r3, #11
+ 888 02da 7B77     		strb	r3, [r7, #29]
+ 259:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[0].pValue = (uint8_t *)jrcHostName;
+ 889              		.loc 1 259 0
+ 890 02dc 404B     		ldr	r3, .L41+8
+ 891 02de 3B62     		str	r3, [r7, #32]
+ 260:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 261:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // location-path option
+ 262:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[1].type = COAP_OPTION_NUM_URIPATH;
+ 892              		.loc 1 262 0
+ 893 02e0 0B23     		movs	r3, #11
+ 894 02e2 87F82430 		strb	r3, [r7, #36]
+ 263:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[1].length = sizeof(cjoin_path0)-1;
+ 895              		.loc 1 263 0
+ 896 02e6 0123     		movs	r3, #1
+ 897 02e8 87F82530 		strb	r3, [r7, #37]
+ 264:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[1].pValue = (uint8_t *)cjoin_path0;
+ 898              		.loc 1 264 0
+ 899 02ec 3D4B     		ldr	r3, .L41+12
+ 900 02ee BB62     		str	r3, [r7, #40]
+ 265:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 266:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // object security option
+ 267:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // length and value are set by the CoAP library
+ 268:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** //   options[2].type = COAP_OPTION_NUM_OBJECTSECURITY;
+ 269:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 270:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // FIXME content format is needed for testing with F-Interop
+ 271:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    cjoin_vars.medType = COAP_MEDTYPE_APPCBOR;
+ 901              		.loc 1 271 0
+ 902 02f0 394B     		ldr	r3, .L41
+ 903 02f2 3C22     		movs	r2, #60
+ 904 02f4 83F89820 		strb	r2, [r3, #152]
+ 272:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[2].type = COAP_OPTION_NUM_CONTENTFORMAT;
+ 905              		.loc 1 272 0
+ 906 02f8 0C23     		movs	r3, #12
+ 907 02fa 87F82C30 		strb	r3, [r7, #44]
+ 273:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[2].length = 1;
+ 908              		.loc 1 273 0
+ 909 02fe 0123     		movs	r3, #1
+ 910 0300 87F82D30 		strb	r3, [r7, #45]
+ 274:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[2].pValue = &cjoin_vars.medType;
+ 911              		.loc 1 274 0
+ 912 0304 384B     		ldr	r3, .L41+16
+ 913 0306 3B63     		str	r3, [r7, #48]
+ 275:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 276:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // ProxyScheme set to "coap"
+ 277:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[3].type = COAP_OPTION_NUM_PROXYSCHEME;
+ 914              		.loc 1 277 0
+ 915 0308 2723     		movs	r3, #39
+ 916 030a 87F83430 		strb	r3, [r7, #52]
+ 278:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[3].length = sizeof(proxyScheme)-1;
+ 917              		.loc 1 278 0
+ 918 030e 0423     		movs	r3, #4
+ 919 0310 87F83530 		strb	r3, [r7, #53]
+ 279:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    options[3].pValue = (uint8_t *)proxyScheme;
+ 920              		.loc 1 279 0
+ 921 0314 354B     		ldr	r3, .L41+20
+ 922 0316 BB63     		str	r3, [r7, #56]
+ 280:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 281:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // metadata
+ 282:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->l4_destination_port       = WKP_UDP_COAP;
+ 923              		.loc 1 282 0
+ 924 0318 BB6C     		ldr	r3, [r7, #72]
+ 925 031a 41F23362 		movw	r2, #5683
+ 926 031e 5A82     		strh	r2, [r3, #18]	@ movhi
+ 283:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->l3_destinationAdd.type    = ADDR_128B;
+ 927              		.loc 1 283 0
+ 928 0320 BB6C     		ldr	r3, [r7, #72]
+ 929 0322 0322     		movs	r2, #3
+ 930 0324 5A76     		strb	r2, [r3, #25]
+ 284:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->l3_destinationAdd.addr_128b[0] = 0xfe;
+ 931              		.loc 1 284 0
+ 932 0326 BB6C     		ldr	r3, [r7, #72]
+ 933 0328 FE22     		movs	r2, #254
+ 934 032a 9A76     		strb	r2, [r3, #26]
+ 285:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    pkt->l3_destinationAdd.addr_128b[1] = 0x80;
+ 935              		.loc 1 285 0
+ 936 032c BB6C     		ldr	r3, [r7, #72]
+ 937 032e 8022     		movs	r2, #128
+ 938 0330 DA76     		strb	r2, [r3, #27]
+ 286:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    memset(&pkt->l3_destinationAdd.addr_128b[2], 0x00, 6);
+ 939              		.loc 1 286 0
+ 940 0332 BB6C     		ldr	r3, [r7, #72]
+ 941 0334 1C33     		adds	r3, r3, #28
+ 942 0336 1846     		mov	r0, r3
+ 943 0338 0021     		movs	r1, #0
+ 944 033a 0622     		movs	r2, #6
+ 945 033c FFF7FEFF 		bl	memset
+ 287:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    memcpy(&pkt->l3_destinationAdd.addr_128b[8],joinProxy->addr_64b,8); // set host to eui-64 of the
+ 946              		.loc 1 287 0
+ 947 0340 BB6C     		ldr	r3, [r7, #72]
+ 948 0342 03F12202 		add	r2, r3, #34
+ 949 0346 7B68     		ldr	r3, [r7, #4]
+ 950 0348 0133     		adds	r3, r3, #1
+ 951 034a 1046     		mov	r0, r2
+ 952 034c 1946     		mov	r1, r3
+ 953 034e 0822     		movs	r2, #8
+ 954 0350 FFF7FEFF 		bl	memcpy
+ 288:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 289:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // encode Join_Request object in the payload
+ 290:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    join_request.role = COJP_ROLE_VALUE_6N; // regular non-6LBR node
+ 955              		.loc 1 290 0
+ 956 0354 0023     		movs	r3, #0
+ 957 0356 3B72     		strb	r3, [r7, #8]
+ 291:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    join_request.pan_id = idmanager_getMyID(ADDR_PANID); // pre-configured PAN ID
+ 958              		.loc 1 291 0
+ 959 0358 0420     		movs	r0, #4
+ 960 035a FFF7FEFF 		bl	idmanager_getMyID
+ 961 035e 0346     		mov	r3, r0
+ 962 0360 FB60     		str	r3, [r7, #12]
+ 292:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    payload_len = cojp_cbor_encode_join_request_object(tmp, &join_request);
+ 963              		.loc 1 292 0
+ 964 0362 07F11002 		add	r2, r7, #16
+ 965 0366 07F10803 		add	r3, r7, #8
+ 966 036a 1046     		mov	r0, r2
+ 967 036c 1946     		mov	r1, r3
+ 968 036e FFF7FEFF 		bl	cojp_cbor_encode_join_request_object
+ 969 0372 0346     		mov	r3, r0
+ 970 0374 87F84F30 		strb	r3, [r7, #79]
+ 293:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    packetfunctions_reserveHeaderSize(pkt, payload_len);
+ 971              		.loc 1 293 0
+ 972 0378 97F84F30 		ldrb	r3, [r7, #79]	@ zero_extendqisi2
+ 973 037c B86C     		ldr	r0, [r7, #72]
+ 974 037e 1946     		mov	r1, r3
+ 975 0380 FFF7FEFF 		bl	packetfunctions_reserveHeaderSize
+ 294:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    memcpy(pkt->payload, tmp, payload_len);
+ 976              		.loc 1 294 0
+ 977 0384 BB6C     		ldr	r3, [r7, #72]
+ 978 0386 5968     		ldr	r1, [r3, #4]
+ 979 0388 97F84F30 		ldrb	r3, [r7, #79]	@ zero_extendqisi2
+ 980 038c 07F11002 		add	r2, r7, #16
+ 981 0390 0846     		mov	r0, r1
+ 982 0392 1146     		mov	r1, r2
+ 983 0394 1A46     		mov	r2, r3
+ 984 0396 FFF7FEFF 		bl	memcpy
+ 295:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 296:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // send
+ 297:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    outcome = opencoap_send(
+ 985              		.loc 1 297 0
+ 986 039a 07F11C03 		add	r3, r7, #28
+ 987 039e 0093     		str	r3, [sp]
+ 988 03a0 0423     		movs	r3, #4
+ 989 03a2 0193     		str	r3, [sp, #4]
+ 990 03a4 0C4B     		ldr	r3, .L41
+ 991 03a6 0293     		str	r3, [sp, #8]
+ 992 03a8 B86C     		ldr	r0, [r7, #72]
+ 993 03aa 0121     		movs	r1, #1
+ 994 03ac 0222     		movs	r2, #2
+ 995 03ae 0023     		movs	r3, #0
+ 996 03b0 FFF7FEFF 		bl	opencoap_send
+ 997 03b4 0346     		mov	r3, r0
+ 998 03b6 87F84730 		strb	r3, [r7, #71]
+ 298:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       pkt,
+ 299:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       COAP_TYPE_NON,
+ 300:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       COAP_CODE_REQ_POST,
+ 301:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       0, // token len
+ 302:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       options,
+ 303:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       4, // options len
+ 304:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       &cjoin_vars.desc
+ 305:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    );
+ 306:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 307:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    // avoid overflowing the queue if fails
+ 308:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    if (outcome==E_FAIL) {
+ 999              		.loc 1 308 0
+ 1000 03ba 97F84730 		ldrb	r3, [r7, #71]	@ zero_extendqisi2
+ 1001 03be 012B     		cmp	r3, #1
+ 1002 03c0 04D1     		bne	.L39
+ 309:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       openqueue_freePacketBuffer(pkt);
+ 1003              		.loc 1 309 0
+ 1004 03c2 B86C     		ldr	r0, [r7, #72]
+ 1005 03c4 FFF7FEFF 		bl	openqueue_freePacketBuffer
+ 310:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****       return E_FAIL;
+ 1006              		.loc 1 310 0
+ 1007 03c8 0123     		movs	r3, #1
+ 1008 03ca 00E0     		b	.L40
+ 1009              	.L39:
+ 311:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    }
+ 312:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 313:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****   return E_SUCCESS;
+ 1010              		.loc 1 313 0
+ 1011 03cc 0023     		movs	r3, #0
+ 1012              	.L40:
+ 314:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 1013              		.loc 1 314 0 discriminator 1
+ 1014 03ce 1846     		mov	r0, r3
+ 1015 03d0 5037     		adds	r7, r7, #80
+ 1016              		.cfi_def_cfa_offset 8
+ 1017 03d2 BD46     		mov	sp, r7
+ 1018              		.cfi_def_cfa_register 13
+ 1019              		@ sp needed
+ 1020 03d4 80BD     		pop	{r7, pc}
+ 1021              	.L42:
+ 1022 03d6 00BF     		.align	2
+ 1023              	.L41:
+ 1024 03d8 00000000 		.word	cjoin_vars
+ 1025 03dc 00000000 		.word	cjoin_retransmission_cb
+ 1026 03e0 D8000000 		.word	jrcHostName
+ 1027 03e4 00000000 		.word	cjoin_path0
+ 1028 03e8 98000000 		.word	cjoin_vars+152
+ 1029 03ec E4000000 		.word	proxyScheme
+ 1030              		.cfi_endproc
+ 1031              	.LFE9:
+ 1033              		.align	2
+ 1034              		.global	cjoin_getIsJoined
+ 1035              		.thumb
+ 1036              		.thumb_func
+ 1038              	cjoin_getIsJoined:
+ 1039              	.LFB10:
+ 315:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 316:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** bool cjoin_getIsJoined(void) {
+ 1040              		.loc 1 316 0
+ 1041              		.cfi_startproc
+ 1042              		@ args = 0, pretend = 0, frame = 8
+ 1043              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1044 03f0 80B5     		push	{r7, lr}
+ 1045              		.cfi_def_cfa_offset 8
+ 1046              		.cfi_offset 7, -8
+ 1047              		.cfi_offset 14, -4
+ 1048 03f2 82B0     		sub	sp, sp, #8
+ 1049              		.cfi_def_cfa_offset 16
+ 1050 03f4 00AF     		add	r7, sp, #0
+ 1051              		.cfi_def_cfa_register 7
+ 317:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    bool res;
+ 318:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    INTERRUPT_DECLARATION();
+ 319:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 320:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    DISABLE_INTERRUPTS();
+ 1052              		.loc 1 320 0
+ 1053 03f6 FFF7FEFF 		bl	IntMasterDisable
+ 321:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    res=cjoin_vars.isJoined;
+ 1054              		.loc 1 321 0
+ 1055 03fa 054B     		ldr	r3, .L45
+ 1056 03fc 93F83930 		ldrb	r3, [r3, #57]
+ 1057 0400 FB71     		strb	r3, [r7, #7]
+ 322:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    ENABLE_INTERRUPTS();
+ 1058              		.loc 1 322 0
+ 1059 0402 FFF7FEFF 		bl	IntMasterEnable
+ 323:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 324:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****    return res;
+ 1060              		.loc 1 324 0
+ 1061 0406 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 325:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 1062              		.loc 1 325 0
+ 1063 0408 1846     		mov	r0, r3
+ 1064 040a 0837     		adds	r7, r7, #8
+ 1065              		.cfi_def_cfa_offset 8
+ 1066 040c BD46     		mov	sp, r7
+ 1067              		.cfi_def_cfa_register 13
+ 1068              		@ sp needed
+ 1069 040e 80BD     		pop	{r7, pc}
+ 1070              	.L46:
+ 1071              		.align	2
+ 1072              	.L45:
+ 1073 0410 00000000 		.word	cjoin_vars
+ 1074              		.cfi_endproc
+ 1075              	.LFE10:
+ 1077              		.align	2
+ 1078              		.global	cjoin_setIsJoined
+ 1079              		.thumb
+ 1080              		.thumb_func
+ 1082              	cjoin_setIsJoined:
+ 1083              	.LFB11:
+ 326:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 327:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** void cjoin_setIsJoined(bool newValue) {
+ 1084              		.loc 1 327 0
+ 1085              		.cfi_startproc
+ 1086              		@ args = 0, pretend = 0, frame = 24
+ 1087              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1088 0414 80B5     		push	{r7, lr}
+ 1089              		.cfi_def_cfa_offset 8
+ 1090              		.cfi_offset 7, -8
+ 1091              		.cfi_offset 14, -4
+ 1092 0416 86B0     		sub	sp, sp, #24
+ 1093              		.cfi_def_cfa_offset 32
+ 1094 0418 00AF     		add	r7, sp, #0
+ 1095              		.cfi_def_cfa_register 7
+ 1096 041a 0346     		mov	r3, r0
+ 1097 041c FB71     		strb	r3, [r7, #7]
+ 328:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     uint8_t array[5];
+ 329:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     asn_t joinAsn;
+ 330:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 331:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (cjoin_vars.isJoined == newValue) {
+ 1098              		.loc 1 331 0
+ 1099 041e 1B4B     		ldr	r3, .L51
+ 1100 0420 93F83930 		ldrb	r3, [r3, #57]	@ zero_extendqisi2
+ 1101 0424 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 1102 0426 9A42     		cmp	r2, r3
+ 1103 0428 2CD0     		beq	.L47
+ 332:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         return;
+ 333:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 334:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 335:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     cjoin_vars.isJoined = newValue;
+ 1104              		.loc 1 335 0
+ 1105 042a 184A     		ldr	r2, .L51
+ 1106 042c FB79     		ldrb	r3, [r7, #7]
+ 1107 042e 82F83930 		strb	r3, [r2, #57]
+ 336:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 337:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     // Update Join ASN value
+ 338:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     ieee154e_getAsn(array);
+ 1108              		.loc 1 338 0
+ 1109 0432 07F11003 		add	r3, r7, #16
+ 1110 0436 1846     		mov	r0, r3
+ 1111 0438 FFF7FEFF 		bl	ieee154e_getAsn
+ 339:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     joinAsn.bytes0and1           = ((uint16_t) array[1] << 8) | ((uint16_t) array[0]);
+ 1112              		.loc 1 339 0
+ 1113 043c 7B7C     		ldrb	r3, [r7, #17]	@ zero_extendqisi2
+ 1114 043e 1B02     		lsls	r3, r3, #8
+ 1115 0440 9AB2     		uxth	r2, r3
+ 1116 0442 3B7C     		ldrb	r3, [r7, #16]	@ zero_extendqisi2
+ 1117 0444 9BB2     		uxth	r3, r3
+ 1118 0446 1343     		orrs	r3, r3, r2
+ 1119 0448 9BB2     		uxth	r3, r3
+ 1120 044a 9BB2     		uxth	r3, r3
+ 1121 044c A7F80B30 		strh	r3, [r7, #11]	@ unaligned
+ 340:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     joinAsn.bytes2and3           = ((uint16_t) array[3] << 8) | ((uint16_t) array[2]);
+ 1122              		.loc 1 340 0
+ 1123 0450 FB7C     		ldrb	r3, [r7, #19]	@ zero_extendqisi2
+ 1124 0452 1B02     		lsls	r3, r3, #8
+ 1125 0454 9AB2     		uxth	r2, r3
+ 1126 0456 BB7C     		ldrb	r3, [r7, #18]	@ zero_extendqisi2
+ 1127 0458 9BB2     		uxth	r3, r3
+ 1128 045a 1343     		orrs	r3, r3, r2
+ 1129 045c 9BB2     		uxth	r3, r3
+ 1130 045e 9BB2     		uxth	r3, r3
+ 1131 0460 A7F80930 		strh	r3, [r7, #9]	@ unaligned
+ 341:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     joinAsn.byte4                = array[4];
+ 1132              		.loc 1 341 0
+ 1133 0464 3B7D     		ldrb	r3, [r7, #20]	@ zero_extendqisi2
+ 1134 0466 3B72     		strb	r3, [r7, #8]
+ 342:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 343:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     idmanager_setJoinAsn(&joinAsn);
+ 1135              		.loc 1 343 0
+ 1136 0468 07F10803 		add	r3, r7, #8
+ 1137 046c 1846     		mov	r0, r3
+ 1138 046e FFF7FEFF 		bl	idmanager_setJoinAsn
+ 344:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** 
+ 345:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     if (newValue == TRUE) {
+ 1139              		.loc 1 345 0
+ 1140 0472 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1141 0474 002B     		cmp	r3, #0
+ 1142 0476 05D0     		beq	.L47
+ 346:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         // log the info
+ 347:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****         openserial_printInfo(COMPONENT_CJOIN, ERR_JOINED,
+ 1143              		.loc 1 347 0
+ 1144 0478 2720     		movs	r0, #39
+ 1145 047a 4421     		movs	r1, #68
+ 1146 047c 0022     		movs	r2, #0
+ 1147 047e 0023     		movs	r3, #0
+ 1148 0480 FFF7FEFF 		bl	openserial_printInfo
+ 1149              	.L47:
+ 348:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                              (errorparameter_t)0,
+ 349:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****                              (errorparameter_t)0);
+ 350:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c ****     }
+ 351:build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.c **** }
+ 1150              		.loc 1 351 0
+ 1151 0484 1837     		adds	r7, r7, #24
+ 1152              		.cfi_def_cfa_offset 8
+ 1153 0486 BD46     		mov	sp, r7
+ 1154              		.cfi_def_cfa_register 13
+ 1155              		@ sp needed
+ 1156 0488 80BD     		pop	{r7, pc}
+ 1157              	.L52:
+ 1158 048a 00BF     		.align	2
+ 1159              	.L51:
+ 1160 048c 00000000 		.word	cjoin_vars
+ 1161              		.cfi_endproc
+ 1162              	.LFE11:
+ 1164              	.Letext0:
+ 1165              		.file 2 "/usr/include/newlib/machine/_default_types.h"
+ 1166              		.file 3 "/usr/include/newlib/sys/_stdint.h"
+ 1167              		.file 4 "inc/opendefs.h"
+ 1168              		.file 5 "drivers/common/opentimers.h"
+ 1169              		.file 6 "openapps/opencoap/opencoap.h"
+ 1170              		.file 7 "build/openmote-cc2538_armgcc/openapps/cjoin/cjoin.h"
+ 1171              		.file 8 "kernel/scheduler.h"
+ 1172              		.file 9 "build/openmote-cc2538_armgcc/openapps/cjoin/cojp_cbor.h"
+ 1173              		.file 10 "bsp/boards/openmote-cc2538/board_info.h"
+ 1174              		.file 11 "openstack/cross-layers/idmanager.h"
+ 1175              		.file 12 "openstack/02a-MAClow/IEEE802154E.h"
+ 1176              		.file 13 "openstack/03b-IPv6/icmpv6rpl.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 cjoin.c
+     /tmp/ccZsXP7t.s:19     .rodata:0000000000000000 $d
+     /tmp/ccZsXP7t.s:22     .rodata:0000000000000000 rreg_uriquery
+     /tmp/ccZsXP7t.s:27     .rodata:0000000000000008 infoBoardname
+     /tmp/ccZsXP7t.s:32     .rodata:0000000000000010 infouCName
+     /tmp/ccZsXP7t.s:37     .rodata:0000000000000018 infoRadioName
+     /tmp/ccZsXP7t.s:42     .rodata:0000000000000024 infoStackName
+     /tmp/ccZsXP7t.s:47     .rodata:0000000000000030 ipAddr_ipsoRD
+     /tmp/ccZsXP7t.s:67     .rodata:0000000000000040 ipAddr_motesEecs
+     /tmp/ccZsXP7t.s:87     .rodata:0000000000000050 ipAddr_local
+     /tmp/ccZsXP7t.s:107    .rodata:0000000000000060 ipAddr_motedata
+     /tmp/ccZsXP7t.s:127    .rodata:0000000000000070 ipAddr_ringmaster
+     /tmp/ccZsXP7t.s:147    .rodata:0000000000000080 linklocalprefix
+     /tmp/ccZsXP7t.s:159    .rodata:0000000000000088 chTemplate_default
+     /tmp/ccZsXP7t.s:179    .rodata:0000000000000098 ebIEsBytestream
+     /tmp/ccZsXP7t.s:211    .rodata:00000000000000b4 all_routers_multicast
+     /tmp/ccZsXP7t.s:232    .rodata:00000000000000c4 cjoin_path0
+     /tmp/ccZsXP7t.s:237    .rodata:00000000000000c8 masterSecret
+     /tmp/ccZsXP7t.s:257    .rodata:00000000000000d8 jrcHostName
+     /tmp/ccZsXP7t.s:262    .rodata:00000000000000e4 proxyScheme
+                            *COM*:000000000000009c cjoin_vars
+     /tmp/ccZsXP7t.s:266    .text:0000000000000000 $t
+     /tmp/ccZsXP7t.s:271    .text:0000000000000000 cjoin_init
+     /tmp/ccZsXP7t.s:429    .text:00000000000000d4 cjoin_schedule
+     /tmp/ccZsXP7t.s:345    .text:0000000000000068 $d
+     /tmp/ccZsXP7t.s:486    .text:0000000000000118 cjoin_receive
+     /tmp/ccZsXP7t.s:794    .text:000000000000026c cjoin_sendDone
+     /tmp/ccZsXP7t.s:353    .text:000000000000007c $t
+     /tmp/ccZsXP7t.s:358    .text:000000000000007c cjoin_init_security_context
+     /tmp/ccZsXP7t.s:420    .text:00000000000000d0 $d
+     /tmp/ccZsXP7t.s:424    .text:00000000000000d4 $t
+     /tmp/ccZsXP7t.s:1038   .text:00000000000003f0 cjoin_getIsJoined
+     /tmp/ccZsXP7t.s:476    .text:0000000000000110 $d
+     /tmp/ccZsXP7t.s:591    .text:00000000000001ac cjoin_timer_cb
+     /tmp/ccZsXP7t.s:481    .text:0000000000000118 $t
+     /tmp/ccZsXP7t.s:1082   .text:0000000000000414 cjoin_setIsJoined
+     /tmp/ccZsXP7t.s:582    .text:00000000000001a8 $d
+     /tmp/ccZsXP7t.s:586    .text:00000000000001ac $t
+     /tmp/ccZsXP7t.s:621    .text:00000000000001c4 $d
+     /tmp/ccZsXP7t.s:718    .text:0000000000000210 cjoin_task_cb
+     /tmp/ccZsXP7t.s:625    .text:00000000000001c8 $t
+     /tmp/ccZsXP7t.s:630    .text:00000000000001c8 cjoin_retransmission_cb
+     /tmp/ccZsXP7t.s:660    .text:00000000000001e0 $d
+     /tmp/ccZsXP7t.s:669    .text:00000000000001e4 cjoin_retransmission_task_cb
+     /tmp/ccZsXP7t.s:664    .text:00000000000001e4 $t
+     /tmp/ccZsXP7t.s:829    .text:0000000000000284 cjoin_sendJoinRequest
+     /tmp/ccZsXP7t.s:785    .text:0000000000000268 $d
+     /tmp/ccZsXP7t.s:789    .text:000000000000026c $t
+     /tmp/ccZsXP7t.s:1024   .text:00000000000003d8 $d
+     /tmp/ccZsXP7t.s:1033   .text:00000000000003f0 $t
+     /tmp/ccZsXP7t.s:1073   .text:0000000000000410 $d
+     /tmp/ccZsXP7t.s:1077   .text:0000000000000414 $t
+     /tmp/ccZsXP7t.s:1160   .text:000000000000048c $d
+                     .debug_frame:0000000000000010 $d
+                           .group:0000000000000000 wm4.0.c64f62fd52e22d94e2a6dd9c07eeb43e
+                           .group:0000000000000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:0000000000000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:0000000000000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:0000000000000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:0000000000000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:0000000000000000 wm4.toolchain_defs.h.2.e5fd326231d01413e5361944b26cde07
+                           .group:0000000000000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:0000000000000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:0000000000000000 wm4._ansi.h.23.84af8eb8cd468d25cc5f45f5eb13ec51
+                           .group:0000000000000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:0000000000000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:0000000000000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:0000000000000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:0000000000000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:0000000000000000 wm4.cdefs.h.47.e6563c1c3863188ba4ac4eaa2c85b6f1
+                           .group:0000000000000000 wm4.string.h.15.dab3980bf35408a4c507182805e2de3a
+                           .group:0000000000000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:0000000000000000 wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2
+                           .group:0000000000000000 wm4.hw_types.h.67.b10589a0806dcc2d274d6fab6b736519
+                           .group:0000000000000000 wm4.interrupt.h.41.272fc4ec0e276feb439e7974d0f77eaf
+                           .group:0000000000000000 wm4.board_info.h.22.b5c65365e76c8378df4f4b0ed59cbc39
+                           .group:0000000000000000 wm4.opendefs.h.23.47191652995b7fa35f12da40c3552cda
+                           .group:0000000000000000 wm4.opentimers.h.8.4ddb88466c5d61beaa6758270059ffcf
+                           .group:0000000000000000 wm4.opencoap.h.32.4fd89a1f25836020968932a0f7dffe46
+                           .group:0000000000000000 wm4.IEEE802154.h.2.38fb510ed33a23a9a0660164e6dfab69
+                           .group:0000000000000000 wm4.stdio.h.27.3fc80220048df77954e38daec3bb9670
+                           .group:0000000000000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:0000000000000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:0000000000000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:0000000000000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:0000000000000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:0000000000000000 wm4.stdio.h.68.a99a2db1e55915cfd1b035cc1e9fcff1
+                           .group:0000000000000000 wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949
+                           .group:0000000000000000 wm4.openserial.h.32.c1b1c4db184af4a79a2b8ff62d908d4d
+                           .group:0000000000000000 wm4.scheduler.h.2.d8d85f436d0d4b3991926a15b8490cf4
+                           .group:0000000000000000 wm4.idmanager.h.2.8c0e2159b32ef3125cbb1e984805cbfe
+                           .group:0000000000000000 wm4.schedule.h.2.1e56c0a55af41b0871de1bf3babafbff
+                           .group:0000000000000000 wm4.IEEE802154E.h.31.4df44943e63b807d05253db7aa10079f
+                           .group:0000000000000000 wm4.IEEE802154_security.h.35.26212369b49c5e0c3bd4f8181fa7153e
+                           .group:0000000000000000 wm4.cojp_cbor.h.2.360b1f24309a2b9f97d26a7c265620f2
+                           .group:0000000000000000 wm4.icmpv6rpl.h.2.f31802bcce2a0808bf5db39ce34f4322
+                           .group:0000000000000000 wm4.neighbors.h.15.2a77b1a66a5fa826e9ff514b195b0560
+
+UNDEFINED SYMBOLS
+IEEE802154_security_setDynamicKeying
+opencoap_register
+opentimers_create
+idmanager_setJoinKey
+eui64_get
+idmanager_getJoinKey
+openoscoap_init_security_context
+openrandom_get16b
+opentimers_scheduleIn
+opentimers_cancel
+cojp_cbor_decode_configuration_object
+IEEE802154_security_setBeaconKey
+IEEE802154_security_setDataKey
+scheduler_push_task
+neighbors_getJoinProxy
+openserial_printError
+ieee154e_isSynch
+idmanager_getIsDAGroot
+opentimers_destroy
+openqueue_freePacketBuffer
+openqueue_getFreePacketBuffer
+memset
+memcpy
+idmanager_getMyID
+cojp_cbor_encode_join_request_object
+packetfunctions_reserveHeaderSize
+opencoap_send
+IntMasterDisable
+IntMasterEnable
+ieee154e_getAsn
+idmanager_setJoinAsn
+openserial_printInfo
